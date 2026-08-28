@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 const VIDEO_SRC = "/api/hero-video";
 
@@ -70,7 +71,17 @@ export function HeroVideoBackground() {
       <div className="absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-emerald-400/10 blur-3xl" />
 
       {failed && (
-        <div className="absolute inset-0 bg-gradient-to-br from-forest via-emerald-900 to-emerald-800" />
+        <>
+          <div className="absolute inset-0 bg-gradient-to-br from-forest via-emerald-900 to-emerald-800" />
+          <div className="absolute bottom-24 left-1/2 z-20 w-full max-w-sm -translate-x-1/2 px-4">
+            <Link
+              href="/upload-video"
+              className="block rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-center text-sm text-white backdrop-blur-md transition-colors hover:bg-white/20"
+            >
+              Video non caricato — clicca qui per caricarlo
+            </Link>
+          </div>
+        </>
       )}
     </div>
   );

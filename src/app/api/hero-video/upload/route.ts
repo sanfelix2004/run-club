@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 export const maxDuration = 120;
 
 const FILENAME = "kling_20260828_VIDEO_Cinematic__4944_0.mp4";
-const MAX_BYTES = 100 * 1024 * 1024; // 100 MB
+const MAX_BYTES = 200 * 1024 * 1024; // 200 MB
 
 export async function POST(request: Request) {
   try {
@@ -21,16 +21,16 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!file.type.startsWith("video/") && !file.name.endsWith(".mp4")) {
+    if (!file.type.startsWith("video/") && !file.name.toLowerCase().endsWith(".mp4") && !file.name.toLowerCase().endsWith(".mov")) {
       return NextResponse.json(
-        { error: "Il file deve essere un video MP4." },
+        { error: "Il file deve essere un video (MP4 o MOV)." },
         { status: 400 },
       );
     }
 
     if (file.size > MAX_BYTES) {
       return NextResponse.json(
-        { error: "File troppo grande (max 100 MB)." },
+        { error: "File troppo grande (max 200 MB)." },
         { status: 400 },
       );
     }
