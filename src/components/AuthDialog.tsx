@@ -42,21 +42,12 @@ function GoogleIcon({ className }: { className?: string }) {
   );
 }
 
-function AppleIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-      <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-    </svg>
-  );
-}
-
 export function AuthDialog({ open, onOpenChange, defaultMode = "login" }: AuthDialogProps) {
   const [mode, setMode] = useState<AuthMode>(defaultMode);
   const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [oauthProviders, setOauthProviders] = useState<OAuthProviders>({
     google: false,
-    apple: false,
   });
 
   useEffect(() => {
@@ -81,18 +72,12 @@ export function AuthDialog({ open, onOpenChange, defaultMode = "login" }: AuthDi
     };
   }, [open, onOpenChange]);
 
-  const oauthNotConfigured =
-    !oauthProviders.google && !oauthProviders.apple;
+  const googleNotConfigured = !oauthProviders.google;
 
-  const handleOAuth = async (provider: "google" | "apple") => {
-    const providerEnabled =
-      provider === "google" ? oauthProviders.google : oauthProviders.apple;
-
-    if (!providerEnabled) {
+  const handleGoogleOAuth = async () => {
+    if (!oauthProviders.google) {
       toast.error(
-        provider === "google"
-          ? "Accesso con Google non ancora attivo. Usa email e password oppure chiedi allo staff di configurare OAuth."
-          : "Accesso con Apple non ancora attivo. Usa email e password oppure chiedi allo staff di configurare OAuth.",
+        "Accesso con Google non ancora attivo. Usa email e password oppure chiedi allo staff di configurare OAuth.",
         { duration: 5000 },
       );
       return;
@@ -100,7 +85,7 @@ export function AuthDialog({ open, onOpenChange, defaultMode = "login" }: AuthDi
 
     setLoading(true);
     try {
-      const result = await signIn(provider, {
+      const result = await signIn("google", {
         callbackUrl: window.location.href,
         redirect: false,
       });
@@ -115,16 +100,16 @@ export function AuthDialog({ open, onOpenChange, defaultMode = "login" }: AuthDi
       if (result?.error) {
         toast.error(
           result.error === "Configuration"
-            ? "Accesso social non configurato correttamente sul server."
-            : `Impossibile avviare l'accesso con ${provider === "google" ? "Google" : "Apple"}.`,
+            ? "Accesso con Google non configurato correttamente sul server."
+            : "Impossibile avviare l'accesso con Google.",
         );
         return;
       }
 
-      toast.error(`Impossibile avviare l'accesso con ${provider === "google" ? "Google" : "Apple"}.`);
+      toast.error("Impossibile avviare l'accesso con Google.");
     } catch {
       setLoading(false);
-      toast.error(`Impossibile accedere con ${provider === "google" ? "Google" : "Apple"}.`);
+      toast.error("Impossibile accedere con Google.");
     }
   };
 
@@ -232,26 +217,16 @@ export function AuthDialog({ open, onOpenChange, defaultMode = "login" }: AuthDi
             type="button"
             variant="outline"
             disabled={loading}
-            onClick={() => handleOAuth("google")}
-            className={`h-11 w-full rounded-xl border-emerald-100 ${!oauthProviders.google ? "opacity-70" : ""}`}
+            onClick={handleGoogleOAuth}
+            className={`h-11 w-full rounded-xl border-emerald-100 ${googleNotConfigured ? "opacity-70" : ""}`}
           >
             <GoogleIcon className="mr-2 h-5 w-5" />
             {loading ? "Reindirizzamento..." : "Continua con Google"}
           </Button>
-          <Button
-            type="button"
-            variant="outline"
-            disabled={loading}
-            onClick={() => handleOAuth("apple")}
-            className={`h-11 w-full rounded-xl border-emerald-100 ${!oauthProviders.apple ? "opacity-70" : ""}`}
-          >
-            <AppleIcon className="mr-2 h-5 w-5" />
-            {loading ? "Reindirizzamento..." : "Continua con Apple"}
-          </Button>
-          {oauthNotConfigured && (
+          {googleNotConfigured && (
             <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs leading-relaxed text-amber-900">
-              Google e Apple non sono ancora collegati a questo sito. Per ora usa{" "}
-              <strong>email e password</strong>. Per attivarli serve configurare le
+              Google non è ancora collegato a questo sito. Per ora usa{" "}
+              <strong>email e password</strong>. Per attivarlo serve configurare le
               credenziali OAuth nel file <code className="rounded bg-amber-100 px-1">.env</code>.
             </p>
           )}

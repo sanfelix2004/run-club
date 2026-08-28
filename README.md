@@ -22,7 +22,7 @@ Includes a full **registration & ticketing system** for weekly meetups with PDF 
 - €5 on-site payment flow (PENDING_PAYMENT → PAID_AND_CHECKED_IN)
 
 ### Area Atleta (`/area-atleta`)
-- Login with email/password, Google, or Apple ID
+- Login with email/password or Google
 - View profile data and event history
 - Stats: bookings, attended events, upcoming reservations
 
@@ -30,7 +30,7 @@ Includes a full **registration & ticketing system** for weekly meetups with PDF 
 - **Accedi / Registrati** buttons always visible in the navbar
 - Welcome popup on first visit for new users (dismissible)
 - Email + password registration
-- Google and Apple OAuth (configure env vars)
+- Google OAuth (configure env vars)
 - Session-linked event bookings
 
 - PIN-protected staff access (default: `runclub2026`)
@@ -76,8 +76,6 @@ Open [http://localhost:43123](http://localhost:43123) for the site.
 | `AUTH_URL` | App URL for OAuth callbacks | `http://localhost:43123` |
 | `AUTH_GOOGLE_ID` | Google OAuth client ID | optional |
 | `AUTH_GOOGLE_SECRET` | Google OAuth client secret | optional |
-| `AUTH_APPLE_ID` | Apple Sign In service ID | optional |
-| `AUTH_APPLE_SECRET` | Apple Sign In secret | optional |
 
 ### Google OAuth (local)
 
