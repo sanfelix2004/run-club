@@ -5,7 +5,7 @@
 Collegando la repo a Vercel ottieni un dominio **gratis per sempre**:
 
 ```
-https://run-club-giovinazzo.vercel.app
+https://run-club-olive.vercel.app
 ```
 
 (o simile, in base al nome progetto su Vercel)
@@ -32,7 +32,7 @@ Il codice viene pushato automaticamente dall’agent quando hai configurato il t
 | Variabile | Valore |
 |-----------|--------|
 | `AUTH_SECRET` | `openssl rand -base64 32` |
-| `AUTH_URL` | `https://run-club-giovinazzo.vercel.app` |
+| `AUTH_URL` | `https://run-club-olive.vercel.app` |
 | `AUTH_GOOGLE_ID` | da Google Cloud |
 | `AUTH_GOOGLE_SECRET` | da Google Cloud |
 | `ADMIN_PIN` | PIN staff |
@@ -62,17 +62,17 @@ In [Google Cloud Console → Credenziali](https://console.cloud.google.com/apis/
 
 **Origini JavaScript autorizzate:**
 ```
-https://run-club-giovinazzo.vercel.app
+https://run-club-olive.vercel.app
 http://localhost:43123
 ```
 
 **URI di reindirizzamento:**
 ```
-https://run-club-giovinazzo.vercel.app/api/auth/callback/google
+https://run-club-olive.vercel.app/api/auth/callback/google
 http://localhost:43123/api/auth/callback/google
 ```
 
-Aggiorna su Vercel: `AUTH_URL=https://run-club-giovinazzo.vercel.app`
+Aggiorna su Vercel: `AUTH_URL=https://run-club-olive.vercel.app`
 
 ---
 
@@ -90,7 +90,7 @@ SQLite su Vercel non persiste i dati. Per produzione usa **Turso** (gratis) o **
 
 | Pagina | URL |
 |--------|-----|
-| Home | https://run-club-giovinazzo.vercel.app |
-| Admin eventi | https://run-club-giovinazzo.vercel.app/admin/events |
-| Check-in QR | https://run-club-giovinazzo.vercel.app/admin/checkin |
-| Area atleta | https://run-club-giovinazzo.vercel.app/area-atleta |
+| Home | https://run-club-olive.vercel.app |
+| Admin eventi | https://run-club-olive.vercel.app/admin/events |
+| Check-in QR | https://run-club-olive.vercel.app/admin/checkin |
+| Area atleta | https://run-club-olive.vercel.app/area-atleta |
