@@ -86,9 +86,9 @@ export function Hero() {
                 size="lg"
                 variant="outline"
                 className="h-12 rounded-full border-white/40 bg-black/30 px-10 text-base font-semibold text-white shadow-lg backdrop-blur-md hover:bg-black/50 sm:h-14 sm:text-lg"
-                onClick={() => scrollTo("#sessions")}
+                onClick={() => scrollTo("#pricing")}
               >
-                Vedi gli allenamenti
+                Scopri il prezzo
               </Button>
             </div>
           </div>

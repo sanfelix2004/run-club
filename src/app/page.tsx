@@ -6,16 +6,19 @@ import { Hero } from "@/components/Hero";
 import { Location } from "@/components/Location";
 import { Navbar } from "@/components/Navbar";
 import { Pricing } from "@/components/Pricing";
-import { Sessions } from "@/components/Sessions";
-import { Stats } from "@/components/Stats";
 import { Testimonials } from "@/components/Testimonials";
 import { getUpcomingEvents } from "@/app/actions/events";
+import { getPublishedReviews } from "@/app/actions/reviews";
 import { auth } from "@/auth";
 import { EventRegistrationProvider } from "@/components/EventRegistrationProvider";
 
 export default async function Home() {
-  const events = await getUpcomingEvents();
-  const session = await auth();
+  const [events, reviews, session] = await Promise.all([
+    getUpcomingEvents(),
+    getPublishedReviews(),
+    auth(),
+  ]);
+
   const user = session?.user
     ? {
         name: session.user.name ?? "",
@@ -30,10 +33,8 @@ export default async function Home() {
         <Hero />
         <Events events={events} />
         <About />
-        <Sessions />
-        <Stats />
         <Pricing />
-        <Testimonials />
+        <Testimonials initialReviews={reviews} />
         <Booking />
         <Location />
       </main>

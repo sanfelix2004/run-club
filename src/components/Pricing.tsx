@@ -3,8 +3,7 @@
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/FadeIn";
-import { PRICING_PLANS } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { PRICING } from "@/lib/constants";
 
 export function Pricing() {
   const scrollToEvents = () => {
@@ -22,81 +21,38 @@ export function Pricing() {
             Piani semplici e trasparenti
           </h2>
           <p className="mt-4 text-lg text-forest/70">
-            Nessun costo nascosto, nessun vincolo lungo. Scegli quello che fa per te e
-            inizia a correre con noi.
+            Nessun costo nascosto. Paghi in loco e dopo la corsa ti aspettano sandwich e
+            bevanda.
           </p>
         </FadeIn>
 
-        <div className="mt-14 grid gap-8 lg:grid-cols-3">
-          {PRICING_PLANS.map((plan, i) => (
-            <FadeIn key={plan.name} delay={i * 0.1}>
-              <div
-                className={cn(
-                  "relative flex h-full flex-col rounded-2xl border p-8 transition-all duration-300",
-                  plan.highlighted
-                    ? "border-emerald-400 bg-forest text-white shadow-xl shadow-forest/20 scale-[1.02]"
-                    : "border-emerald-100 bg-white text-forest shadow-sm hover:shadow-md",
-                )}
-              >
-                {plan.highlighted && (
-                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-emerald-500 px-4 py-1 text-xs font-semibold text-white">
-                    Più popolare
-                  </span>
-                )}
-                <h3 className="text-xl font-semibold">{plan.name}</h3>
-                <p
-                  className={cn(
-                    "mt-2 text-sm",
-                    plan.highlighted ? "text-emerald-100/80" : "text-forest/60",
-                  )}
-                >
-                  {plan.description}
-                </p>
-                <div className="mt-6 flex items-baseline gap-1">
-                  <span className="text-4xl font-bold">€{plan.price}</span>
-                  <span
-                    className={cn(
-                      "text-sm",
-                      plan.highlighted ? "text-emerald-100/70" : "text-forest/50",
-                    )}
-                  >
-                    {plan.period}
-                  </span>
-                </div>
-                <ul className="mt-8 flex-1 space-y-3">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-3 text-sm">
-                      <Check
-                        className={cn(
-                          "mt-0.5 h-4 w-4 shrink-0",
-                          plan.highlighted ? "text-emerald-300" : "text-emerald-500",
-                        )}
-                      />
-                      <span
-                        className={
-                          plan.highlighted ? "text-emerald-50/90" : "text-forest/70"
-                        }
-                      >
-                        {feature}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  className={cn(
-                    "mt-8 w-full rounded-full",
-                    plan.highlighted
-                      ? "bg-emerald-500 text-white hover:bg-emerald-400"
-                      : "bg-emerald-500 text-white hover:bg-emerald-600",
-                  )}
-                  onClick={scrollToEvents}
-                >
-                  Inizia ora
-                </Button>
-              </div>
-            </FadeIn>
-          ))}
-        </div>
+        <FadeIn className="mx-auto mt-14 max-w-lg">
+          <div className="relative flex flex-col rounded-2xl border border-emerald-400 bg-forest p-8 text-white shadow-xl shadow-forest/20">
+            <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-emerald-500 px-4 py-1 text-xs font-semibold text-white">
+              Unica tariffa
+            </span>
+            <h3 className="text-xl font-semibold">Corsa di gruppo</h3>
+            <p className="mt-2 text-sm text-emerald-100/80">{PRICING.description}</p>
+            <div className="mt-6 flex items-baseline gap-1">
+              <span className="text-5xl font-bold">€{PRICING.price}</span>
+              <span className="text-sm text-emerald-100/70">{PRICING.period}</span>
+            </div>
+            <ul className="mt-8 space-y-3">
+              {PRICING.features.map((feature) => (
+                <li key={feature} className="flex items-start gap-3 text-sm">
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />
+                  <span className="text-emerald-50/90">{feature}</span>
+                </li>
+              ))}
+            </ul>
+            <Button
+              className="mt-8 w-full rounded-full bg-emerald-500 text-white hover:bg-emerald-400"
+              onClick={scrollToEvents}
+            >
+              Prenota la prossima corsa
+            </Button>
+          </div>
+        </FadeIn>
       </div>
     </section>
   );

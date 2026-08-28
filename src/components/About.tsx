@@ -40,7 +40,7 @@ export function About() {
                 "Tutti i livelli benvenuti",
                 "Sessioni guidate dai coach",
                 "Percorsi costieri e trail",
-                "Eventi per la community tutto l'anno",
+                "Eventi tutto l'anno",
               ].map((item) => (
                 <li
                   key={item}
@@ -57,17 +57,14 @@ export function About() {
             <div className="relative overflow-hidden rounded-2xl shadow-xl shadow-emerald-900/10">
               <motion.div style={{ y: imageY }} className="relative aspect-[4/5]">
                 <Image
-                  src="https://picsum.photos/seed/giovinazzo-about/800/1000"
-                  alt="Runner sul lungomare di Giovinazzo all'alba"
+                  src="/images/giovinazzo-porto.jpg"
+                  alt="Il porto di Giovinazzo sul mare Adriatico"
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority
                 />
               </motion.div>
-            </div>
-            <div className="absolute -bottom-6 -left-6 rounded-2xl border border-emerald-100 bg-white p-5 shadow-lg sm:-left-8">
-              <p className="text-3xl font-bold text-emerald-500">320+</p>
-              <p className="text-sm font-medium text-forest/60">runner e non solo</p>
             </div>
           </FadeIn>
         </div>
