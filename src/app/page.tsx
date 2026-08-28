@@ -8,8 +8,11 @@ import { Pricing } from "@/components/Pricing";
 import { Sessions } from "@/components/Sessions";
 import { Stats } from "@/components/Stats";
 import { Testimonials } from "@/components/Testimonials";
+import { getUpcomingEvent } from "@/app/actions/registration";
 
-export default function Home() {
+export default async function Home() {
+  const upcomingEvent = await getUpcomingEvent();
+
   return (
     <>
       <Navbar />
@@ -20,7 +23,7 @@ export default function Home() {
         <Stats />
         <Pricing />
         <Testimonials />
-        <Booking />
+        <Booking upcomingEvent={upcomingEvent} />
         <Location />
       </main>
       <Footer />

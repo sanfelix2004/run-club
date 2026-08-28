@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 import { SITE } from "@/lib/constants";
 
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${dmSans.variable} h-full scroll-smooth`}>
       <body className="min-h-full bg-[#FAFDFB] font-sans text-forest antialiased">
         {children}
+        <Toaster position="top-center" richColors closeButton />
       </body>
     </html>
   );

@@ -1,25 +1,66 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
-import { Calendar, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
+import { Calendar, CheckCircle2, Euro } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FadeIn } from "@/components/FadeIn";
-import { SESSIONS } from "@/lib/constants";
+import { TicketPreview } from "@/components/TicketPreview";
+import { registerForMeetup, type RegistrationResult } from "@/app/actions/registration";
+import { PACE_CATEGORIES } from "@/lib/registration-types";
+import type { RegistrationFormData } from "@/lib/validations/registration";
 
-export function Booking() {
-  const [submitted, setSubmitted] = useState(false);
+type UpcomingEvent = {
+  title: string;
+  date: string;
+  time: string;
+  locationName: string;
+  priceAmount: number;
+} | null;
+
+type BookingProps = {
+  upcomingEvent: UpcomingEvent;
+};
+
+export function Booking({ upcomingEvent }: BookingProps) {
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const [registration, setRegistration] = useState<
+    Extract<RegistrationResult, { success: true }>["registration"] | null
+  >(null);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setSubmitted(true);
-    }, 800);
+    setFieldErrors({});
+
+    const formData = new FormData(e.currentTarget);
+    const data: RegistrationFormData = {
+      firstName: formData.get("firstName") as string,
+      lastName: formData.get("lastName") as string,
+      email: formData.get("email") as string,
+      phone: formData.get("phone") as string,
+      emergencyName: formData.get("emergencyName") as string,
+      emergencyPhone: formData.get("emergencyPhone") as string,
+      paceCategory: formData.get("paceCategory") as RegistrationFormData["paceCategory"],
+    };
+
+    const result = await registerForMeetup(data);
+    setLoading(false);
+
+    if (result.success) {
+      setRegistration(result.registration);
+      toast.success("Iscrizione completata! Scarica il tuo pass.");
+    } else {
+      if (result.fieldErrors) setFieldErrors(result.fieldErrors);
+      toast.error(result.error);
+    }
   };
+
+  const selectClass =
+    "flex h-9 w-full rounded-xl border border-emerald-100 bg-transparent px-3 py-1 text-sm text-forest shadow-xs outline-none focus-visible:border-emerald-400 focus-visible:ring-2 focus-visible:ring-emerald-400/30";
 
   return (
     <section id="booking" className="py-20 sm:py-28">
@@ -27,20 +68,40 @@ export function Booking() {
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
           <FadeIn>
             <p className="text-sm font-semibold uppercase tracking-widest text-emerald-500">
-              Booking
+              Iscrizione Meetup
             </p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight text-forest sm:text-4xl">
-              Reserve your spot
+              Registrati alla prossima corsa
             </h2>
             <p className="mt-4 text-lg leading-relaxed text-forest/70">
-              Pick a session, fill in your details, and you&apos;re in. We&apos;ll
-              send a confirmation with the meeting point and what to bring.
+              Compila il modulo, scarica il pass PDF con QR code e presentalo al
+              ritrovo. La quota di{" "}
+              <strong className="text-forest">
+                {upcomingEvent?.priceAmount.toFixed(2).replace(".", ",") ?? "5,00"}€
+              </strong>{" "}
+              si paga in contanti o POS il giorno della corsa.
             </p>
+
+            {upcomingEvent && (
+              <div className="mt-6 rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm">
+                <p className="font-semibold text-forest">{upcomingEvent.title}</p>
+                <p className="mt-2 flex items-center gap-2 text-sm text-forest/60">
+                  <Calendar className="h-4 w-4 text-emerald-500" />
+                  {upcomingEvent.date} · {upcomingEvent.time}
+                </p>
+                <p className="mt-1 text-sm text-forest/60">{upcomingEvent.locationName}</p>
+                <p className="mt-3 flex items-center gap-2 text-sm font-medium text-emerald-600">
+                  <Euro className="h-4 w-4" />
+                  Quota: {upcomingEvent.priceAmount.toFixed(2).replace(".", ",")}€ da saldare all&apos;arrivo
+                </p>
+              </div>
+            )}
+
             <ul className="mt-8 space-y-4">
               {[
-                "Free for your first session",
-                "Confirmation within 24 hours",
-                "Cancel anytime — no stress",
+                "Pass PDF con QR code generato subito",
+                "Pagamento €5 sul posto (contanti/POS)",
+                "Check-in rapido con scansione QR",
               ].map((item) => (
                 <li key={item} className="flex items-center gap-3 text-forest/70">
                   <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
@@ -52,42 +113,45 @@ export function Booking() {
 
           <FadeIn delay={0.15}>
             <div className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm sm:p-8">
-              {submitted ? (
-                <div className="flex flex-col items-center py-12 text-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-                    <CheckCircle2 className="h-8 w-8 text-emerald-500" />
-                  </div>
-                  <h3 className="mt-6 text-xl font-semibold text-forest">
-                    You&apos;re booked!
-                  </h3>
-                  <p className="mt-2 max-w-sm text-forest/60">
-                    Check your inbox for confirmation. See you at the starting
-                    line — lace up and let&apos;s run.
-                  </p>
-                  <Button
-                    variant="outline"
-                    className="mt-8 rounded-full border-emerald-200"
-                    onClick={() => setSubmitted(false)}
-                  >
-                    Book another session
-                  </Button>
-                </div>
+              {registration ? (
+                <TicketPreview
+                  registration={registration}
+                  onRegisterAnother={() => setRegistration(null)}
+                />
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="flex items-center gap-2 text-forest">
                     <Calendar className="h-5 w-5 text-emerald-500" />
-                    <span className="font-semibold">Session booking</span>
+                    <span className="font-semibold">Modulo di iscrizione runner</span>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Full name</Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      required
-                      placeholder="Marco Rossi"
-                      className="rounded-xl border-emerald-100"
-                    />
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName">Nome</Label>
+                      <Input
+                        id="firstName"
+                        name="firstName"
+                        required
+                        placeholder="Marco"
+                        className="rounded-xl border-emerald-100"
+                      />
+                      {fieldErrors.firstName && (
+                        <p className="text-xs text-red-500">{fieldErrors.firstName[0]}</p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName">Cognome</Label>
+                      <Input
+                        id="lastName"
+                        name="lastName"
+                        required
+                        placeholder="Rossi"
+                        className="rounded-xl border-emerald-100"
+                      />
+                      {fieldErrors.lastName && (
+                        <p className="text-xs text-red-500">{fieldErrors.lastName[0]}</p>
+                      )}
+                    </div>
                   </div>
 
                   <div className="space-y-2">
@@ -100,57 +164,95 @@ export function Booking() {
                       placeholder="marco@example.com"
                       className="rounded-xl border-emerald-100"
                     />
+                    {fieldErrors.email && (
+                      <p className="text-xs text-red-500">{fieldErrors.email[0]}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone (optional)</Label>
+                    <Label htmlFor="phone">Numero di telefono</Label>
                     <Input
                       id="phone"
                       name="phone"
                       type="tel"
+                      required
                       placeholder="+39 333 123 4567"
                       className="rounded-xl border-emerald-100"
                     />
+                    {fieldErrors.phone && (
+                      <p className="text-xs text-red-500">{fieldErrors.phone[0]}</p>
+                    )}
+                  </div>
+
+                  <div className="rounded-xl border border-emerald-50 bg-emerald-50/50 p-4">
+                    <p className="mb-3 text-sm font-medium text-forest">
+                      Contatto di emergenza
+                    </p>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="emergencyName">Nome</Label>
+                        <Input
+                          id="emergencyName"
+                          name="emergencyName"
+                          required
+                          placeholder="Laura Rossi"
+                          className="rounded-xl border-emerald-100 bg-white"
+                        />
+                        {fieldErrors.emergencyName && (
+                          <p className="text-xs text-red-500">{fieldErrors.emergencyName[0]}</p>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="emergencyPhone">Telefono</Label>
+                        <Input
+                          id="emergencyPhone"
+                          name="emergencyPhone"
+                          type="tel"
+                          required
+                          placeholder="+39 333 987 6543"
+                          className="rounded-xl border-emerald-100 bg-white"
+                        />
+                        {fieldErrors.emergencyPhone && (
+                          <p className="text-xs text-red-500">{fieldErrors.emergencyPhone[0]}</p>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="session">Choose a session</Label>
+                    <Label htmlFor="paceCategory">Fascia di passo</Label>
                     <select
-                      id="session"
-                      name="session"
+                      id="paceCategory"
+                      name="paceCategory"
                       required
-                      className="flex h-9 w-full rounded-xl border border-emerald-100 bg-transparent px-3 py-1 text-sm text-forest shadow-xs outline-none focus-visible:border-emerald-400 focus-visible:ring-2 focus-visible:ring-emerald-400/30"
+                      className={selectClass}
+                      defaultValue=""
                     >
-                      <option value="">Select a session...</option>
-                      {SESSIONS.map((s) => (
-                        <option key={s.title} value={s.title}>
-                          {s.title} — {s.time}
+                      <option value="" disabled>
+                        Seleziona il tuo gruppo...
+                      </option>
+                      {PACE_CATEGORIES.map((pace) => (
+                        <option key={pace} value={pace}>
+                          {pace}
                         </option>
                       ))}
                     </select>
+                    {fieldErrors.paceCategory && (
+                      <p className="text-xs text-red-500">{fieldErrors.paceCategory[0]}</p>
+                    )}
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="experience">Running experience</Label>
-                    <select
-                      id="experience"
-                      name="experience"
-                      required
-                      className="flex h-9 w-full rounded-xl border border-emerald-100 bg-transparent px-3 py-1 text-sm text-forest shadow-xs outline-none focus-visible:border-emerald-400 focus-visible:ring-2 focus-visible:ring-emerald-400/30"
-                    >
-                      <option value="">Select your level...</option>
-                      <option value="beginner">Beginner — just starting out</option>
-                      <option value="intermediate">Intermediate — regular runner</option>
-                      <option value="advanced">Advanced — training for races</option>
-                    </select>
-                  </div>
+                  <p className="text-xs leading-relaxed text-forest/50">
+                    Iscrivendoti accetti lo scarico di responsabilità e confermi
+                    di essere in condizioni fisiche adeguate per partecipare.
+                  </p>
 
                   <Button
                     type="submit"
                     disabled={loading}
                     className="w-full rounded-full bg-emerald-500 py-5 text-white hover:bg-emerald-600"
                   >
-                    {loading ? "Booking..." : "Confirm Booking"}
+                    {loading ? "Registrazione in corso..." : "Iscriviti e genera il pass"}
                   </Button>
                 </form>
               )}
