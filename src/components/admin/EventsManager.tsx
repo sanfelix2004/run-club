@@ -1,17 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Calendar, MapPin, Pencil, Plus, Trash2, Users } from "lucide-react";
+import { Calendar, CheckCircle2, MapPin, Pencil, Plus, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { EventAttendeesPanel } from "@/components/admin/EventAttendeesPanel";
 import {
   createEvent,
   deleteEvent,
   getAllEventsAdmin,
   updateEvent,
-  type PublicEvent,
+  type AdminEvent,
 } from "@/app/actions/events";
 import type { EventFormData } from "@/lib/validations/event";
 
@@ -31,12 +32,13 @@ function toLocalDatetimeValue(iso: string) {
 }
 
 export function EventsManager() {
-  const [events, setEvents] = useState<PublicEvent[]>([]);
+  const [events, setEvents] = useState<AdminEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<EventFormData>(emptyForm);
   const [showForm, setShowForm] = useState(false);
+  const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
 
   const loadEvents = async () => {
     const data = await getAllEventsAdmin();
@@ -60,7 +62,7 @@ export function EventsManager() {
     setShowForm(true);
   };
 
-  const startEdit = (event: PublicEvent) => {
+  const startEdit = (event: AdminEvent) => {
     setForm({
       title: event.title,
       dateTime: toLocalDatetimeValue(event.dateTime),
@@ -95,7 +97,7 @@ export function EventsManager() {
     }
   };
 
-  const handleDelete = async (event: PublicEvent) => {
+  const handleDelete = async (event: AdminEvent) => {
     const registrationNote =
       event.registrationCount > 0
         ? `\n\nVerranno eliminate anche ${event.registrationCount} iscrizioni collegate.`
@@ -111,6 +113,10 @@ export function EventsManager() {
     } else {
       toast.error(result.error ?? "Errore durante l'eliminazione");
     }
+  };
+
+  const toggleAttendees = (eventId: string) => {
+    setExpandedEventId((current) => (current === eventId ? null : eventId));
   };
 
   const isPast = (dateTime: string) => new Date(dateTime) < new Date();
@@ -273,10 +279,24 @@ export function EventsManager() {
                       <Users className="h-4 w-4 text-emerald-500" />
                       {event.registrationCount} iscritti
                     </span>
+                    <span className="flex items-center gap-1.5">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                      {event.checkedInCount} presenti
+                    </span>
                   </div>
                 </div>
 
                 <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => toggleAttendees(event.id)}
+                    className="rounded-full border-emerald-200"
+                  >
+                    <Users className="mr-1.5 h-3.5 w-3.5" />
+                    {expandedEventId === event.id ? "Nascondi" : "Iscritti"}
+                  </Button>
                   <Button
                     type="button"
                     variant="outline"
@@ -299,6 +319,11 @@ export function EventsManager() {
                   </Button>
                 </div>
               </div>
+
+              <EventAttendeesPanel
+                eventId={event.id}
+                open={expandedEventId === event.id}
+              />
             </article>
           ))}
         </div>

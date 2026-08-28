@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { formatEventDate } from "@/lib/pdf";
+import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 import { isAdminAuthenticated } from "@/app/actions/admin-auth";
 import { eventSchema, type EventFormData } from "@/lib/validations/event";
 
@@ -17,6 +18,10 @@ export type PublicEvent = {
   priceAmount: number;
   currency: string;
   registrationCount: number;
+};
+
+export type AdminEvent = PublicEvent & {
+  checkedInCount: number;
 };
 
 function serializeEvent(
@@ -64,16 +69,32 @@ export async function getUpcomingEvents(): Promise<PublicEvent[]> {
   }
 }
 
-export async function getAllEventsAdmin(): Promise<PublicEvent[]> {
+export async function getAllEventsAdmin(): Promise<AdminEvent[]> {
   const authed = await isAdminAuthenticated();
   if (!authed) return [];
 
   const events = await prisma.event.findMany({
     orderBy: { dateTime: "asc" },
-    include: { _count: { select: { registrations: true } } },
+    include: {
+      registrations: {
+        where: { status: { not: REGISTRATION_STATUSES.CANCELLED } },
+        select: { status: true },
+      },
+    },
   });
 
-  return events.map(serializeEvent);
+  return events.map((event) => {
+    const base = serializeEvent({
+      ...event,
+      _count: { registrations: event.registrations.length },
+    });
+    return {
+      ...base,
+      checkedInCount: event.registrations.filter(
+        (r) => r.status === REGISTRATION_STATUSES.PAID_AND_CHECKED_IN,
+      ).length,
+    };
+  });
 }
 
 type ActionResult =
