@@ -15,7 +15,7 @@ export function Events({ events }: EventsProps) {
   };
 
   return (
-    <section id="events" className="py-20 sm:py-28">
+    <section id="events" className="bg-emerald-50/50 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <FadeIn className="mx-auto max-w-2xl text-center">
           <p className="text-sm font-semibold uppercase tracking-widest text-emerald-500">
