@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 
-const VIDEO_SRC = "/videos/kling_20260828_VIDEO_Cinematic__4944_0.mp4";
+const VIDEO_SRC = "/videos/hero-run.mp4";
+const POSTER_SRC = "/videos/hero-poster.webp";
 
 export function HeroVideoBackground() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -16,53 +18,65 @@ export function HeroVideoBackground() {
 
     const tryPlay = () => {
       setReady(true);
-      video.play().catch(() => {
-        /* autoplay blocked — video still visible on interaction */
-      });
+      video.play().catch(() => {});
     };
 
-    const onLoadedData = () => tryPlay();
+    const onCanPlay = () => tryPlay();
     const onError = () => setFailed(true);
 
-    video.addEventListener("loadeddata", onLoadedData);
+    video.addEventListener("canplay", onCanPlay);
     video.addEventListener("error", onError);
 
-    if (video.readyState >= 2) tryPlay();
-
     return () => {
-      video.removeEventListener("loadeddata", onLoadedData);
+      video.removeEventListener("canplay", onCanPlay);
       video.removeEventListener("error", onError);
     };
   }, []);
 
   return (
     <div className="absolute inset-0 overflow-hidden bg-forest">
+      {/* Poster — visibile subito mentre il video carica */}
+      <Image
+        src={POSTER_SRC}
+        alt=""
+        fill
+        priority
+        className={`object-cover transition-opacity duration-700 ${
+          ready && !failed ? "opacity-0" : "opacity-100"
+        }`}
+        style={{
+          transform: "scale(1.25)",
+          objectPosition: "center 36%",
+        }}
+        sizes="100vw"
+        aria-hidden="true"
+      />
+
       {!failed && (
-        <div className="absolute inset-0 overflow-hidden">
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            aria-hidden="true"
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
-              ready ? "opacity-100" : "opacity-0"
-            }`}
-            style={{
-              transform: "scale(1.25)",
-              objectPosition: "center 36%",
-            }}
-          >
-            <source src={VIDEO_SRC} type="video/mp4" />
-          </video>
-        </div>
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster={POSTER_SRC}
+          aria-hidden="true"
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+            ready ? "opacity-100" : "opacity-0"
+          }`}
+          style={{
+            transform: "scale(1.25)",
+            objectPosition: "center 36%",
+          }}
+        >
+          <source src={VIDEO_SRC} type="video/mp4" />
+        </video>
       )}
 
-      <div className="absolute inset-0 bg-forest/25" />
-      <div className="absolute inset-0 bg-gradient-to-r from-forest/60 via-forest/20 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-b from-forest/25 via-transparent to-[#FAFDFB]/80" />
+      {/* Overlay scuro a sinistra per leggibilità testo */}
+      <div className="absolute inset-0 bg-gradient-to-r from-forest/95 via-forest/75 to-forest/20" />
+      <div className="absolute inset-0 bg-gradient-to-b from-forest/50 via-transparent to-[#FAFDFB]/90" />
       <div className="absolute inset-0 bg-gradient-to-t from-[#FAFDFB] via-transparent to-transparent" />
 
       {failed && (
