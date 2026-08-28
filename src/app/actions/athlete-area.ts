@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
+import { getAthleteProfile, type AthleteProfile } from "@/app/actions/athlete-profile";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 
 export type AthleteRegistration = {
@@ -21,13 +22,7 @@ export type AthleteRegistration = {
 };
 
 export type AthleteDashboard = {
-  profile: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    paceCategory: string;
-  };
+  profile: AthleteProfile;
   stats: {
     totalRegistrations: number;
     eventsAttended: number;
@@ -41,6 +36,9 @@ export async function getAthleteDashboard(): Promise<AthleteDashboard | null> {
   const email = session?.user?.email?.toLowerCase();
   if (!email) return null;
 
+  const profile = await getAthleteProfile();
+  if (!profile) return null;
+
   const registrations = await prisma.registration.findMany({
     where: {
       email,
@@ -50,36 +48,10 @@ export async function getAthleteDashboard(): Promise<AthleteDashboard | null> {
     orderBy: { event: { dateTime: "desc" } },
   });
 
-  if (registrations.length === 0) {
-    const nameParts = session?.user?.name?.split(" ") ?? ["Atleta", ""];
-    return {
-      profile: {
-        firstName: nameParts[0] ?? "Atleta",
-        lastName: nameParts.slice(1).join(" ") || "—",
-        email,
-        phone: "—",
-        paceCategory: "—",
-      },
-      stats: {
-        totalRegistrations: 0,
-        eventsAttended: 0,
-        upcomingEvents: 0,
-      },
-      registrations: [],
-    };
-  }
-
-  const latest = registrations[0];
   const now = new Date();
 
   return {
-    profile: {
-      firstName: latest.firstName,
-      lastName: latest.lastName,
-      email: latest.email,
-      phone: latest.phone,
-      paceCategory: latest.paceCategory,
-    },
+    profile,
     stats: {
       totalRegistrations: registrations.length,
       eventsAttended: registrations.filter(

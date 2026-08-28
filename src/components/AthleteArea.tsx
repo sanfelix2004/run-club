@@ -12,6 +12,7 @@ import {
   User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AthleteProfileForm } from "@/components/AthleteProfileForm";
 import { useAuthUI } from "@/components/AuthUIProvider";
 import type { AthleteDashboard } from "@/app/actions/athlete-area";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
@@ -119,33 +120,7 @@ export function AthleteArea({ initialDashboard }: AthleteAreaProps) {
         </div>
       </div>
 
-      {stats.totalRegistrations > 0 && (
-        <div className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-forest">I tuoi dati</h2>
-          <dl className="mt-4 grid gap-4 sm:grid-cols-2">
-            <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-forest/40">
-                Nome
-              </dt>
-              <dd className="mt-1 font-medium text-forest">
-                {profile.firstName} {profile.lastName}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-forest/40">
-                Telefono
-              </dt>
-              <dd className="mt-1 font-medium text-forest">{profile.phone}</dd>
-            </div>
-            <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-forest/40">
-                Gruppo di passo
-              </dt>
-              <dd className="mt-1 font-medium text-forest">{profile.paceCategory}</dd>
-            </div>
-          </dl>
-        </div>
-      )}
+      <AthleteProfileForm initialProfile={profile} />
 
       <div>
         <h2 className="text-lg font-semibold text-forest">Storico eventi</h2>

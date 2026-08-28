@@ -45,6 +45,7 @@ function exportCsv(attendees: EventAttendee[], eventTitle: string) {
     "Email",
     "Telefono",
     "Fascia di passo",
+    "Patologie / note mediche",
     "Stato",
     "Data iscrizione",
     "Check-in",
@@ -59,6 +60,7 @@ function exportCsv(attendees: EventAttendee[], eventTitle: string) {
     a.email,
     a.phone,
     a.paceCategory,
+    a.medicalNotes ?? "",
     STATUS_LABELS[a.status] ?? a.status,
     formatDateTime(a.createdAt),
     a.checkedInAt ? formatDateTime(a.checkedInAt) : "",
@@ -91,6 +93,10 @@ function RunnerDetail({ attendee }: { attendee: EventAttendee }) {
     { label: "Email", value: attendee.email },
     { label: "Telefono", value: attendee.phone },
     { label: "Fascia di passo", value: attendee.paceCategory },
+    {
+      label: "Patologie / note mediche",
+      value: attendee.medicalNotes?.trim() || "—",
+    },
     {
       label: "Stato",
       value: STATUS_LABELS[attendee.status] ?? attendee.status,

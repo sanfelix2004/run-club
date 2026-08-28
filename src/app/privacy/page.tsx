@@ -38,8 +38,13 @@ export default function PrivacyPage() {
             conservata in forma crittografata), eventuale immagine profilo da login social.
           </li>
           <li>
+            <strong>Dati di profilo atleta:</strong> nome, telefono, fascia di passo,
+            eventuali patologie o note mediche (facoltative, fornite volontariamente).
+          </li>
+          <li>
             <strong>Dati di iscrizione agli eventi:</strong> fascia di passo, telefono,
-            stato prenotazione e pagamento, token QR per il check-in.
+            note mediche al momento della prenotazione, stato prenotazione e pagamento,
+            token QR per il check-in.
           </li>
           <li>
             <strong>Recensioni:</strong> testo della recensione e nome visualizzato.

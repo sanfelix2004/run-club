@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TicketPreview } from "@/components/TicketPreview";
 import { registerForMeetup, type RegistrationResult } from "@/app/actions/registration";
+import { getAthleteProfileForBooking } from "@/app/actions/athlete-profile";
 import type { PublicEvent } from "@/app/actions/events";
 import { PrivacyConsentField } from "@/components/PrivacyConsentField";
 import { ModalPortal } from "@/components/ModalPortal";
@@ -47,6 +48,28 @@ export function EventRegistrationSheet({
     Extract<RegistrationResult, { success: true }>["registration"] | null
   >(null);
   const [formKey, setFormKey] = useState(0);
+  const [profileDefaults, setProfileDefaults] = useState({
+    firstName: userNames.firstName,
+    lastName: userNames.lastName,
+    phone: "",
+    paceCategory: "",
+  });
+
+  useEffect(() => {
+    if (!open || !user?.email) return;
+
+    getAthleteProfileForBooking().then((profile) => {
+      if (!profile) return;
+      const fallback = user?.name ? splitName(user.name) : { firstName: "", lastName: "" };
+      setProfileDefaults({
+        firstName: profile.firstName || fallback.firstName,
+        lastName: profile.lastName || fallback.lastName,
+        phone: profile.phone,
+        paceCategory: profile.paceCategory,
+      });
+      setFormKey((k) => k + 1);
+    });
+  }, [open, user?.email, user?.name]);
 
   useEffect(() => {
     if (!open) {
@@ -165,7 +188,11 @@ export function EventRegistrationSheet({
             <form key={formKey} onSubmit={handleSubmit} className="space-y-4">
               <p className="text-sm text-forest/60">
                 Compila i dati per prenotare il tuo posto come{" "}
-                <strong>{user?.email}</strong>. Riceverai subito il PDF con QR code.
+                <strong>{user?.email}</strong>. Riceverai subito il PDF con QR code.{" "}
+                <a href="/area-atleta" className="font-medium text-emerald-600 hover:underline">
+                  Modifica il profilo
+                </a>{" "}
+                per aggiornare nome, telefono e note mediche.
               </p>
 
               <div className="grid gap-4 sm:grid-cols-2">
@@ -175,7 +202,7 @@ export function EventRegistrationSheet({
                     id="sheet-firstName"
                     name="firstName"
                     required
-                    defaultValue={userNames.firstName}
+                    defaultValue={profileDefaults.firstName}
                     placeholder="Marco"
                     className="rounded-xl border-emerald-100"
                   />
@@ -189,7 +216,7 @@ export function EventRegistrationSheet({
                     id="sheet-lastName"
                     name="lastName"
                     required
-                    defaultValue={userNames.lastName}
+                    defaultValue={profileDefaults.lastName}
                     placeholder="Rossi"
                     className="rounded-xl border-emerald-100"
                   />
@@ -231,6 +258,7 @@ export function EventRegistrationSheet({
                   name="phone"
                   type="tel"
                   required
+                  defaultValue={profileDefaults.phone}
                   placeholder="+39 333 123 4567"
                   className="rounded-xl border-emerald-100"
                 />
@@ -246,7 +274,7 @@ export function EventRegistrationSheet({
                   name="paceCategory"
                   required
                   className={selectClass}
-                  defaultValue=""
+                  defaultValue={profileDefaults.paceCategory || ""}
                 >
                   <option value="" disabled>
                     Seleziona il tuo gruppo...

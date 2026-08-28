@@ -12,6 +12,7 @@ export type EventAttendee = {
   email: string;
   phone: string;
   emergencyContact: string | null;
+  medicalNotes: string | null;
   paceCategory: string;
   qrToken: string;
   status: string;
@@ -61,6 +62,7 @@ export async function getEventAttendance(
       email: r.email,
       phone: r.phone,
       emergencyContact: r.emergencyContact,
+      medicalNotes: r.medicalNotes,
       paceCategory: r.paceCategory,
       qrToken: r.qrToken,
       status: r.status,

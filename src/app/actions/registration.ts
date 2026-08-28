@@ -94,6 +94,11 @@ export async function registerForMeetup(
 
   const qrToken = generateQrToken();
 
+  const userProfile = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { medicalNotes: true },
+  });
+
   const registration = await prisma.registration.create({
     data: {
       eventId: event.id,
@@ -102,6 +107,7 @@ export async function registerForMeetup(
       lastName,
       email: registrationEmail,
       phone,
+      medicalNotes: userProfile?.medicalNotes,
       paceCategory,
       qrToken,
       status: REGISTRATION_STATUSES.PENDING_PAYMENT,
