@@ -55,14 +55,14 @@ export function Hero() {
           animate={{ opacity: ready ? 1 : 0, y: ready ? 0 : 16 }}
           transition={REVEAL}
         >
-        <div className="max-w-2xl">
-          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/40 px-4 py-1.5 text-sm font-medium text-white shadow-lg backdrop-blur-md">
-            <MapPin className="h-3.5 w-3.5 text-emerald-300" />
+        <div className="max-w-3xl">
+          <p className="mb-5 inline-flex items-center gap-2.5 rounded-full border border-white/25 bg-black/40 px-5 py-2 text-base font-medium text-white shadow-lg backdrop-blur-md">
+            <MapPin className="h-4 w-4 text-emerald-300" />
             Giovinazzo, Puglia — Adriatic coast
           </p>
 
           <h1
-            className="text-5xl font-bold leading-[1.1] tracking-tight text-white sm:text-6xl lg:text-7xl"
+            className="text-6xl font-bold leading-[1.08] tracking-tight text-white sm:text-7xl lg:text-8xl"
             style={{
               textShadow:
                 "0 2px 20px rgba(0,0,0,0.8), 0 4px 40px rgba(0,0,0,0.5)",
@@ -72,14 +72,14 @@ export function Hero() {
             <span className="block text-emerald-300">together.</span>
           </h1>
 
-          <p className="mt-6 max-w-lg rounded-2xl border border-white/10 bg-black/35 px-5 py-4 text-lg leading-relaxed text-white shadow-xl backdrop-blur-sm">
+          <p className="mt-7 max-w-xl rounded-2xl border border-white/10 bg-black/35 px-6 py-5 text-xl leading-relaxed text-white shadow-xl backdrop-blur-sm">
             {SITE.description}
           </p>
 
-          <div className="mt-10 flex flex-wrap gap-4">
+          <div className="mt-12 flex flex-wrap gap-5">
             <Button
               size="lg"
-              className="rounded-full bg-emerald-500 px-8 text-white shadow-lg shadow-black/30 hover:bg-emerald-400"
+              className="h-13 rounded-full bg-emerald-500 px-10 py-6 text-base font-semibold text-white shadow-lg shadow-black/30 hover:bg-emerald-400 sm:text-lg"
               onClick={() => scrollTo("#booking")}
             >
               Book Your First Run
@@ -87,7 +87,7 @@ export function Hero() {
             <Button
               size="lg"
               variant="outline"
-              className="rounded-full border-white/40 bg-black/30 px-8 text-white shadow-lg backdrop-blur-md hover:bg-black/50"
+              className="h-13 rounded-full border-white/40 bg-black/30 px-10 py-6 text-base font-semibold text-white shadow-lg backdrop-blur-md hover:bg-black/50 sm:text-lg"
               onClick={() => scrollTo("#sessions")}
             >
               See Sessions
