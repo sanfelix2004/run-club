@@ -159,7 +159,7 @@ export function AthleteArea({ initialDashboard }: AthleteAreaProps) {
           <p className="mt-4 rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/50 p-8 text-center text-sm text-forest/60">
             Non hai ancora prenotato nessun evento.{" "}
             <Link href="/#events" className="font-medium text-emerald-600 hover:underline">
-              Prenota il tuo primo meetup
+              Prenota il tuo primo evento
             </Link>
           </p>
         ) : (

@@ -59,7 +59,7 @@ export function TicketPreview({
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex-1">
               <p className="text-xs font-semibold uppercase tracking-wider text-emerald-500">
-                Runner
+                Atleta
               </p>
               <p className="mt-1 text-2xl font-bold text-forest">
                 {registration.firstName} {registration.lastName}

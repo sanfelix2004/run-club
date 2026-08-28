@@ -44,7 +44,7 @@ export async function generateTicketPdf(data: TicketData): Promise<Uint8Array> {
   doc.setTextColor(6, 78, 59);
   doc.setFontSize(10);
   doc.setFont("helvetica", "bold");
-  doc.text("RUNNER", margin, y);
+  doc.text("ATLETA", margin, y);
   y += 6;
   doc.setFontSize(16);
   doc.text(`${data.firstName} ${data.lastName}`, margin, y);

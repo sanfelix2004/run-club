@@ -49,10 +49,10 @@ export function Stats() {
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <FadeIn className="mx-auto max-w-2xl text-center">
           <p className="text-sm font-semibold uppercase tracking-widest text-emerald-300">
-            By the Numbers
+            I numeri
           </p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            A community that keeps growing
+            Una community che continua a crescere
           </h2>
         </FadeIn>
 

@@ -90,7 +90,7 @@ export function Navbar() {
             className="rounded-full bg-emerald-500 px-5 text-white hover:bg-emerald-600"
             onClick={() => handleNavClick("#events")}
           >
-            Join a Run
+            Prenota un evento
           </Button>
         </div>
 
@@ -102,7 +102,7 @@ export function Navbar() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  aria-label="Open menu"
+                  aria-label="Apri menu"
                 >
                   <Menu
                     className={cn(
@@ -134,7 +134,7 @@ export function Navbar() {
                 className="mt-6 w-full rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
                 onClick={() => handleNavClick("#events")}
               >
-                Join a Run
+                Prenota un evento
               </Button>
             </SheetContent>
           </Sheet>

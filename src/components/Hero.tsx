@@ -34,7 +34,6 @@ export function Hero() {
       ref={ref}
       className="relative flex min-h-screen items-center overflow-hidden bg-forest"
     >
-      {/* Video — nascosto finché non è pronto */}
       <motion.div
         style={{ y: yBg, scale }}
         className="absolute inset-0"
@@ -45,7 +44,6 @@ export function Hero() {
         <HeroVideoBackground onReady={handleReady} />
       </motion.div>
 
-      {/* Testo — appare insieme al video */}
       <motion.div
         style={{ y: yContent, opacity: scrollOpacity }}
         className="relative z-10 mx-auto w-full max-w-6xl px-4 py-32 sm:px-6 lg:px-8"
@@ -58,7 +56,7 @@ export function Hero() {
         <div className="max-w-3xl">
           <p className="mb-5 inline-flex items-center gap-2.5 rounded-full border border-white/25 bg-black/40 px-5 py-2 text-base font-medium text-white shadow-lg backdrop-blur-md">
             <MapPin className="h-4 w-4 text-emerald-300" />
-            Giovinazzo, Puglia — Adriatic coast
+            Giovinazzo, Puglia — Costa adriatica
           </p>
 
           <h1
@@ -69,7 +67,7 @@ export function Hero() {
             }}
           >
             {SITE.tagline}
-            <span className="block text-emerald-300">together.</span>
+            <span className="block text-emerald-300">insieme.</span>
           </h1>
 
           <p className="mt-7 max-w-xl rounded-2xl border border-white/10 bg-black/35 px-6 py-5 text-xl leading-relaxed text-white shadow-xl backdrop-blur-sm">
@@ -82,7 +80,7 @@ export function Hero() {
               className="h-12 rounded-full bg-emerald-500 px-10 text-base font-semibold text-white shadow-lg shadow-black/30 hover:bg-emerald-400 sm:h-14 sm:text-lg"
               onClick={() => scrollTo("#events")}
             >
-              Book Your First Run
+              Prenota la tua prima corsa
             </Button>
             <Button
               size="lg"
@@ -90,7 +88,7 @@ export function Hero() {
               className="h-12 rounded-full border-white/40 bg-black/30 px-10 text-base font-semibold text-white shadow-lg backdrop-blur-md hover:bg-black/50 sm:h-14 sm:text-lg"
               onClick={() => scrollTo("#sessions")}
             >
-              See Sessions
+              Vedi gli allenamenti
             </Button>
           </div>
         </div>
@@ -99,10 +97,10 @@ export function Hero() {
           type="button"
           onClick={() => scrollTo("#about")}
           className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-white/70 transition-colors hover:text-emerald-300"
-          aria-label="Scroll to about section"
+          aria-label="Scorri alla sezione chi siamo"
         >
           <span className="text-xs font-medium uppercase tracking-widest drop-shadow-md">
-            Scroll
+            Scorri
           </span>
           <ArrowDown className="h-4 w-4 animate-bounce drop-shadow-md" />
         </button>

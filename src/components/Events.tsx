@@ -21,7 +21,7 @@ export function Events({ events }: EventsProps) {
             Eventi
           </p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-forest sm:text-4xl">
-            Prossimi meetup
+            Prossimi eventi
           </h2>
           <p className="mt-4 text-lg text-forest/70">
             Clicca su un evento per aprire la scheda di iscrizione, compilare i dati e

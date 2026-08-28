@@ -2,9 +2,11 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+const DEFAULT_EVENT_TITLE = "Meetup settimanale Run Club";
+
 async function main() {
   const existing = await prisma.event.findFirst({
-    where: { title: "Weekly Run Club Meetup" },
+    where: { title: DEFAULT_EVENT_TITLE },
   });
 
   if (!existing) {
@@ -14,7 +16,8 @@ async function main() {
 
     await prisma.event.create({
       data: {
-        title: "Weekly Run Club Meetup",
+        title: DEFAULT_EVENT_TITLE,
+        description: "Corsa di gruppo sul lungomare, tutti i livelli benvenuti.",
         dateTime: nextSaturday,
         locationName: "Piazza Vittorio Emanuele II, Giovinazzo",
         priceAmount: 5.0,
@@ -22,9 +25,9 @@ async function main() {
       },
     });
 
-    console.log("Seeded default event: Weekly Run Club Meetup");
+    console.log(`Evento di default creato: ${DEFAULT_EVENT_TITLE}`);
   } else {
-    console.log("Default event already exists");
+    console.log("L'evento di default esiste già");
   }
 }
 

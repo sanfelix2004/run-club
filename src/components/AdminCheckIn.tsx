@@ -232,7 +232,7 @@ export function AdminCheckIn() {
       <header className="sticky top-0 z-10 border-b border-emerald-100 bg-white/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-lg items-center justify-between px-4 py-3">
           <div>
-            <h1 className="text-sm font-bold text-forest">Check-in Staff</h1>
+            <h1 className="text-sm font-bold text-forest">Check-in organizzatore</h1>
             <p className="text-xs text-forest/50">Run Club Giovinazzo</p>
           </div>
           <Button
@@ -328,7 +328,7 @@ export function AdminCheckIn() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-emerald-500">
-                  Runner trovato
+                  Atleta trovato
                 </p>
                 <p className="mt-1 text-xl font-bold text-forest">
                   {scanResult.registration.firstName} {scanResult.registration.lastName}

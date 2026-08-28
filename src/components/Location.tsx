@@ -10,14 +10,14 @@ export function Location() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <FadeIn className="mx-auto max-w-2xl text-center">
           <p className="text-sm font-semibold uppercase tracking-widest text-emerald-500">
-            Contact
+            Contatti
           </p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-forest sm:text-4xl">
-            Find us in Giovinazzo
+            Trovaci a Giovinazzo
           </h2>
           <p className="mt-4 text-lg text-forest/70">
-            We meet at the harbour near Piazza Vittorio Emanuele. Look for the
-            green flag — you can&apos;t miss us.
+            Ci ritroviamo al porto vicino a Piazza Vittorio Emanuele. Cerca la
+            bandiera verde — non puoi sbagliare.
           </p>
         </FadeIn>
 
@@ -27,13 +27,13 @@ export function Location() {
               {[
                 {
                   icon: MapPin,
-                  title: "Address",
-                  text: "Piazza Vittorio Emanuele II\n70054 Giovinazzo BA, Italy",
+                  title: "Indirizzo",
+                  text: "Piazza Vittorio Emanuele II\n70054 Giovinazzo BA, Italia",
                 },
                 {
                   icon: Clock,
-                  title: "Office Hours",
-                  text: "Mon–Fri: 9:00 AM – 6:00 PM\nSat–Sun: Session times only",
+                  title: "Orari segreteria",
+                  text: "Lun–Ven: 9:00 – 18:00\nSab–Dom: solo orari sessioni",
                 },
                 {
                   icon: Mail,
@@ -42,7 +42,7 @@ export function Location() {
                 },
                 {
                   icon: Phone,
-                  title: "Phone",
+                  title: "Telefono",
                   text: "+39 080 123 4567",
                 },
               ].map((item) => (
@@ -67,7 +67,7 @@ export function Location() {
           <FadeIn delay={0.15} className="lg:col-span-3">
             <div className="overflow-hidden rounded-2xl border border-emerald-100 shadow-sm">
               <iframe
-                title="Run Club Giovinazzo location on Google Maps"
+                title="Posizione Run Club Giovinazzo su Google Maps"
                 src={MAP_EMBED_URL}
                 width="100%"
                 height="400"

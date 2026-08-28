@@ -45,10 +45,10 @@ export function Testimonials() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <FadeIn className="mx-auto max-w-2xl text-center">
           <p className="text-sm font-semibold uppercase tracking-widest text-emerald-500">
-            Testimonials
+            Dicono di noi
           </p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-forest sm:text-4xl">
-            What our runners say
+            Cosa dicono i nostri runner
           </h2>
         </FadeIn>
 
@@ -100,7 +100,7 @@ export function Testimonials() {
                         ? "w-6 bg-emerald-500"
                         : "w-2 bg-emerald-200 hover:bg-emerald-300"
                     }`}
-                    aria-label={`Go to testimonial ${i + 1}`}
+                    aria-label={`Vai alla testimonianza ${i + 1}`}
                   />
                 ))}
               </div>
@@ -110,7 +110,7 @@ export function Testimonials() {
                   size="icon"
                   className="rounded-full border-emerald-200"
                   onClick={prev}
-                  aria-label="Previous testimonial"
+                  aria-label="Testimonianza precedente"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -119,7 +119,7 @@ export function Testimonials() {
                   size="icon"
                   className="rounded-full border-emerald-200"
                   onClick={next}
-                  aria-label="Next testimonial"
+                  aria-label="Testimonianza successiva"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>

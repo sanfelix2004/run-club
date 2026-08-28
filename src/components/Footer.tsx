@@ -40,7 +40,7 @@ export function Footer() {
     <footer className="border-t border-emerald-100 bg-white py-6">
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6 lg:px-8">
         <p className="text-sm text-forest/50">
-          &copy; {year} {SITE.name}. All rights reserved.
+          &copy; {year} {SITE.name}. Tutti i diritti riservati.
         </p>
 
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-6">

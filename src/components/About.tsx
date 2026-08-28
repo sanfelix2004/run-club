@@ -19,29 +19,28 @@ export function About() {
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <FadeIn>
             <p className="text-sm font-semibold uppercase tracking-widest text-emerald-500">
-              About Us
+              Chi siamo
             </p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight text-forest sm:text-4xl">
-              run club Giovinazzo
+              Run Club Giovinazzo
             </h2>
             <p className="mt-6 text-lg leading-relaxed text-forest/70">
-              We started as a handful of friends meeting at the old harbour for
-              morning jogs. Today we&apos;re a proper community of runners —
-              locals, expats, and visitors — who share one thing: the love of
-              putting one foot in front of the other.
+              Siamo partiti come un gruppo di amici che si ritrovava al porto vecchio
+              per le corse mattutine. Oggi siamo una vera community di runner —
+              locali, expat e visitatori — uniti dalla passione per mettere un piede
+              davanti all&apos;altro.
             </p>
             <p className="mt-4 text-lg leading-relaxed text-forest/70">
-              No egos, no pressure. Whether you&apos;re training for your first
-              5K or your tenth marathon, you&apos;ll find your pace here. We run
-              the seafront at dawn, the hills on weekends, and celebrate every
-              finish line together.
+              Niente egos, niente pressione. Che tu stia preparando il tuo primo 5K o
+              il decimo maratona, qui trovi il tuo ritmo. Corriamo sul lungomare
+              all&apos;alba, in collina nel weekend e festeggiamo ogni traguardo insieme.
             </p>
             <ul className="mt-8 grid gap-4 sm:grid-cols-2">
               {[
-                "All levels welcome",
-                "Coach-led sessions",
-                "Coastal & trail routes",
-                "Community events year-round",
+                "Tutti i livelli benvenuti",
+                "Sessioni guidate dai coach",
+                "Percorsi costieri e trail",
+                "Eventi per la community tutto l'anno",
               ].map((item) => (
                 <li
                   key={item}
@@ -59,7 +58,7 @@ export function About() {
               <motion.div style={{ y: imageY }} className="relative aspect-[4/5]">
                 <Image
                   src="https://picsum.photos/seed/giovinazzo-about/800/1000"
-                  alt="Runners along the Giovinazzo seafront at sunrise"
+                  alt="Runner sul lungomare di Giovinazzo all'alba"
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 50vw"
@@ -68,7 +67,7 @@ export function About() {
             </div>
             <div className="absolute -bottom-6 -left-6 rounded-2xl border border-emerald-100 bg-white p-5 shadow-lg sm:-left-8">
               <p className="text-3xl font-bold text-emerald-500">320+</p>
-              <p className="text-sm font-medium text-forest/60">runners & counting</p>
+              <p className="text-sm font-medium text-forest/60">runner e non solo</p>
             </div>
           </FadeIn>
         </div>

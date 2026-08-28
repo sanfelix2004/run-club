@@ -16,14 +16,14 @@ export function Pricing() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <FadeIn className="mx-auto max-w-2xl text-center">
           <p className="text-sm font-semibold uppercase tracking-widest text-emerald-500">
-            Pricing
+            Prezzi
           </p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-forest sm:text-4xl">
-            Simple, honest plans
+            Piani semplici e trasparenti
           </h2>
           <p className="mt-4 text-lg text-forest/70">
-            No hidden fees, no long contracts. Pick what works for you and start
-            running with us.
+            Nessun costo nascosto, nessun vincolo lungo. Scegli quello che fa per te e
+            inizia a correre con noi.
           </p>
         </FadeIn>
 
@@ -40,7 +40,7 @@ export function Pricing() {
               >
                 {plan.highlighted && (
                   <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-emerald-500 px-4 py-1 text-xs font-semibold text-white">
-                    Most Popular
+                    Più popolare
                   </span>
                 )}
                 <h3 className="text-xl font-semibold">{plan.name}</h3>
@@ -91,7 +91,7 @@ export function Pricing() {
                   )}
                   onClick={scrollToEvents}
                 >
-                  Get Started
+                  Inizia ora
                 </Button>
               </div>
             </FadeIn>
