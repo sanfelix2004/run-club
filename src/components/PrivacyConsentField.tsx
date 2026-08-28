@@ -6,6 +6,7 @@ type PrivacyConsentFieldProps = {
   required?: boolean;
   error?: string;
   className?: string;
+  onCheckedChange?: (checked: boolean) => void;
 };
 
 export function PrivacyConsentField({
@@ -14,6 +15,7 @@ export function PrivacyConsentField({
   required = true,
   error,
   className,
+  onCheckedChange,
 }: PrivacyConsentFieldProps) {
   return (
     <div className={className}>
@@ -24,6 +26,7 @@ export function PrivacyConsentField({
           type="checkbox"
           value="true"
           required={required}
+          onChange={(e) => onCheckedChange?.(e.target.checked)}
           className="mt-1 h-4 w-4 shrink-0 rounded border-emerald-200 text-emerald-500 focus:ring-emerald-400"
         />
         <span>

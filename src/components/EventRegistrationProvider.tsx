@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+import type { AthleteProfile } from "@/app/actions/athlete-profile";
 import type { PublicEvent } from "@/app/actions/events";
 import { useAuthUI } from "@/components/AuthUIProvider";
 import { EventRegistrationSheet } from "@/components/EventRegistrationSheet";
@@ -30,11 +31,13 @@ export function useEventRegistration() {
 type EventRegistrationProviderProps = {
   children: React.ReactNode;
   user?: BookingUser;
+  bookingProfile?: AthleteProfile | null;
 };
 
 export function EventRegistrationProvider({
   children,
   user: serverUser = null,
+  bookingProfile: serverBookingProfile = null,
 }: EventRegistrationProviderProps) {
   const { data: session, status } = useSession();
   const { openLogin } = useAuthUI();
@@ -48,6 +51,9 @@ export function EventRegistrationProvider({
           email: session.user.email,
         }
       : serverUser;
+
+  const bookingProfile =
+    status === "authenticated" ? serverBookingProfile : null;
 
   const showRegistration = useCallback((event: PublicEvent) => {
     setSelectedEvent(event);
@@ -101,6 +107,7 @@ export function EventRegistrationProvider({
         open={open}
         onOpenChange={handleOpenChange}
         user={user}
+        bookingProfile={bookingProfile}
       />
     </EventRegistrationContext.Provider>
   );

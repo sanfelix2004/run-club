@@ -9,10 +9,10 @@ import {
   Download,
   MapPin,
   Ticket,
-  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AthleteProfileForm } from "@/components/AthleteProfileForm";
+import { ClubLogo } from "@/components/ClubLogo";
 import { useAuthUI } from "@/components/AuthUIProvider";
 import type { AthleteDashboard } from "@/app/actions/athlete-area";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
@@ -52,9 +52,7 @@ export function AthleteArea({ initialDashboard }: AthleteAreaProps) {
     return (
       <div className="mx-auto w-full max-w-md text-center">
         <div className="rounded-2xl border border-emerald-100 bg-white p-8 shadow-lg">
-          <div className="mx-auto mb-6 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 text-white">
-            <User className="h-6 w-6" />
-          </div>
+          <ClubLogo size={48} className="mx-auto mb-6" />
           <h1 className="text-2xl font-bold text-forest">Area Atleta</h1>
           <p className="mt-2 text-sm text-forest/60">
             Accedi o registrati per vedere i tuoi dati e lo storico eventi.

@@ -9,15 +9,17 @@ import { Partners } from "@/components/Partners";
 import { Pricing } from "@/components/Pricing";
 import { Testimonials } from "@/components/Testimonials";
 import { getUpcomingEvents } from "@/app/actions/events";
+import { getAthleteProfileForBooking } from "@/app/actions/athlete-profile";
 import { getPublishedReviews } from "@/app/actions/reviews";
 import { auth } from "@/auth";
 import { EventRegistrationProvider } from "@/components/EventRegistrationProvider";
 
 export default async function Home() {
-  const [events, reviews, session] = await Promise.all([
+  const [events, reviews, session, bookingProfile] = await Promise.all([
     getUpcomingEvents(),
     getPublishedReviews(),
     auth(),
+    getAthleteProfileForBooking(),
   ]);
 
   const user = session?.user
@@ -28,7 +30,7 @@ export default async function Home() {
     : null;
 
   return (
-    <EventRegistrationProvider user={user}>
+    <EventRegistrationProvider user={user} bookingProfile={bookingProfile}>
       <Navbar />
       <main>
         <Hero />

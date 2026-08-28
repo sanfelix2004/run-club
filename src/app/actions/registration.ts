@@ -115,6 +115,17 @@ export async function registerForMeetup(
     include: { event: true },
   });
 
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      firstName,
+      lastName,
+      name: `${firstName} ${lastName}`.trim(),
+      phone,
+      paceCategory,
+    },
+  });
+
   return {
     success: true,
     registration: {

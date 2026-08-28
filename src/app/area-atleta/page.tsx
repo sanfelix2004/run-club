@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AthleteArea } from "@/components/AthleteArea";
 import { AuthButtons } from "@/components/AuthButtons";
+import { ClubLogo } from "@/components/ClubLogo";
 import { Footer } from "@/components/Footer";
 import { getAthleteDashboard } from "@/app/actions/athlete-area";
 import { SITE } from "@/lib/constants";
@@ -17,10 +18,8 @@ export default async function AthleteAreaPage() {
     <>
       <header className="border-b border-emerald-100 bg-white/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold text-white">
-              R
-            </span>
+          <Link href="/" className="group flex items-center gap-2">
+            <ClubLogo size={32} />
             <span className="text-sm font-semibold text-forest sm:text-base">
               {SITE.name}
             </span>

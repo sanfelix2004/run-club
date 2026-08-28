@@ -18,6 +18,10 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: `${SITE.name} — ${SITE.tagline}`,
   description: SITE.description,
+  icons: {
+    icon: "/logo.svg",
+    apple: "/logo.svg",
+  },
   openGraph: {
     title: SITE.name,
     description: SITE.description,

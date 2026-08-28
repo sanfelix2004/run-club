@@ -13,6 +13,7 @@ import {
 import { NAV_LINKS, SITE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { AuthButtons } from "@/components/AuthButtons";
+import { ClubLogo } from "@/components/ClubLogo";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -49,9 +50,7 @@ export function Navbar() {
           }}
           className="group flex items-center gap-2"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold text-white transition-transform group-hover:scale-110">
-            R
-          </span>
+          <ClubLogo size={32} />
           <span
             className={cn(
               "text-sm font-semibold tracking-tight transition-colors sm:text-base",
