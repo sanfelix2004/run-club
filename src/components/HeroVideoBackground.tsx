@@ -1,97 +1,79 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 
 const VIDEO_SRC = "/videos/hero-run.mp4";
-const POSTER_SRC = "/videos/hero-poster.webp";
 
-export function HeroVideoBackground() {
+type HeroVideoBackgroundProps = {
+  onReady: () => void;
+};
+
+export function HeroVideoBackground({ onReady }: HeroVideoBackgroundProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [ready, setReady] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const readyCalled = useRef(false);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    const tryPlay = () => {
-      setReady(true);
+    const markReady = () => {
+      if (readyCalled.current) return;
+      readyCalled.current = true;
       video.play().catch(() => {});
+      onReady();
     };
 
-    const onCanPlay = () => tryPlay();
-    const onError = () => setFailed(true);
+    const onLoadedData = () => markReady();
+    const onCanPlay = () => markReady();
+    const onError = () => markReady(); // mostra comunque il testo se il video fallisce
 
+    video.addEventListener("loadeddata", onLoadedData);
     video.addEventListener("canplay", onCanPlay);
     video.addEventListener("error", onError);
 
+    video.load();
+
+    if (video.readyState >= 2) markReady();
+
     return () => {
+      video.removeEventListener("loadeddata", onLoadedData);
       video.removeEventListener("canplay", onCanPlay);
       video.removeEventListener("error", onError);
     };
-  }, []);
+  }, [onReady]);
 
   return (
-    <div className="absolute inset-0 overflow-hidden bg-forest">
-      {/* Poster — visibile subito mentre il video carica */}
-      <Image
-        src={POSTER_SRC}
-        alt=""
-        fill
-        priority
-        className={`object-cover transition-opacity duration-700 ${
-          ready && !failed ? "opacity-0" : "opacity-100"
-        }`}
+    <div className="absolute inset-0 overflow-hidden">
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full object-cover"
         style={{
           transform: "scale(1.25)",
           objectPosition: "center 36%",
         }}
-        sizes="100vw"
-        aria-hidden="true"
-      />
+      >
+        <source src={VIDEO_SRC} type="video/mp4" />
+      </video>
 
-      {!failed && (
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          poster={POSTER_SRC}
-          aria-hidden="true"
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
-            ready ? "opacity-100" : "opacity-0"
-          }`}
-          style={{
-            transform: "scale(1.25)",
-            objectPosition: "center 36%",
-          }}
-        >
-          <source src={VIDEO_SRC} type="video/mp4" />
-        </video>
-      )}
-
-      {/* Overlay scuro a sinistra per leggibilità testo */}
       <div className="absolute inset-0 bg-gradient-to-r from-forest/95 via-forest/75 to-forest/20" />
       <div className="absolute inset-0 bg-gradient-to-b from-forest/50 via-transparent to-[#FAFDFB]/90" />
       <div className="absolute inset-0 bg-gradient-to-t from-[#FAFDFB] via-transparent to-transparent" />
 
-      {failed && (
-        <>
-          <div className="absolute inset-0 bg-gradient-to-br from-forest via-emerald-900 to-emerald-800" />
-          <div className="absolute bottom-24 left-1/2 z-20 w-full max-w-sm -translate-x-1/2 px-4">
-            <Link
-              href="/upload-video"
-              className="block rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-center text-sm text-white backdrop-blur-md transition-colors hover:bg-white/20"
-            >
-              Video non caricato — clicca qui per caricarlo
-            </Link>
-          </div>
-        </>
-      )}
+      <noscript>
+        <Link
+          href="/upload-video"
+          className="absolute bottom-24 left-1/2 z-20 -translate-x-1/2 rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white"
+        >
+          Video non disponibile
+        </Link>
+      </noscript>
     </div>
   );
 }

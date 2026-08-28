@@ -23,6 +23,15 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${dmSans.variable} h-full scroll-smooth`}>
+      <head>
+        <link
+          rel="preload"
+          href="/videos/hero-run.mp4"
+          as="fetch"
+          type="video/mp4"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className="min-h-full bg-[#FAFDFB] font-sans text-forest antialiased">
         {children}
         <Toaster position="top-center" richColors closeButton />
