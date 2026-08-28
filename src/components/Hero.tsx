@@ -79,7 +79,7 @@ export function Hero() {
           <div className="mt-12 flex flex-wrap gap-5">
             <Button
               size="lg"
-              className="h-13 rounded-full bg-emerald-500 px-10 py-6 text-base font-semibold text-white shadow-lg shadow-black/30 hover:bg-emerald-400 sm:text-lg"
+              className="h-12 rounded-full bg-emerald-500 px-10 text-base font-semibold text-white shadow-lg shadow-black/30 hover:bg-emerald-400 sm:h-14 sm:text-lg"
               onClick={() => scrollTo("#booking")}
             >
               Book Your First Run
@@ -87,7 +87,7 @@ export function Hero() {
             <Button
               size="lg"
               variant="outline"
-              className="h-13 rounded-full border-white/40 bg-black/30 px-10 py-6 text-base font-semibold text-white shadow-lg backdrop-blur-md hover:bg-black/50 sm:text-lg"
+              className="h-12 rounded-full border-white/40 bg-black/30 px-10 text-base font-semibold text-white shadow-lg backdrop-blur-md hover:bg-black/50 sm:h-14 sm:text-lg"
               onClick={() => scrollTo("#sessions")}
             >
               See Sessions

@@ -10,6 +10,7 @@ datasource db {
 model Event {
   id           String         @id @default(uuid())
   title        String
+  description  String?
   dateTime     DateTime       @map("date_time")
   locationName String         @map("location_name")
   priceAmount  Float          @default(5.0) @map("price_amount")

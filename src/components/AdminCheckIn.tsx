@@ -19,11 +19,13 @@ import {
   confirmCheckIn,
   getCheckInStats,
   lookupRegistrationByQr,
-  logoutAdmin,
-  verifyAdminPin,
   type CheckInStats,
   type ScanResult,
 } from "@/app/actions/checkin";
+import {
+  logoutAdmin,
+  verifyAdminPin,
+} from "@/app/actions/admin-auth";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 
 const SCANNER_ID = "qr-reader";

@@ -12,19 +12,15 @@ import { registerForMeetup, type RegistrationResult } from "@/app/actions/regist
 import { PACE_CATEGORIES } from "@/lib/registration-types";
 import type { RegistrationFormData } from "@/lib/validations/registration";
 
-type UpcomingEvent = {
-  title: string;
-  date: string;
-  time: string;
-  locationName: string;
-  priceAmount: number;
-} | null;
+import type { PublicEvent } from "@/app/actions/events";
 
 type BookingProps = {
-  upcomingEvent: UpcomingEvent;
+  events: PublicEvent[];
 };
 
-export function Booking({ upcomingEvent }: BookingProps) {
+export function Booking({ events }: BookingProps) {
+  const [selectedEventId, setSelectedEventId] = useState(events[0]?.id ?? "");
+  const selectedEvent = events.find((e) => e.id === selectedEventId) ?? events[0] ?? null;
   const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [registration, setRegistration] = useState<
@@ -47,7 +43,9 @@ export function Booking({ upcomingEvent }: BookingProps) {
       paceCategory: formData.get("paceCategory") as RegistrationFormData["paceCategory"],
     };
 
-    const result = await registerForMeetup(data);
+    const eventId = formData.get("eventId") as string;
+
+    const result = await registerForMeetup({ ...data, eventId });
     setLoading(false);
 
     if (result.success) {
@@ -77,22 +75,22 @@ export function Booking({ upcomingEvent }: BookingProps) {
               Compila il modulo, scarica il pass PDF con QR code e presentalo al
               ritrovo. La quota di{" "}
               <strong className="text-forest">
-                {upcomingEvent?.priceAmount.toFixed(2).replace(".", ",") ?? "5,00"}€
+                {selectedEvent?.priceAmount.toFixed(2).replace(".", ",") ?? "5,00"}€
               </strong>{" "}
               si paga in contanti o POS il giorno della corsa.
             </p>
 
-            {upcomingEvent && (
+            {selectedEvent && (
               <div className="mt-6 rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm">
-                <p className="font-semibold text-forest">{upcomingEvent.title}</p>
+                <p className="font-semibold text-forest">{selectedEvent.title}</p>
                 <p className="mt-2 flex items-center gap-2 text-sm text-forest/60">
                   <Calendar className="h-4 w-4 text-emerald-500" />
-                  {upcomingEvent.date} · {upcomingEvent.time}
+                  {selectedEvent.date} · {selectedEvent.time}
                 </p>
-                <p className="mt-1 text-sm text-forest/60">{upcomingEvent.locationName}</p>
+                <p className="mt-1 text-sm text-forest/60">{selectedEvent.locationName}</p>
                 <p className="mt-3 flex items-center gap-2 text-sm font-medium text-emerald-600">
                   <Euro className="h-4 w-4" />
-                  Quota: {upcomingEvent.priceAmount.toFixed(2).replace(".", ",")}€ da saldare all&apos;arrivo
+                  Quota: {selectedEvent.priceAmount.toFixed(2).replace(".", ",")}€ da saldare all&apos;arrivo
                 </p>
               </div>
             )}
@@ -124,6 +122,26 @@ export function Booking({ upcomingEvent }: BookingProps) {
                     <Calendar className="h-5 w-5 text-emerald-500" />
                     <span className="font-semibold">Modulo di iscrizione runner</span>
                   </div>
+
+                  {events.length > 0 && (
+                    <div className="space-y-2">
+                      <Label htmlFor="eventId">Scegli evento</Label>
+                      <select
+                        id="eventId"
+                        name="eventId"
+                        required
+                        value={selectedEventId}
+                        onChange={(e) => setSelectedEventId(e.target.value)}
+                        className={selectClass}
+                      >
+                        {events.map((event) => (
+                          <option key={event.id} value={event.id}>
+                            {event.title} — {event.date} {event.time}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">

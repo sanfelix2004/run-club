@@ -2,7 +2,6 @@
 
 import { prisma } from "@/lib/db";
 import { generateQrToken } from "@/lib/qr";
-import { formatEventDate } from "@/lib/pdf";
 import {
   registrationSchema,
   type RegistrationFormData,
@@ -31,7 +30,7 @@ export type RegistrationResult =
   | { success: false; error: string; fieldErrors?: Record<string, string[]> };
 
 export async function registerForMeetup(
-  data: RegistrationFormData,
+  data: RegistrationFormData & { eventId?: string },
 ): Promise<RegistrationResult> {
   const parsed = registrationSchema.safeParse(data);
 
@@ -43,9 +42,17 @@ export async function registerForMeetup(
     };
   }
 
-  const event = await prisma.event.findFirst({
-    orderBy: { dateTime: "asc" },
-  });
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+
+  let event = data.eventId
+    ? await prisma.event.findFirst({
+        where: { id: data.eventId, dateTime: { gte: now } },
+      })
+    : await prisma.event.findFirst({
+        where: { dateTime: { gte: now } },
+        orderBy: { dateTime: "asc" },
+      });
 
   if (!event) {
     return {
@@ -92,26 +99,5 @@ export async function registerForMeetup(
         currency: registration.event.currency,
       },
     },
-  };
-}
-
-export async function getUpcomingEvent() {
-  const event = await prisma.event.findFirst({
-    orderBy: { dateTime: "asc" },
-  });
-
-  if (!event) return null;
-
-  const { date, time } = formatEventDate(event.dateTime);
-
-  return {
-    id: event.id,
-    title: event.title,
-    date,
-    time,
-    dateTime: event.dateTime.toISOString(),
-    locationName: event.locationName,
-    priceAmount: event.priceAmount,
-    currency: event.currency,
   };
 }
