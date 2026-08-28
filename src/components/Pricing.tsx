@@ -7,8 +7,8 @@ import { PRICING_PLANS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 export function Pricing() {
-  const scrollToBooking = () => {
-    document.querySelector("#booking")?.scrollIntoView({ behavior: "smooth" });
+  const scrollToEvents = () => {
+    document.querySelector("#events")?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -89,7 +89,7 @@ export function Pricing() {
                       ? "bg-emerald-500 text-white hover:bg-emerald-400"
                       : "bg-emerald-500 text-white hover:bg-emerald-600",
                   )}
-                  onClick={scrollToBooking}
+                  onClick={scrollToEvents}
                 >
                   Get Started
                 </Button>

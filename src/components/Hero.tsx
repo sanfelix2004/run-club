@@ -80,7 +80,7 @@ export function Hero() {
             <Button
               size="lg"
               className="h-12 rounded-full bg-emerald-500 px-10 text-base font-semibold text-white shadow-lg shadow-black/30 hover:bg-emerald-400 sm:h-14 sm:text-lg"
-              onClick={() => scrollTo("#booking")}
+              onClick={() => scrollTo("#events")}
             >
               Book Your First Run
             </Button>

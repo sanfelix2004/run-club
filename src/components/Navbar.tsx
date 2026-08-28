@@ -88,7 +88,7 @@ export function Navbar() {
           <Button
             size="sm"
             className="rounded-full bg-emerald-500 px-5 text-white hover:bg-emerald-600"
-            onClick={() => handleNavClick("#booking")}
+            onClick={() => handleNavClick("#events")}
           >
             Join a Run
           </Button>
@@ -132,7 +132,7 @@ export function Navbar() {
               </ul>
               <Button
                 className="mt-6 w-full rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
-                onClick={() => handleNavClick("#booking")}
+                onClick={() => handleNavClick("#events")}
               >
                 Join a Run
               </Button>

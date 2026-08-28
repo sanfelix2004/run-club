@@ -28,7 +28,7 @@ export default async function AthleteAreaPage() {
           <div className="flex items-center gap-3">
             <AuthButtons scrolled />
             <Link
-              href="/#booking"
+              href="/#events"
               className="hidden rounded-full bg-emerald-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-600 sm:inline-block"
             >
               Prenota evento

@@ -11,6 +11,7 @@ import { Stats } from "@/components/Stats";
 import { Testimonials } from "@/components/Testimonials";
 import { getUpcomingEvents } from "@/app/actions/events";
 import { auth } from "@/auth";
+import { EventRegistrationProvider } from "@/components/EventRegistrationProvider";
 
 export default async function Home() {
   const events = await getUpcomingEvents();
@@ -23,7 +24,7 @@ export default async function Home() {
     : null;
 
   return (
-    <>
+    <EventRegistrationProvider user={user}>
       <Navbar />
       <main>
         <Hero />
@@ -33,10 +34,10 @@ export default async function Home() {
         <Stats />
         <Pricing />
         <Testimonials />
-        <Booking events={events} user={user} />
+        <Booking />
         <Location />
       </main>
       <Footer />
-    </>
+    </EventRegistrationProvider>
   );
 }

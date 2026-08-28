@@ -89,8 +89,9 @@ Update `provider` in `prisma/schema.prisma` from `sqlite` to `postgresql`.
 
 ## Database Schema
 
+- **users** — account (email/password or OAuth)
 - **events** — title, date_time, location_name, price_amount (5.00), currency
-- **registrations** — runner details, qr_token, status (`PENDING_PAYMENT` | `PAID_AND_CHECKED_IN` | `CANCELLED`), checked_in_at
+- **registrations** — runner details, qr_token, status, optional user_id link
 
 ## Build for Production
 

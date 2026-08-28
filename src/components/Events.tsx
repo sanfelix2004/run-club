@@ -3,6 +3,7 @@
 import { Calendar, MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/FadeIn";
+import { useEventRegistration } from "@/components/EventRegistrationProvider";
 import type { PublicEvent } from "@/app/actions/events";
 
 type EventsProps = {
@@ -10,9 +11,7 @@ type EventsProps = {
 };
 
 export function Events({ events }: EventsProps) {
-  const scrollToBooking = () => {
-    document.getElementById("booking")?.scrollIntoView({ behavior: "smooth" });
-  };
+  const { openRegistration } = useEventRegistration();
 
   return (
     <section id="events" className="bg-emerald-50/50 py-20 sm:py-28">
@@ -25,7 +24,8 @@ export function Events({ events }: EventsProps) {
             Prossimi meetup
           </h2>
           <p className="mt-4 text-lg text-forest/70">
-            Iscriviti a un evento, scarica il pass con QR code e vieni a correre con noi.
+            Clicca su un evento per aprire la scheda di iscrizione, compilare i dati e
+            scaricare subito il PDF con QR code.
           </p>
         </FadeIn>
 
@@ -38,9 +38,22 @@ export function Events({ events }: EventsProps) {
           <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {events.map((event, i) => (
               <FadeIn key={event.id} delay={i * 0.08}>
-                <article className="flex h-full flex-col rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-900/10">
+                <article
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => openRegistration(event)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      openRegistration(event);
+                    }
+                  }}
+                  className="group flex h-full cursor-pointer flex-col rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:border-emerald-200 hover:shadow-lg hover:shadow-emerald-900/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+                >
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-lg font-semibold text-forest">{event.title}</h3>
+                    <h3 className="text-lg font-semibold text-forest group-hover:text-emerald-700">
+                      {event.title}
+                    </h3>
                     <span className="shrink-0 rounded-full bg-emerald-100 px-3 py-1 text-sm font-bold text-emerald-700">
                       €{event.priceAmount.toFixed(2).replace(".", ",")}
                     </span>
@@ -69,7 +82,10 @@ export function Events({ events }: EventsProps) {
 
                   <Button
                     className="mt-6 w-full rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
-                    onClick={scrollToBooking}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openRegistration(event);
+                    }}
                   >
                     Iscriviti
                   </Button>

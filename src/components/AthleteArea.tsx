@@ -75,7 +75,7 @@ export function AthleteArea({ initialDashboard }: AthleteAreaProps) {
           </div>
           <p className="mt-6 text-sm text-forest/50">
             Non sei ancora iscritto a un evento?{" "}
-            <Link href="/#booking" className="font-medium text-emerald-600 hover:underline">
+            <Link href="/#events" className="font-medium text-emerald-600 hover:underline">
               Prenota ora
             </Link>
           </p>
@@ -158,7 +158,7 @@ export function AthleteArea({ initialDashboard }: AthleteAreaProps) {
         {registrations.length === 0 ? (
           <p className="mt-4 rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/50 p-8 text-center text-sm text-forest/60">
             Non hai ancora prenotato nessun evento.{" "}
-            <Link href="/#booking" className="font-medium text-emerald-600 hover:underline">
+            <Link href="/#events" className="font-medium text-emerald-600 hover:underline">
               Prenota il tuo primo meetup
             </Link>
           </p>
@@ -239,7 +239,7 @@ export function AthleteArea({ initialDashboard }: AthleteAreaProps) {
 
       <div className="text-center">
         <Link
-          href="/#booking"
+          href="/#events"
           className="text-sm font-medium text-emerald-600 hover:underline"
         >
           Prenota un nuovo evento →

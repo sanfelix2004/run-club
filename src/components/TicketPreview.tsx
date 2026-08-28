@@ -11,9 +11,14 @@ import { buildQrPayload } from "@/lib/qr";
 type TicketPreviewProps = {
   registration: Extract<RegistrationResult, { success: true }>["registration"];
   onRegisterAnother: () => void;
+  closeLabel?: string;
 };
 
-export function TicketPreview({ registration, onRegisterAnother }: TicketPreviewProps) {
+export function TicketPreview({
+  registration,
+  onRegisterAnother,
+  closeLabel = "Nuova iscrizione",
+}: TicketPreviewProps) {
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
 
   const eventDate = new Date(registration.event.dateTime);
@@ -126,7 +131,7 @@ export function TicketPreview({ registration, onRegisterAnother }: TicketPreview
           className="flex-1 rounded-full border-emerald-200 py-5"
           onClick={onRegisterAnother}
         >
-          Nuova iscrizione
+          {closeLabel}
         </Button>
       </div>
 
