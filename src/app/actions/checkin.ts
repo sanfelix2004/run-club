@@ -3,8 +3,6 @@
 import { prisma } from "@/lib/db";
 import { isValidQrToken, parseQrPayload } from "@/lib/qr";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
-import { isAdminAuthenticated } from "@/app/actions/admin-auth";
-
 export type ScanResult =
   | {
       success: true;
@@ -28,11 +26,6 @@ export type ScanResult =
   | { success: false; error: string };
 
 export async function lookupRegistrationByQr(qrToken: string): Promise<ScanResult> {
-  const authed = await isAdminAuthenticated();
-  if (!authed) {
-    return { success: false, error: "Accesso non autorizzato." };
-  }
-
   const token = parseQrPayload(qrToken);
 
   if (!isValidQrToken(token)) {
@@ -74,11 +67,6 @@ export type CheckInResult =
   | { success: false; error: string };
 
 export async function confirmCheckIn(registrationId: string): Promise<CheckInResult> {
-  const authed = await isAdminAuthenticated();
-  if (!authed) {
-    return { success: false, error: "Accesso non autorizzato." };
-  }
-
   const registration = await prisma.registration.findUnique({
     where: { id: registrationId },
   });
@@ -143,18 +131,6 @@ async function getActiveEvent() {
 }
 
 export async function getCheckInStats(): Promise<CheckInStats> {
-  const authed = await isAdminAuthenticated();
-  if (!authed) {
-    return {
-      eventId: null,
-      eventTitle: "",
-      totalRegistered: 0,
-      checkedIn: 0,
-      pending: 0,
-      totalCollected: 0,
-    };
-  }
-
   const event = await getActiveEvent();
   if (!event) {
     return {
@@ -190,9 +166,6 @@ export async function getCheckInStats(): Promise<CheckInStats> {
 }
 
 export async function getPresentAttendees(): Promise<PresentAttendee[]> {
-  const authed = await isAdminAuthenticated();
-  if (!authed) return [];
-
   const event = await getActiveEvent();
   if (!event) return [];
 

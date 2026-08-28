@@ -5,11 +5,7 @@ import { Html5Qrcode } from "html5-qrcode";
 import {
   AlertTriangle,
   Banknote,
-  Calendar,
   CheckCircle2,
-  LogOut,
-  MapPin,
-  QrCode,
   RefreshCw,
   ScanLine,
   Users,
@@ -29,7 +25,6 @@ import {
   type ScanResult,
 } from "@/app/actions/checkin";
 import { AdminNav } from "@/components/admin/AdminNav";
-import { logoutAdmin, verifyAdminPin } from "@/app/actions/admin-auth";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 
 const SCANNER_ID = "qr-reader";
@@ -42,9 +37,6 @@ type ModalState =
   | { type: "error"; message: string };
 
 export function AdminCheckIn() {
-  const [pin, setPin] = useState("");
-  const [authed, setAuthed] = useState(false);
-  const [pinLoading, setPinLoading] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [modal, setModal] = useState<ModalState>({ type: "idle" });
   const [stats, setStats] = useState<CheckInStats>({
@@ -70,8 +62,8 @@ export function AdminCheckIn() {
   }, []);
 
   useEffect(() => {
-    if (authed) refreshDashboard();
-  }, [authed, refreshDashboard]);
+    refreshDashboard();
+  }, [refreshDashboard]);
 
   const closeModal = useCallback(() => {
     setModal({ type: "idle" });
@@ -114,27 +106,6 @@ export function AdminCheckIn() {
     },
     [closeModal, refreshDashboard],
   );
-
-  const handlePinSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setPinLoading(true);
-    const result = await verifyAdminPin(pin);
-    setPinLoading(false);
-    if (result.success) {
-      setAuthed(true);
-      toast.success("Accesso organizzatore confermato");
-    } else {
-      toast.error("PIN non valido");
-    }
-  };
-
-  const handleLogout = async () => {
-    await stopScanner();
-    await logoutAdmin();
-    setAuthed(false);
-    setPin("");
-    closeModal();
-  };
 
   const stopScanner = useCallback(async () => {
     if (scannerRef.current) {
@@ -191,13 +162,11 @@ export function AdminCheckIn() {
   }, [closeModal, handleScan, stopScanner]);
 
   useEffect(() => {
-    if (authed) {
-      startScanner();
-    }
+    startScanner();
     return () => {
       stopScanner();
     };
-  }, [authed, startScanner, stopScanner]);
+  }, [startScanner, stopScanner]);
 
   const handleManualLookup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -206,39 +175,6 @@ export function AdminCheckIn() {
     if (!token.trim()) return;
     await handleScan(token.trim());
   };
-
-  if (!authed) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#FFFBF7] p-4">
-        <div className="w-full max-w-sm rounded-2xl border border-emerald-100 bg-white p-8 shadow-lg">
-          <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-full bg-forest text-white">
-            <QrCode className="h-6 w-6" />
-          </div>
-          <h1 className="text-xl font-bold text-forest">Check-in Organizzatore</h1>
-          <p className="mt-2 text-sm text-forest/60">
-            Inserisci il PIN staff per accedere allo scanner QR.
-          </p>
-          <form onSubmit={handlePinSubmit} className="mt-6 space-y-4">
-            <Input
-              type="password"
-              placeholder="PIN organizzatore"
-              value={pin}
-              onChange={(e) => setPin(e.target.value)}
-              className="rounded-xl border-emerald-100 text-center text-lg tracking-widest"
-              autoFocus
-            />
-            <Button
-              type="submit"
-              disabled={pinLoading || !pin}
-              className="w-full rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
-            >
-              {pinLoading ? "Verifica..." : "Accedi"}
-            </Button>
-          </form>
-        </div>
-      </div>
-    );
-  }
 
   const modalResult =
     modal.type === "confirming" ||
@@ -257,12 +193,7 @@ export function AdminCheckIn() {
               {stats.eventTitle || "Giovinazzo Sunset Run"}
             </p>
           </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <AdminNav />
-            <Button variant="ghost" size="icon-sm" onClick={handleLogout} aria-label="Esci">
-              <LogOut className="h-4 w-4" />
-            </Button>
-          </div>
+          <AdminNav />
         </div>
       </header>
 

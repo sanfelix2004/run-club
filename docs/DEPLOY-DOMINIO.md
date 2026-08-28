@@ -76,13 +76,16 @@ Aggiorna su Vercel: `AUTH_URL=https://run-club-olive.vercel.app`
 
 ---
 
-## Database online
+## Database online (Turso)
 
-SQLite su Vercel non persiste i dati. Per produzione usa **Turso** (gratis) o **Neon** (gratis):
+Aggiungi su Vercel:
 
-1. Crea database su https://turso.tech o https://neon.tech
-2. Aggiungi `DATABASE_URL` nelle env di Vercel
-3. Se usi PostgreSQL, in `prisma/schema.prisma` cambia `provider` in `postgresql` e fai `npx prisma db push`
+| Variabile | Valore |
+|-----------|--------|
+| `TURSO_DATABASE_URL` | `libsql://run-club-frasanf004.aws-eu-west-1.turso.io` |
+| `TURSO_AUTH_TOKEN` | token da Turso dashboard |
+
+Poi **Redeploy**. Eventi, iscrizioni e profili restano salvati.
 
 ---
 
