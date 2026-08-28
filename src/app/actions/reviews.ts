@@ -13,17 +13,22 @@ export type PublicReview = {
 };
 
 export async function getPublishedReviews(): Promise<PublicReview[]> {
-  const reviews = await prisma.review.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 50,
-  });
+  try {
+    const reviews = await prisma.review.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    });
 
-  return reviews.map((review) => ({
-    id: review.id,
-    authorName: review.authorName,
-    message: review.message,
-    createdAt: review.createdAt.toISOString(),
-  }));
+    return reviews.map((review) => ({
+      id: review.id,
+      authorName: review.authorName,
+      message: review.message,
+      createdAt: review.createdAt.toISOString(),
+    }));
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    return [];
+  }
 }
 
 type SubmitReviewResult =

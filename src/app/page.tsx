@@ -16,10 +16,10 @@ import { EventRegistrationProvider } from "@/components/EventRegistrationProvide
 
 export default async function Home() {
   const [events, reviews, session, bookingProfile] = await Promise.all([
-    getUpcomingEvents(),
-    getPublishedReviews(),
-    auth(),
-    getAthleteProfileForBooking(),
+    getUpcomingEvents().catch(() => []),
+    getPublishedReviews().catch(() => []),
+    auth().catch(() => null),
+    getAthleteProfileForBooking().catch(() => null),
   ]);
 
   const user = session?.user
