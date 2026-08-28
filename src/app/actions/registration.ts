@@ -55,7 +55,7 @@ export async function registerForMeetup(
   const now = new Date();
   now.setHours(0, 0, 0, 0);
 
-  let event = data.eventId
+  const event = data.eventId
     ? await prisma.event.findFirst({
         where: { id: data.eventId, dateTime: { gte: now } },
       })

@@ -32,9 +32,8 @@ export function Testimonials({ initialReviews }: TestimonialsProps) {
   const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
-  useEffect(() => {
-    setReviews(initialReviews);
-  }, [initialReviews]);
+  const safeCurrent =
+    reviews.length > 0 ? Math.min(current, reviews.length - 1) : 0;
 
   const goTo = useCallback((index: number) => {
     setDirection(index > current ? 1 : -1);
@@ -84,7 +83,7 @@ export function Testimonials({ initialReviews }: TestimonialsProps) {
     toast.success("Grazie! La tua recensione è stata pubblicata.");
   };
 
-  const review = reviews[current];
+  const review = reviews[safeCurrent];
 
   const variants = {
     enter: (dir: number) => ({ x: dir > 0 ? 80 : -80, opacity: 0 }),
@@ -152,7 +151,7 @@ export function Testimonials({ initialReviews }: TestimonialsProps) {
                           type="button"
                           onClick={() => goTo(i)}
                           className={`h-2 rounded-full transition-all duration-300 ${
-                            i === current
+                            i === safeCurrent
                               ? "w-6 bg-emerald-500"
                               : "w-2 bg-emerald-200 hover:bg-emerald-300"
                           }`}

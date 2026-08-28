@@ -201,6 +201,13 @@ export function EventRegistrationSheet({
                 </div>
               </div>
 
+              {!user?.email && (
+                <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                  Il tuo account non ha un&apos;email associata. Aggiorna il profilo o
+                  contatta lo staff.
+                </p>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="sheet-email">Email</Label>
                 <Input
@@ -210,6 +217,7 @@ export function EventRegistrationSheet({
                   required
                   defaultValue={user?.email ?? ""}
                   readOnly={Boolean(user?.email)}
+                  disabled={!user?.email}
                   placeholder="marco@example.com"
                   className="rounded-xl border-emerald-100"
                 />
@@ -298,7 +306,7 @@ export function EventRegistrationSheet({
 
               <Button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !user?.email}
                 className="w-full rounded-full bg-emerald-500 py-5 text-white hover:bg-emerald-600"
               >
                 {loading ? "Registrazione in corso..." : "Conferma iscrizione"}

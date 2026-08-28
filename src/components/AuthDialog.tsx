@@ -54,7 +54,13 @@ export function AuthDialog({
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
-    if (open) setMode(defaultMode);
+    if (!open) {
+      setLoading(false);
+      setFieldErrors({});
+      return;
+    }
+
+    setMode(defaultMode);
   }, [open, defaultMode]);
 
   useEffect(() => {

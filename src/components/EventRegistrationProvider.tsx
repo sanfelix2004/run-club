@@ -34,12 +34,20 @@ type EventRegistrationProviderProps = {
 
 export function EventRegistrationProvider({
   children,
-  user = null,
+  user: serverUser = null,
 }: EventRegistrationProviderProps) {
-  const { status } = useSession();
+  const { data: session, status } = useSession();
   const { openLogin } = useAuthUI();
   const [open, setOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<PublicEvent | null>(null);
+
+  const user: BookingUser =
+    session?.user?.email
+      ? {
+          name: session.user.name ?? "",
+          email: session.user.email,
+        }
+      : serverUser;
 
   const showRegistration = useCallback((event: PublicEvent) => {
     setSelectedEvent(event);
@@ -48,6 +56,13 @@ export function EventRegistrationProvider({
 
   const openRegistration = useCallback(
     (event: PublicEvent) => {
+      if (status === "loading") {
+        toast.message("Verifica accesso in corso...", {
+          description: "Riprova tra un attimo.",
+        });
+        return;
+      }
+
       if (status !== "authenticated") {
         savePendingEvent(event);
         toast.message("Accedi o registrati per prenotare", {
