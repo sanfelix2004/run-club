@@ -19,8 +19,8 @@ export const metadata: Metadata = {
   title: `${SITE.name} — ${SITE.tagline}`,
   description: SITE.description,
   icons: {
-    icon: "/logo.svg",
-    apple: "/logo.svg",
+    icon: [{ url: "/logo.png", type: "image/png" }, { url: "/icon.svg", type: "image/svg+xml" }],
+    apple: "/logo.png",
   },
   openGraph: {
     title: SITE.name,
@@ -44,7 +44,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           crossOrigin="anonymous"
         />
       </head>
-      <body className="min-h-full bg-[#FAFDFB] font-sans text-forest antialiased">
+      <body className="min-h-full bg-[#FFFBF7] font-sans text-forest antialiased">
         <AuthProvider session={session}>
           <AuthUIProvider googleOAuthEnabled={googleOAuthEnabled}>
             {children}

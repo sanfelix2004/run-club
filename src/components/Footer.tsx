@@ -4,6 +4,7 @@ import Link from "next/link";
 import { SITE, SOCIAL_LINKS } from "@/lib/constants";
 import { LEGAL_LINKS } from "@/lib/legal";
 import { openCookieSettings } from "@/components/CookieBanner";
+import { ClubLogo } from "@/components/ClubLogo";
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -45,7 +46,8 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center justify-between gap-6 sm:flex-row sm:items-start">
           <div className="text-center sm:text-left">
-            <p className="text-sm text-forest/50">
+            <ClubLogo size={56} className="mx-auto sm:mx-0" />
+            <p className="mt-3 text-sm text-forest/50">
               &copy; {year} {SITE.name}. Tutti i diritti riservati.
             </p>
             <nav aria-label="Link legali" className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-2 sm:justify-start">

@@ -1,6 +1,12 @@
 import { jsPDF } from "jspdf";
 import QRCode from "qrcode";
+import { readFile } from "fs/promises";
+import path from "path";
 import { buildQrPayload } from "@/lib/qr";
+
+/** Brand colors from Giovinazzo Sunset Run logo */
+const NAVY = { r: 10, g: 42, b: 92 }; // #0A2A5C
+const ORANGE = { r: 255, g: 107, b: 0 }; // #FF6B00
 
 export type TicketData = {
   eventTitle: string;
@@ -24,24 +30,42 @@ export async function generateTicketPdf(data: TicketData): Promise<Uint8Array> {
     width: 400,
     margin: 1,
     errorCorrectionLevel: "H",
-    color: { dark: "#064E3B", light: "#FFFFFF" },
+    color: { dark: "#0A2A5C", light: "#FFFFFF" },
   });
 
-  doc.setFillColor(6, 78, 59);
-  doc.rect(0, 0, pageWidth, 28, "F");
+  // Header bar — navy
+  doc.setFillColor(NAVY.r, NAVY.g, NAVY.b);
+  doc.rect(0, 0, pageWidth, 30, "F");
+
+  // Orange accent strip under header
+  doc.setFillColor(ORANGE.r, ORANGE.g, ORANGE.b);
+  doc.rect(0, 30, pageWidth, 2.5, "F");
+
+  // Try to embed logo mark on the right of the header
+  try {
+    const logoPath = path.join(process.cwd(), "public", "logo.png");
+    const logoBytes = await readFile(logoPath);
+    const logoBase64 = Buffer.from(logoBytes).toString("base64");
+    doc.addImage(`data:image/png;base64,${logoBase64}`, "PNG", pageWidth - margin - 28, 3, 26, 24);
+  } catch {
+    /* logo optional */
+  }
 
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(9);
-  doc.text("RUN CLUB GIOVINAZZO", margin, 10);
-  doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.text(data.eventTitle.toUpperCase(), margin, 18);
-  doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
-  doc.text("PRENOTAZIONE CONFERMATA", margin, 24);
+  doc.setFont("helvetica", "bold");
+  doc.text("GIOVINAZZO", margin, 10);
+  doc.setTextColor(ORANGE.r, ORANGE.g, ORANGE.b);
+  doc.text("SUNSET RUN", margin, 15);
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(11);
+  doc.text(data.eventTitle.toUpperCase(), margin, 22);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7);
+  doc.text("PRENOTAZIONE CONFERMATA", margin, 27);
 
-  let y = 36;
-  doc.setTextColor(6, 78, 59);
+  let y = 42;
+  doc.setTextColor(NAVY.r, NAVY.g, NAVY.b);
   doc.setFontSize(10);
   doc.setFont("helvetica", "bold");
   doc.text("ATLETA", margin, y);
@@ -55,7 +79,7 @@ export async function generateTicketPdf(data: TicketData): Promise<Uint8Array> {
   doc.text(`Gruppo di passo: ${data.paceCategory}`, margin, y);
 
   y += 12;
-  doc.setTextColor(6, 78, 59);
+  doc.setTextColor(NAVY.r, NAVY.g, NAVY.b);
   doc.setFont("helvetica", "bold");
   doc.text("RITROVO", margin, y);
   y += 6;
@@ -70,7 +94,7 @@ export async function generateTicketPdf(data: TicketData): Promise<Uint8Array> {
 
   const qrSize = 42;
   const qrX = pageWidth - margin - qrSize;
-  const qrY = 34;
+  const qrY = 40;
   doc.addImage(qrDataUrl, "PNG", qrX, qrY, qrSize, qrSize);
   doc.setFontSize(7);
   doc.setTextColor(120, 120, 120);
@@ -79,7 +103,8 @@ export async function generateTicketPdf(data: TicketData): Promise<Uint8Array> {
   });
 
   y += 14;
-  doc.setFillColor(16, 185, 129);
+  // Orange payment banner
+  doc.setFillColor(ORANGE.r, ORANGE.g, ORANGE.b);
   doc.roundedRect(margin, y, pageWidth - margin * 2, 16, 3, 3, "F");
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
@@ -92,7 +117,7 @@ export async function generateTicketPdf(data: TicketData): Promise<Uint8Array> {
   );
 
   y += 24;
-  doc.setTextColor(6, 78, 59);
+  doc.setTextColor(NAVY.r, NAVY.g, NAVY.b);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(8);
   doc.text("NOTE DI SICUREZZA", margin, y);
@@ -113,7 +138,11 @@ export async function generateTicketPdf(data: TicketData): Promise<Uint8Array> {
 
   doc.setFontSize(6);
   doc.setTextColor(160, 160, 160);
-  doc.text(`Codice: ${data.qrToken.slice(0, 8).toUpperCase()}`, margin, doc.internal.pageSize.getHeight() - 6);
+  doc.text(
+    `Codice: ${data.qrToken.slice(0, 8).toUpperCase()}  ·  Giovinazzo Sunset Run`,
+    margin,
+    doc.internal.pageSize.getHeight() - 6,
+  );
 
   return new Uint8Array(doc.output("arraybuffer"));
 }

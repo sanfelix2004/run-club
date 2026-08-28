@@ -16,8 +16,7 @@ export function LegalShell({ title, description, children }: LegalShellProps) {
       <header className="border-b border-emerald-100 bg-white/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="group flex items-center gap-2">
-            <ClubLogo size={32} />
-            <span className="text-sm font-semibold text-forest sm:text-base">{SITE.name}</span>
+            <ClubLogo size={48} />
           </Link>
           <Link
             href="/"

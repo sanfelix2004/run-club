@@ -22,7 +22,7 @@ export function About() {
               Chi siamo
             </p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight text-forest sm:text-4xl">
-              Run Club Giovinazzo
+              Giovinazzo Sunset Run
             </h2>
             <p className="mt-6 text-lg leading-relaxed text-forest/70">
               Siamo partiti come un gruppo di amici che si ritrovava al porto vecchio

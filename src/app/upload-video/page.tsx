@@ -74,7 +74,7 @@ export default function UploadVideoPage() {
   );
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#FAFDFB] p-4">
+    <div className="flex min-h-screen items-center justify-center bg-[#FFFBF7] p-4">
       <div className="w-full max-w-lg rounded-2xl border border-emerald-100 bg-white p-8 shadow-lg">
         <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100">
           <Film className="h-7 w-7 text-emerald-600" />

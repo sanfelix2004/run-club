@@ -190,7 +190,7 @@ export function AdminCheckIn() {
 
   if (!authed) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#FAFDFB] p-4">
+      <div className="flex min-h-screen items-center justify-center bg-[#FFFBF7] p-4">
         <div className="w-full max-w-sm rounded-2xl border border-emerald-100 bg-white p-8 shadow-lg">
           <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-full bg-forest text-white">
             <QrCode className="h-6 w-6" />
@@ -229,12 +229,12 @@ export function AdminCheckIn() {
     scanResult?.registration.status === REGISTRATION_STATUSES.PAID_AND_CHECKED_IN;
 
   return (
-    <div className="min-h-screen bg-[#FAFDFB]">
+    <div className="min-h-screen bg-[#FFFBF7]">
       <header className="sticky top-0 z-10 border-b border-emerald-100 bg-white/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-lg items-center justify-between gap-2 px-4 py-3">
           <div className="min-w-0">
             <h1 className="text-sm font-bold text-forest">Check-in organizzatore</h1>
-            <p className="text-xs text-forest/50">Run Club Giovinazzo</p>
+            <p className="text-xs text-forest/50">Giovinazzo Sunset Run</p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <AdminNav />

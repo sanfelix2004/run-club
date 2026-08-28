@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SITE } from "@/lib/constants";
 
 const ERROR_MESSAGES: Record<string, { title: string; description: string }> = {
   Configuration: {
@@ -51,7 +52,7 @@ export default async function AuthErrorPage({ searchParams }: PageProps) {
     <main className="flex min-h-screen items-center justify-center bg-emerald-50/40 px-4 py-16">
       <div className="w-full max-w-lg rounded-2xl border border-emerald-100 bg-white p-8 shadow-xl">
         <p className="text-sm font-medium uppercase tracking-wide text-emerald-600">
-          Run Club Giovinazzo
+          {SITE.name}
         </p>
         <h1 className="mt-2 text-2xl font-bold text-forest">{info.title}</h1>
         <p className="mt-4 text-sm leading-relaxed text-forest/70">{info.description}</p>

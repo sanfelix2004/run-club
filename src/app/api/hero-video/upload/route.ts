@@ -4,7 +4,7 @@ import path from "path";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
-export const maxDuration = 120;
+export const maxDuration = 60;
 
 const FILENAME = "kling_20260828_VIDEO_Cinematic__4944_0.mp4";
 const MAX_BYTES = 200 * 1024 * 1024; // 200 MB

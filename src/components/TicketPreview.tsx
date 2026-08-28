@@ -38,7 +38,7 @@ export function TicketPreview({
       width: 280,
       margin: 2,
       errorCorrectionLevel: "H",
-      color: { dark: "#064E3B", light: "#FFFFFF" },
+      color: { dark: "#0A2A5C", light: "#FFFFFF" },
     }).then(setQrDataUrl);
   }, [registration.qrToken]);
 
@@ -49,7 +49,7 @@ export function TicketPreview({
       <div className="overflow-hidden rounded-2xl border-2 border-emerald-200 bg-white shadow-lg">
         <div className="bg-forest px-6 py-4 text-white">
           <p className="text-xs font-medium uppercase tracking-widest opacity-80">
-            Run Club Giovinazzo
+            Giovinazzo Sunset Run
           </p>
           <h3 className="mt-1 text-lg font-bold">{registration.event.title}</h3>
           <p className="text-xs opacity-70">Prenotazione confermata</p>

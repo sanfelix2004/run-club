@@ -54,13 +54,19 @@ export function Hero() {
           transition={REVEAL}
         >
           <div className="max-w-3xl">
+            <p
+              className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-emerald-300 sm:text-base"
+              style={{ textShadow: "0 2px 12px rgba(0,0,0,0.7)" }}
+            >
+              Giovinazzo Sunset Run
+            </p>
             <p className="mb-5 inline-flex items-center gap-2.5 rounded-full border border-white/25 bg-black/40 px-5 py-2 text-base font-medium text-white shadow-lg backdrop-blur-md">
               <MapPin className="h-4 w-4 text-emerald-300" />
               Giovinazzo, Puglia — Costa adriatica
             </p>
 
             <h1
-              className="text-6xl font-bold leading-[1.08] tracking-tight text-white sm:text-7xl lg:text-8xl"
+              className="text-5xl font-bold leading-[1.08] tracking-tight text-white sm:text-6xl lg:text-7xl"
               style={{
                 textShadow:
                   "0 2px 20px rgba(0,0,0,0.8), 0 4px 40px rgba(0,0,0,0.5)",

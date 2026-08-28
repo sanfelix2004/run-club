@@ -52,7 +52,7 @@ export function AdminPinGate({ title, subtitle, children }: AdminPinGateProps) {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#FAFDFB]">
+      <div className="flex min-h-screen items-center justify-center bg-[#FFFBF7]">
         <p className="text-forest/50">Caricamento...</p>
       </div>
     );
@@ -60,7 +60,7 @@ export function AdminPinGate({ title, subtitle, children }: AdminPinGateProps) {
 
   if (!authed) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#FAFDFB] p-4">
+      <div className="flex min-h-screen items-center justify-center bg-[#FFFBF7] p-4">
         <div className="w-full max-w-sm rounded-2xl border border-emerald-100 bg-white p-8 shadow-lg">
           <h1 className="text-xl font-bold text-forest">{title}</h1>
           <p className="mt-2 text-sm text-forest/60">{subtitle}</p>
@@ -88,7 +88,7 @@ export function AdminPinGate({ title, subtitle, children }: AdminPinGateProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFDFB]">
+    <div className="min-h-screen bg-[#FFFBF7]">
       <header className="sticky top-0 z-10 border-b border-emerald-100 bg-white/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3">
           <div>

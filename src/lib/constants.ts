@@ -1,8 +1,8 @@
 export const SITE = {
-  name: "Run Club Giovinazzo",
-  tagline: "Corri",
+  name: "Giovinazzo Sunset Run",
+  tagline: "Corri al tramonto",
   description:
-    "Una community di running sulla costa adriatica — sessioni all'alba, percorsi sul mare e persone fantastiche a Giovinazzo.",
+    "Community di running sulla costa adriatica — corse al tramonto, percorsi sul mare e persone fantastiche a Giovinazzo.",
 } as const;
 
 export const NAV_LINKS = [

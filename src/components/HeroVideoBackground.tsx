@@ -63,8 +63,8 @@ export function HeroVideoBackground({ onReady }: HeroVideoBackgroundProps) {
       </video>
 
       <div className="absolute inset-0 bg-gradient-to-r from-forest/95 via-forest/75 to-forest/20" />
-      <div className="absolute inset-0 bg-gradient-to-b from-forest/50 via-transparent to-[#FAFDFB]/90" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#FAFDFB] via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-forest/50 via-transparent to-[#FFFBF7]/90" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#FFFBF7] via-transparent to-transparent" />
 
       <noscript>
         <Link

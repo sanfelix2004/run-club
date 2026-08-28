@@ -50,15 +50,8 @@ export function Navbar() {
           }}
           className="group flex items-center gap-2"
         >
-          <ClubLogo size={32} />
-          <span
-            className={cn(
-              "text-sm font-semibold tracking-tight transition-colors sm:text-base",
-              scrolled ? "text-forest" : "text-white",
-            )}
-          >
-            {SITE.name}
-          </span>
+          <ClubLogo size={48} />
+          <span className="sr-only">{SITE.name}</span>
         </a>
 
         <div className="hidden items-center gap-2 md:flex">

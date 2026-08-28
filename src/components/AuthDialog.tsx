@@ -57,11 +57,8 @@ export function AuthDialog({
     if (!open) {
       setLoading(false);
       setFieldErrors({});
-      return;
     }
-
-    setMode(defaultMode);
-  }, [open, defaultMode]);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;

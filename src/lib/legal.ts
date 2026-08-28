@@ -1,6 +1,6 @@
 export const LEGAL = {
-  siteName: "Run Club Giovinazzo",
-  owner: "Run Club Giovinazzo",
+  siteName: "Giovinazzo Sunset Run",
+  owner: "Giovinazzo Sunset Run",
   address: "Piazza Vittorio Emanuele II, 70054 Giovinazzo (BA), Italia",
   email: "ciao@runclubgiovinazzo.it",
   phone: "+39 080 123 4567",

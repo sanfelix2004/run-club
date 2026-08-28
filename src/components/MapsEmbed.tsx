@@ -37,7 +37,7 @@ export function MapsEmbed() {
 
   return (
     <iframe
-      title="Posizione Run Club Giovinazzo su Google Maps"
+      title="Posizione Giovinazzo Sunset Run su Google Maps"
       src={MAP_EMBED_URL}
       width="100%"
       height="400"
