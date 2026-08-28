@@ -95,15 +95,22 @@ export function EventRegistrationSheet({
     setLoading(true);
     setFieldErrors({});
 
-    const result = await registerForMeetup({ ...data, eventId: event.id });
-    setLoading(false);
+    try {
+      const result = await registerForMeetup({ ...data, eventId: event.id });
 
-    if (result.success) {
-      setRegistration(result.registration);
-      toast.success("Prenotazione confermata! Scarica il PDF con il QR code.");
-    } else {
-      if (result.fieldErrors) setFieldErrors(result.fieldErrors);
-      toast.error(result.error);
+      if (result.success) {
+        setRegistration(result.registration);
+        toast.success("Prenotazione confermata! Scarica il PDF con il QR code.");
+      } else {
+        if (result.fieldErrors) setFieldErrors(result.fieldErrors);
+        toast.error(result.error);
+      }
+    } catch {
+      toast.error(
+        "Connessione lenta o errore del server. Ricarica la pagina e riprova.",
+      );
+    } finally {
+      setLoading(false);
     }
   };
 

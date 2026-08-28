@@ -34,123 +34,134 @@ export type RegistrationResult =
 export async function registerForMeetup(
   data: RegistrationFormData & { eventId?: string },
 ): Promise<RegistrationResult> {
-  const session = await auth();
+  try {
+    const session = await auth();
 
-  if (!session?.user?.email) {
+    if (!session?.user?.email) {
+      return {
+        success: false,
+        error: "Devi accedere o registrarti per prenotare un evento.",
+      };
+    }
+
+    const athlete = await getOrCreateAthleteUser();
+    if (!athlete) {
+      return {
+        success: false,
+        error: "Impossibile caricare il profilo. Esci e riaccedi, poi riprova.",
+      };
+    }
+
+    const parsed = registrationSchema.safeParse(data);
+
+    if (!parsed.success) {
+      return {
+        success: false,
+        error: "Dati non validi. Controlla i campi e riprova.",
+        fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]>,
+      };
+    }
+
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    const event = data.eventId
+      ? await prisma.event.findFirst({
+          where: { id: data.eventId, dateTime: { gte: now } },
+        })
+      : await prisma.event.findFirst({
+          where: { dateTime: { gte: now } },
+          orderBy: { dateTime: "asc" },
+        });
+
+    if (!event) {
+      return {
+        success: false,
+        error: data.eventId
+          ? "Evento non trovato. Ricarica la pagina e riprova."
+          : "Nessun evento disponibile al momento. Riprova più tardi.",
+      };
+    }
+
+    const { firstName, lastName, email, phone, paceCategory } = parsed.data;
+
+    const userId = athlete.id;
+    const registrationEmail = session.user.email?.toLowerCase() ?? email.toLowerCase();
+
+    const existing = await prisma.registration.findFirst({
+      where: {
+        eventId: event.id,
+        email: registrationEmail,
+        status: { not: REGISTRATION_STATUSES.CANCELLED },
+      },
+    });
+
+    if (existing) {
+      return {
+        success: false,
+        error:
+          "Sei già iscritto a questo evento con questa email. Controlla la tua casella o scarica di nuovo il pass.",
+      };
+    }
+
+    const qrToken = generateQrToken();
+
+    const userProfile = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { medicalNotes: true },
+    });
+
+    const registration = await prisma.registration.create({
+      data: {
+        eventId: event.id,
+        userId,
+        firstName,
+        lastName,
+        email: registrationEmail,
+        phone,
+        medicalNotes: userProfile?.medicalNotes,
+        paceCategory,
+        qrToken,
+        status: REGISTRATION_STATUSES.PENDING_PAYMENT,
+      },
+      include: { event: true },
+    });
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        firstName,
+        lastName,
+        name: `${firstName} ${lastName}`.trim(),
+        phone,
+        paceCategory,
+      },
+    });
+
     return {
-      success: false,
-      error: "Devi accedere o registrarti per prenotare un evento.",
+      success: true,
+      registration: {
+        id: registration.id,
+        qrToken: registration.qrToken,
+        firstName: registration.firstName,
+        lastName: registration.lastName,
+        paceCategory: registration.paceCategory,
+        status: registration.status,
+        event: {
+          title: registration.event.title,
+          dateTime: registration.event.dateTime.toISOString(),
+          locationName: registration.event.locationName,
+          priceAmount: registration.event.priceAmount,
+          currency: registration.event.currency,
+        },
+      },
     };
-  }
-
-  const athlete = await getOrCreateAthleteUser();
-  if (!athlete) {
-    return {
-      success: false,
-      error: "Impossibile caricare il profilo. Esci e riaccedi, poi riprova.",
-    };
-  }
-
-  const parsed = registrationSchema.safeParse(data);
-
-  if (!parsed.success) {
-    return {
-      success: false,
-      error: "Dati non validi. Controlla i campi e riprova.",
-      fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]>,
-    };
-  }
-
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-
-  const event = data.eventId
-    ? await prisma.event.findFirst({
-        where: { id: data.eventId, dateTime: { gte: now } },
-      })
-    : await prisma.event.findFirst({
-        where: { dateTime: { gte: now } },
-        orderBy: { dateTime: "asc" },
-      });
-
-  if (!event) {
-    return {
-      success: false,
-      error: "Nessun evento disponibile al momento. Riprova più tardi.",
-    };
-  }
-
-  const { firstName, lastName, email, phone, paceCategory } = parsed.data;
-
-  const userId = athlete.id;
-  const registrationEmail = session.user.email?.toLowerCase() ?? email.toLowerCase();
-
-  const existing = await prisma.registration.findFirst({
-    where: {
-      eventId: event.id,
-      email: registrationEmail,
-      status: { not: REGISTRATION_STATUSES.CANCELLED },
-    },
-  });
-
-  if (existing) {
+  } catch (error) {
+    console.error("registerForMeetup failed:", error);
     return {
       success: false,
       error:
-        "Sei già iscritto a questo evento con questa email. Controlla la tua casella o scarica di nuovo il pass.",
+        "Errore durante la registrazione. Ricarica la pagina e riprova tra qualche secondo.",
     };
   }
-
-  const qrToken = generateQrToken();
-
-  const userProfile = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { medicalNotes: true },
-  });
-
-  const registration = await prisma.registration.create({
-    data: {
-      eventId: event.id,
-      userId,
-      firstName,
-      lastName,
-      email: registrationEmail,
-      phone,
-      medicalNotes: userProfile?.medicalNotes,
-      paceCategory,
-      qrToken,
-      status: REGISTRATION_STATUSES.PENDING_PAYMENT,
-    },
-    include: { event: true },
-  });
-
-  await prisma.user.update({
-    where: { id: userId },
-    data: {
-      firstName,
-      lastName,
-      name: `${firstName} ${lastName}`.trim(),
-      phone,
-      paceCategory,
-    },
-  });
-
-  return {
-    success: true,
-    registration: {
-      id: registration.id,
-      qrToken: registration.qrToken,
-      firstName: registration.firstName,
-      lastName: registration.lastName,
-      paceCategory: registration.paceCategory,
-      status: registration.status,
-      event: {
-        title: registration.event.title,
-        dateTime: registration.event.dateTime.toISOString(),
-        locationName: registration.event.locationName,
-        priceAmount: registration.event.priceAmount,
-        currency: registration.event.currency,
-      },
-    },
-  };
 }
