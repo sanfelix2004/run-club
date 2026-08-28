@@ -5,3 +5,4 @@ node_modules
 download
 *.db
 *.db-journal
+public/videos/kling_*.mp4

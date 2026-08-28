@@ -3,21 +3,22 @@ import { existsSync } from "fs";
 import path from "path";
 import { NextResponse } from "next/server";
 
-const FILENAME = "kling_20260828_VIDEO_Cinematic__4944_0.mp4";
-
-const CANDIDATES = [
-  path.join(process.cwd(), "download", FILENAME),
-  path.join(process.cwd(), "public", "videos", FILENAME),
-];
+const PUBLIC_VIDEO = path.join(process.cwd(), "public", "videos", "hero-run.mp4");
 
 export async function GET() {
-  const filePath = CANDIDATES.find((p) => existsSync(p));
+  // Prefer the public hero video used by the site.
+  const candidates = [
+    PUBLIC_VIDEO,
+    path.join(process.cwd(), "public", "videos", "kling_20260828_VIDEO_Cinematic__4944_0.mp4"),
+  ];
+
+  const filePath = candidates.find((p) => existsSync(p));
 
   if (!filePath) {
     return NextResponse.json(
       {
         error: "Video non trovato",
-        hint: `Metti il file in: download/${FILENAME}`,
+        hint: "Metti hero-run.mp4 in public/videos/",
       },
       { status: 404 },
     );

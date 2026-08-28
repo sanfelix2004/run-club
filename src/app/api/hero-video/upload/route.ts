@@ -6,8 +6,8 @@ import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-const FILENAME = "kling_20260828_VIDEO_Cinematic__4944_0.mp4";
-const MAX_BYTES = 200 * 1024 * 1024; // 200 MB
+const FILENAME = "hero-run.mp4";
+const MAX_BYTES = 50 * 1024 * 1024; // 50 MB (Vercel-friendly)
 
 export async function POST(request: Request) {
   try {
@@ -21,7 +21,11 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!file.type.startsWith("video/") && !file.name.toLowerCase().endsWith(".mp4") && !file.name.toLowerCase().endsWith(".mov")) {
+    if (
+      !file.type.startsWith("video/") &&
+      !file.name.toLowerCase().endsWith(".mp4") &&
+      !file.name.toLowerCase().endsWith(".mov")
+    ) {
       return NextResponse.json(
         { error: "Il file deve essere un video (MP4 o MOV)." },
         { status: 400 },
@@ -30,30 +34,22 @@ export async function POST(request: Request) {
 
     if (file.size > MAX_BYTES) {
       return NextResponse.json(
-        { error: "File troppo grande (max 200 MB)." },
+        { error: "File troppo grande (max 50 MB)." },
         { status: 400 },
       );
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-
-    const downloadDir = path.join(process.cwd(), "download");
     const publicDir = path.join(process.cwd(), "public", "videos");
-
-    await mkdir(downloadDir, { recursive: true });
     await mkdir(publicDir, { recursive: true });
-
-    const downloadPath = path.join(downloadDir, FILENAME);
     const publicPath = path.join(publicDir, FILENAME);
-
-    await writeFile(downloadPath, buffer);
     await writeFile(publicPath, buffer);
 
     return NextResponse.json({
       success: true,
       message: "Video caricato con successo!",
       size: file.size,
-      path: `download/${FILENAME}`,
+      path: `public/videos/${FILENAME}`,
     });
   } catch {
     return NextResponse.json(
@@ -64,11 +60,9 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
-  const downloadPath = path.join(process.cwd(), "download", FILENAME);
-  const exists = existsSync(downloadPath);
-
+  const publicPath = path.join(process.cwd(), "public", "videos", FILENAME);
   return NextResponse.json({
-    uploaded: exists,
+    uploaded: existsSync(publicPath),
     filename: FILENAME,
   });
 }
