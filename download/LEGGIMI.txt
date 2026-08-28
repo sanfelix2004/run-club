@@ -1,14 +1,11 @@
 ═══════════════════════════════════════════════════
-  METTI IL VIDEO QUI
+  NON RIESCI A TRASCINARE IL FILE?
 ═══════════════════════════════════════════════════
 
-Trascina in QUESTA cartella il file:
+Apri questa pagina nel browser:
 
-  kling_20260828_VIDEO_Cinematic__4944_0.mp4
+  /upload-video
 
-Percorso completo:
-  download/kling_20260828_VIDEO_Cinematic__4944_0.mp4
-
-Poi ricarica il sito — lo sfondo video si attiva da solo.
+Clicca "Seleziona video dal computer" e scegli il file.
 
 ═══════════════════════════════════════════════════
