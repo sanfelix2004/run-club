@@ -64,6 +64,7 @@ Open [http://localhost:43123](http://localhost:43123) for the site.
 
 - **Registration:** scroll to the Booking section or visit `#booking`
 - **Admin check-in:** [http://localhost:43123/admin/checkin](http://localhost:43123/admin/checkin)
+- **Admin eventi (crea / modifica / elimina):** [http://localhost:43123/admin/events](http://localhost:43123/admin/events)
 
 ## Environment Variables
 

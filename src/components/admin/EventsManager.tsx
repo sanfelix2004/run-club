@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { Calendar, MapPin, Pencil, Plus, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -72,6 +71,9 @@ export function EventsManager() {
     });
     setEditingId(event.id);
     setShowForm(true);
+    requestAnimationFrame(() => {
+      document.getElementById("event-admin-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,14 +95,21 @@ export function EventsManager() {
     }
   };
 
-  const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`Eliminare "${title}"?`)) return;
-    const result = await deleteEvent(id);
+  const handleDelete = async (event: PublicEvent) => {
+    const registrationNote =
+      event.registrationCount > 0
+        ? `\n\nVerranno eliminate anche ${event.registrationCount} iscrizioni collegate.`
+        : "";
+
+    if (!confirm(`Eliminare "${event.title}"?${registrationNote}`)) return;
+
+    const result = await deleteEvent(event.id);
     if (result.success) {
       toast.success("Evento eliminato");
+      if (editingId === event.id) resetForm();
       loadEvents();
     } else {
-      toast.error(result.error ?? "Errore");
+      toast.error(result.error ?? "Errore durante l'eliminazione");
     }
   };
 
@@ -115,12 +124,6 @@ export function EventsManager() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Link
-            href="/admin/checkin"
-            className="inline-flex items-center justify-center rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-medium text-forest transition-colors hover:bg-emerald-50"
-          >
-            Check-in QR
-          </Link>
           <Button
             onClick={startCreate}
             className="rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
@@ -133,6 +136,7 @@ export function EventsManager() {
 
       {showForm && (
         <form
+          id="event-admin-form"
           onSubmit={handleSubmit}
           className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm"
         >
@@ -272,23 +276,26 @@ export function EventsManager() {
                   </div>
                 </div>
 
-                <div className="flex shrink-0 gap-1">
+                <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
                   <Button
-                    variant="ghost"
-                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                    size="sm"
                     onClick={() => startEdit(event)}
-                    aria-label="Modifica"
+                    className="rounded-full border-emerald-200"
                   >
-                    <Pencil className="h-4 w-4" />
+                    <Pencil className="mr-1.5 h-3.5 w-3.5" />
+                    Modifica
                   </Button>
                   <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={() => handleDelete(event.id, event.title)}
-                    aria-label="Elimina"
-                    className="text-red-500 hover:text-red-600"
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDelete(event)}
+                    className="rounded-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                    Elimina
                   </Button>
                 </div>
               </div>

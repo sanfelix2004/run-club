@@ -24,6 +24,7 @@ import {
   type CheckInStats,
   type ScanResult,
 } from "@/app/actions/checkin";
+import { AdminNav } from "@/components/admin/AdminNav";
 import {
   logoutAdmin,
   verifyAdminPin,
@@ -230,19 +231,22 @@ export function AdminCheckIn() {
   return (
     <div className="min-h-screen bg-[#FAFDFB]">
       <header className="sticky top-0 z-10 border-b border-emerald-100 bg-white/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-lg items-center justify-between px-4 py-3">
-          <div>
+        <div className="mx-auto flex max-w-lg items-center justify-between gap-2 px-4 py-3">
+          <div className="min-w-0">
             <h1 className="text-sm font-bold text-forest">Check-in organizzatore</h1>
             <p className="text-xs text-forest/50">Run Club Giovinazzo</p>
           </div>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={handleLogout}
-            aria-label="Esci"
-          >
-            <LogOut className="h-4 w-4" />
-          </Button>
+          <div className="flex shrink-0 items-center gap-2">
+            <AdminNav />
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={handleLogout}
+              aria-label="Esci"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </header>
 

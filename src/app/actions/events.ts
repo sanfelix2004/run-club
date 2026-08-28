@@ -150,7 +150,25 @@ export async function deleteEvent(id: string): Promise<{ success: boolean; error
   const authed = await isAdminAuthenticated();
   if (!authed) return { success: false, error: "Accesso non autorizzato." };
 
-  await prisma.event.delete({ where: { id } });
+  const event = await prisma.event.findUnique({
+    where: { id },
+    include: { _count: { select: { registrations: true } } },
+  });
+
+  if (!event) {
+    return { success: false, error: "Evento non trovato." };
+  }
+
+  try {
+    await prisma.event.delete({ where: { id } });
+  } catch (error) {
+    console.error("Error deleting event:", error);
+    return {
+      success: false,
+      error:
+        "Impossibile eliminare l'evento. Riprova o contatta il supporto tecnico.",
+    };
+  }
 
   revalidatePath("/");
   revalidatePath("/admin/events");

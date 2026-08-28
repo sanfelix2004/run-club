@@ -89,7 +89,7 @@ model Registration {
   status           String    @default("PENDING_PAYMENT")
   checkedInAt      DateTime? @map("checked_in_at")
   createdAt        DateTime  @default(now()) @map("created_at")
-  event            Event     @relation(fields: [eventId], references: [id])
+  event            Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
   user             User?     @relation(fields: [userId], references: [id])
 
   @@map("registrations")
