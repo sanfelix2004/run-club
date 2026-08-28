@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const session = await auth();
+  const session = await auth().catch(() => null);
   const googleOAuthEnabled = isGoogleOAuthEnabled();
 
   return (
