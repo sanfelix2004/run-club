@@ -125,7 +125,7 @@ git remote add github https://github.com/sanfelix2004/run-club.git
 git push -u github main
 ```
 
-Guida completa dominio personalizzato (`runclubgiovinazzo.com`): vedi [`docs/DEPLOY-DOMINIO.md`](docs/DEPLOY-DOMINIO.md).
+Guida deploy gratuito da GitHub (`*.vercel.app`): vedi [`docs/DEPLOY-DOMINIO.md`](docs/DEPLOY-DOMINIO.md).
 
 ### 2. Database PostgreSQL (obbligatorio online)
 SQLite funziona solo in locale. Su Vercel usa un DB gratuito:
