@@ -13,51 +13,107 @@ import {
   RefreshCw,
   ScanLine,
   Users,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ModalPortal } from "@/components/ModalPortal";
 import {
   confirmCheckIn,
   getCheckInStats,
+  getPresentAttendees,
   lookupRegistrationByQr,
   type CheckInStats,
+  type PresentAttendee,
   type ScanResult,
 } from "@/app/actions/checkin";
 import { AdminNav } from "@/components/admin/AdminNav";
-import {
-  logoutAdmin,
-  verifyAdminPin,
-} from "@/app/actions/admin-auth";
+import { logoutAdmin, verifyAdminPin } from "@/app/actions/admin-auth";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 
 const SCANNER_ID = "qr-reader";
+
+type ModalState =
+  | { type: "idle" }
+  | { type: "confirming"; result: Extract<ScanResult, { success: true }> }
+  | { type: "success"; result: Extract<ScanResult, { success: true }>; message: string }
+  | { type: "already_used"; result: Extract<ScanResult, { success: true }> }
+  | { type: "error"; message: string };
 
 export function AdminCheckIn() {
   const [pin, setPin] = useState("");
   const [authed, setAuthed] = useState(false);
   const [pinLoading, setPinLoading] = useState(false);
   const [scanning, setScanning] = useState(false);
-  const [scanResult, setScanResult] = useState<Extract<ScanResult, { success: true }> | null>(null);
-  const [scanError, setScanError] = useState<string | null>(null);
-  const [checkInLoading, setCheckInLoading] = useState(false);
+  const [modal, setModal] = useState<ModalState>({ type: "idle" });
   const [stats, setStats] = useState<CheckInStats>({
+    eventId: null,
+    eventTitle: "",
     totalRegistered: 0,
     checkedIn: 0,
     pending: 0,
     totalCollected: 0,
   });
+  const [presentList, setPresentList] = useState<PresentAttendee[]>([]);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const lastScannedRef = useRef<string>("");
+  const processingRef = useRef(false);
 
-  const refreshStats = useCallback(async () => {
-    const data = await getCheckInStats();
-    setStats(data);
+  const refreshDashboard = useCallback(async () => {
+    const [nextStats, attendees] = await Promise.all([
+      getCheckInStats(),
+      getPresentAttendees(),
+    ]);
+    setStats(nextStats);
+    setPresentList(attendees);
   }, []);
 
   useEffect(() => {
-    if (authed) refreshStats();
-  }, [authed, refreshStats]);
+    if (authed) refreshDashboard();
+  }, [authed, refreshDashboard]);
+
+  const closeModal = useCallback(() => {
+    setModal({ type: "idle" });
+    lastScannedRef.current = "";
+    processingRef.current = false;
+  }, []);
+
+  const processCheckIn = useCallback(
+    async (result: Extract<ScanResult, { success: true }>) => {
+      const alreadyIn =
+        result.registration.status === REGISTRATION_STATUSES.PAID_AND_CHECKED_IN;
+
+      if (alreadyIn) {
+        setModal({ type: "already_used", result });
+        return;
+      }
+
+      setModal({ type: "confirming", result });
+
+      const checkIn = await confirmCheckIn(result.registration.id);
+
+      if (checkIn.success) {
+        await refreshDashboard();
+        setModal({
+          type: "success",
+          result: {
+            ...result,
+            registration: {
+              ...result.registration,
+              status: REGISTRATION_STATUSES.PAID_AND_CHECKED_IN,
+              checkedInAt: new Date().toISOString(),
+            },
+          },
+          message: checkIn.message,
+        });
+        setTimeout(closeModal, 2500);
+      } else {
+        setModal({ type: "error", message: checkIn.error });
+      }
+    },
+    [closeModal, refreshDashboard],
+  );
 
   const handlePinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,8 +133,7 @@ export function AdminCheckIn() {
     await logoutAdmin();
     setAuthed(false);
     setPin("");
-    setScanResult(null);
-    setScanError(null);
+    closeModal();
   };
 
   const stopScanner = useCallback(async () => {
@@ -99,37 +154,25 @@ export function AdminCheckIn() {
 
   const handleScan = useCallback(
     async (decodedText: string) => {
-      if (decodedText === lastScannedRef.current) return;
+      if (processingRef.current || decodedText === lastScannedRef.current) return;
+      processingRef.current = true;
       lastScannedRef.current = decodedText;
 
       const result = await lookupRegistrationByQr(decodedText);
 
       if (result.success) {
-        setScanResult(result);
-        setScanError(null);
-
-        if (result.registration.status === REGISTRATION_STATUSES.PAID_AND_CHECKED_IN) {
-          toast.warning("Biglietto già utilizzato!");
-        } else {
-          toast.success(`Trovato: ${result.registration.firstName} ${result.registration.lastName}`);
-        }
+        await processCheckIn(result);
       } else {
-        setScanResult(null);
-        setScanError(result.error);
+        setModal({ type: "error", message: result.error });
         toast.error(result.error);
       }
-
-      setTimeout(() => {
-        lastScannedRef.current = "";
-      }, 3000);
     },
-    [],
+    [processCheckIn],
   );
 
   const startScanner = useCallback(async () => {
     await stopScanner();
-    setScanResult(null);
-    setScanError(null);
+    closeModal();
 
     const scanner = new Html5Qrcode(SCANNER_ID);
     scannerRef.current = scanner;
@@ -145,7 +188,7 @@ export function AdminCheckIn() {
     } catch {
       toast.error("Impossibile accedere alla fotocamera. Controlla i permessi.");
     }
-  }, [handleScan, stopScanner]);
+  }, [closeModal, handleScan, stopScanner]);
 
   useEffect(() => {
     if (authed) {
@@ -155,30 +198,6 @@ export function AdminCheckIn() {
       stopScanner();
     };
   }, [authed, startScanner, stopScanner]);
-
-  const handleCheckIn = async () => {
-    if (!scanResult) return;
-    setCheckInLoading(true);
-
-    const result = await confirmCheckIn(scanResult.registration.id);
-    setCheckInLoading(false);
-
-    if (result.success) {
-      toast.success(result.message);
-      setScanResult({
-        ...scanResult,
-        registration: {
-          ...scanResult.registration,
-          status: REGISTRATION_STATUSES.PAID_AND_CHECKED_IN,
-          checkedInAt: new Date().toISOString(),
-        },
-      });
-      refreshStats();
-    } else {
-      toast.error(result.error);
-      setScanError(result.error);
-    }
-  };
 
   const handleManualLookup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -216,16 +235,17 @@ export function AdminCheckIn() {
               {pinLoading ? "Verifica..." : "Accedi"}
             </Button>
           </form>
-          <p className="mt-4 text-center text-xs text-forest/40">
-            PIN predefinito: runclub2026
-          </p>
         </div>
       </div>
     );
   }
 
-  const isAlreadyCheckedIn =
-    scanResult?.registration.status === REGISTRATION_STATUSES.PAID_AND_CHECKED_IN;
+  const modalResult =
+    modal.type === "confirming" ||
+    modal.type === "success" ||
+    modal.type === "already_used"
+      ? modal.result
+      : null;
 
   return (
     <div className="min-h-screen bg-[#FFFBF7]">
@@ -233,16 +253,13 @@ export function AdminCheckIn() {
         <div className="mx-auto flex max-w-lg items-center justify-between gap-2 px-4 py-3">
           <div className="min-w-0">
             <h1 className="text-sm font-bold text-forest">Check-in organizzatore</h1>
-            <p className="text-xs text-forest/50">Giovinazzo Sunset Run</p>
+            <p className="truncate text-xs text-forest/50">
+              {stats.eventTitle || "Giovinazzo Sunset Run"}
+            </p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <AdminNav />
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={handleLogout}
-              aria-label="Esci"
-            >
+            <Button variant="ghost" size="icon-sm" onClick={handleLogout} aria-label="Esci">
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
@@ -260,7 +277,7 @@ export function AdminCheckIn() {
           </div>
           <div className="rounded-xl border border-emerald-100 bg-white p-3 text-center shadow-sm">
             <CheckCircle2 className="mx-auto h-4 w-4 text-emerald-500" />
-            <p className="mt-1 text-xl font-bold text-forest">{stats.checkedIn}</p>
+            <p className="mt-1 text-xl font-bold text-emerald-600">{stats.checkedIn}</p>
             <p className="text-[10px] font-medium uppercase tracking-wide text-forest/50">
               Presenti
             </p>
@@ -282,12 +299,7 @@ export function AdminCheckIn() {
               <ScanLine className="h-4 w-4 text-emerald-500" />
               <span className="text-sm font-semibold text-forest">Scanner QR</span>
             </div>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={startScanner}
-              aria-label="Riavvia scanner"
-            >
+            <Button variant="ghost" size="icon-sm" onClick={startScanner} aria-label="Riavvia scanner">
               <RefreshCw className="h-4 w-4" />
             </Button>
           </div>
@@ -302,7 +314,7 @@ export function AdminCheckIn() {
         <form onSubmit={handleManualLookup} className="flex gap-2">
           <Input
             name="token"
-            placeholder="Inserisci token manualmente..."
+            placeholder="Codice QR manuale..."
             className="rounded-xl border-emerald-100 text-sm"
           />
           <Button type="submit" variant="outline" className="shrink-0 rounded-xl border-emerald-200">
@@ -310,102 +322,132 @@ export function AdminCheckIn() {
           </Button>
         </form>
 
-        {scanError && (
-          <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
-            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
-            <div>
-              <p className="font-semibold text-red-700">Biglietto non valido</p>
-              <p className="mt-1 text-sm text-red-600">{scanError}</p>
-            </div>
+        <div className="rounded-2xl border border-emerald-100 bg-white shadow-sm">
+          <div className="border-b border-emerald-50 px-4 py-3">
+            <h2 className="text-sm font-semibold text-forest">
+              Chi è presente ({presentList.length})
+            </h2>
           </div>
-        )}
-
-        {scanResult && (
-          <div
-            className={`rounded-2xl border p-5 shadow-sm ${
-              isAlreadyCheckedIn
-                ? "border-amber-200 bg-amber-50"
-                : "border-emerald-200 bg-white"
-            }`}
-          >
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-emerald-500">
-                  Atleta trovato
-                </p>
-                <p className="mt-1 text-xl font-bold text-forest">
-                  {scanResult.registration.firstName} {scanResult.registration.lastName}
-                </p>
-                <p className="mt-1 text-sm text-forest/60">
-                  Gruppo: {scanResult.registration.paceCategory}
-                </p>
-                <p className="mt-2 text-sm font-medium text-forest">
-                  {scanResult.event.title}
-                </p>
-                <p className="mt-1 flex items-center gap-1.5 text-xs text-forest/60">
-                  <Calendar className="h-3.5 w-3.5 text-emerald-500" />
-                  {new Date(scanResult.event.dateTime).toLocaleString("it-IT", {
-                    weekday: "short",
-                    day: "numeric",
-                    month: "short",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-                <p className="mt-0.5 flex items-center gap-1.5 text-xs text-forest/60">
-                  <MapPin className="h-3.5 w-3.5 text-emerald-500" />
-                  {scanResult.event.locationName}
-                </p>
-              </div>
-              <span
-                className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                  isAlreadyCheckedIn
-                    ? "bg-amber-100 text-amber-700"
-                    : "bg-emerald-100 text-emerald-700"
-                }`}
-              >
-                {isAlreadyCheckedIn ? "GIÀ UTILIZZATO" : "IN ATTESA PAGAMENTO"}
-              </span>
-            </div>
-
-            <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <p className="text-forest/40">Email</p>
-                <p className="truncate font-medium text-forest">{scanResult.registration.email}</p>
-              </div>
-              <div>
-                <p className="text-forest/40">Telefono</p>
-                <p className="font-medium text-forest">{scanResult.registration.phone}</p>
-              </div>
-            </div>
-
-            <div className="mt-4 rounded-xl bg-emerald-50 px-4 py-3 text-center">
-              <p className="text-sm font-bold text-emerald-700">
-                Quota: €{scanResult.event.priceAmount.toFixed(2).replace(".", ",")}
-              </p>
-            </div>
-
-            {!isAlreadyCheckedIn && (
-              <Button
-                onClick={handleCheckIn}
-                disabled={checkInLoading}
-                className="mt-4 w-full rounded-full bg-emerald-500 py-5 text-white hover:bg-emerald-600"
-              >
-                {checkInLoading
-                  ? "Conferma in corso..."
-                  : `Conferma Presenza e Incassa ${scanResult.event.priceAmount.toFixed(2).replace(".", ",")}€`}
-              </Button>
-            )}
-
-            {isAlreadyCheckedIn && scanResult.registration.checkedInAt && (
-              <p className="mt-4 text-center text-sm text-amber-600">
-                Check-in effettuato il{" "}
-                {new Date(scanResult.registration.checkedInAt).toLocaleString("it-IT")}
-              </p>
-            )}
-          </div>
-        )}
+          {presentList.length === 0 ? (
+            <p className="px-4 py-6 text-center text-sm text-forest/50">
+              Nessun check-in ancora. Scansiona un QR valido.
+            </p>
+          ) : (
+            <ul className="max-h-64 divide-y divide-emerald-50 overflow-y-auto">
+              {presentList.map((person, index) => (
+                <li key={person.id} className="flex items-center gap-3 px-4 py-3">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold text-white">
+                    {presentList.length - index}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-forest">
+                      {person.firstName} {person.lastName}
+                    </p>
+                    <p className="text-xs text-forest/50">{person.paceCategory}</p>
+                  </div>
+                  <p className="shrink-0 text-xs text-forest/40">
+                    {new Date(person.checkedInAt).toLocaleTimeString("it-IT", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </main>
+
+      {modal.type !== "idle" && (
+        <ModalPortal>
+          <div className="fixed inset-0 z-[300] flex items-center justify-center bg-forest/70 p-4 backdrop-blur-sm">
+            <div
+              role="dialog"
+              aria-modal="true"
+              className="relative w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl"
+            >
+              <button
+                type="button"
+                onClick={closeModal}
+                className="absolute right-3 top-3 rounded-full p-1.5 text-forest/40 hover:bg-emerald-50 hover:text-forest"
+                aria-label="Chiudi"
+              >
+                <X className="h-5 w-5" />
+              </button>
+
+              {modal.type === "error" && (
+                <div className="text-center">
+                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
+                    <AlertTriangle className="h-7 w-7 text-red-500" />
+                  </div>
+                  <h3 className="text-lg font-bold text-forest">QR non valido</h3>
+                  <p className="mt-2 text-sm text-forest/60">{modal.message}</p>
+                  <Button
+                    onClick={closeModal}
+                    className="mt-6 w-full rounded-full bg-forest text-white hover:bg-forest/90"
+                  >
+                    Chiudi
+                  </Button>
+                </div>
+              )}
+
+              {modal.type === "confirming" && modalResult && (
+                <div className="text-center">
+                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
+                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+                  </div>
+                  <h3 className="text-lg font-bold text-forest">Registrazione in corso...</h3>
+                  <p className="mt-2 text-sm text-forest/60">
+                    {modalResult.registration.firstName} {modalResult.registration.lastName}
+                  </p>
+                </div>
+              )}
+
+              {modal.type === "success" && modalResult && (
+                <div className="text-center">
+                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500 text-white">
+                    <CheckCircle2 className="h-8 w-8" />
+                  </div>
+                  <h3 className="text-lg font-bold text-forest">Presente!</h3>
+                  <p className="mt-2 text-xl font-semibold text-emerald-600">
+                    {modalResult.registration.firstName} {modalResult.registration.lastName}
+                  </p>
+                  <p className="mt-1 text-sm text-forest/60">{modal.message}</p>
+                  <p className="mt-4 rounded-xl bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">
+                    Totale presenti: {stats.checkedIn}
+                  </p>
+                </div>
+              )}
+
+              {modal.type === "already_used" && modalResult && (
+                <div className="text-center">
+                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
+                    <AlertTriangle className="h-7 w-7 text-amber-600" />
+                  </div>
+                  <h3 className="text-lg font-bold text-forest">Già presente</h3>
+                  <p className="mt-2 text-xl font-semibold text-amber-700">
+                    {modalResult.registration.firstName} {modalResult.registration.lastName}
+                  </p>
+                  <p className="mt-2 text-sm text-forest/60">
+                    Check-in già effettuato
+                    {modalResult.registration.checkedInAt
+                      ? ` alle ${new Date(modalResult.registration.checkedInAt).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}`
+                      : ""}
+                    .
+                  </p>
+                  <Button
+                    onClick={closeModal}
+                    variant="outline"
+                    className="mt-6 w-full rounded-full border-amber-200"
+                  >
+                    Chiudi
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </ModalPortal>
+      )}
     </div>
   );
 }

@@ -113,21 +113,58 @@ export async function confirmCheckIn(registrationId: string): Promise<CheckInRes
 }
 
 export type CheckInStats = {
+  eventId: string | null;
+  eventTitle: string;
   totalRegistered: number;
   checkedIn: number;
   pending: number;
   totalCollected: number;
 };
 
+export type PresentAttendee = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  paceCategory: string;
+  checkedInAt: string;
+};
+
+async function getActiveEvent() {
+  const now = new Date();
+  return (
+    (await prisma.event.findFirst({
+      where: { dateTime: { gte: now } },
+      orderBy: { dateTime: "asc" },
+    })) ??
+    (await prisma.event.findFirst({
+      orderBy: { dateTime: "desc" },
+    }))
+  );
+}
+
 export async function getCheckInStats(): Promise<CheckInStats> {
   const authed = await isAdminAuthenticated();
   if (!authed) {
-    return { totalRegistered: 0, checkedIn: 0, pending: 0, totalCollected: 0 };
+    return {
+      eventId: null,
+      eventTitle: "",
+      totalRegistered: 0,
+      checkedIn: 0,
+      pending: 0,
+      totalCollected: 0,
+    };
   }
 
-  const event = await prisma.event.findFirst({ orderBy: { dateTime: "asc" } });
+  const event = await getActiveEvent();
   if (!event) {
-    return { totalRegistered: 0, checkedIn: 0, pending: 0, totalCollected: 0 };
+    return {
+      eventId: null,
+      eventTitle: "",
+      totalRegistered: 0,
+      checkedIn: 0,
+      pending: 0,
+      totalCollected: 0,
+    };
   }
 
   const [totalRegistered, checkedIn] = await Promise.all([
@@ -143,9 +180,44 @@ export async function getCheckInStats(): Promise<CheckInStats> {
   ]);
 
   return {
+    eventId: event.id,
+    eventTitle: event.title,
     totalRegistered,
     checkedIn,
     pending: totalRegistered - checkedIn,
     totalCollected: checkedIn * event.priceAmount,
   };
+}
+
+export async function getPresentAttendees(): Promise<PresentAttendee[]> {
+  const authed = await isAdminAuthenticated();
+  if (!authed) return [];
+
+  const event = await getActiveEvent();
+  if (!event) return [];
+
+  const registrations = await prisma.registration.findMany({
+    where: {
+      eventId: event.id,
+      status: REGISTRATION_STATUSES.PAID_AND_CHECKED_IN,
+    },
+    orderBy: { checkedInAt: "desc" },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      paceCategory: true,
+      checkedInAt: true,
+    },
+  });
+
+  return registrations
+    .filter((r) => r.checkedInAt)
+    .map((r) => ({
+      id: r.id,
+      firstName: r.firstName,
+      lastName: r.lastName,
+      paceCategory: r.paceCategory,
+      checkedInAt: r.checkedInAt!.toISOString(),
+    }));
 }
