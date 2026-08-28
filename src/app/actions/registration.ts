@@ -1,5 +1,6 @@
 "use server";
 
+import { getOrCreateAthleteUser } from "@/app/actions/athlete-profile";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { generateQrToken } from "@/lib/qr";
@@ -35,10 +36,18 @@ export async function registerForMeetup(
 ): Promise<RegistrationResult> {
   const session = await auth();
 
-  if (!session?.user?.id) {
+  if (!session?.user?.email) {
     return {
       success: false,
       error: "Devi accedere o registrarti per prenotare un evento.",
+    };
+  }
+
+  const athlete = await getOrCreateAthleteUser();
+  if (!athlete) {
+    return {
+      success: false,
+      error: "Impossibile caricare il profilo. Esci e riaccedi, poi riprova.",
     };
   }
 
@@ -73,7 +82,7 @@ export async function registerForMeetup(
 
   const { firstName, lastName, email, phone, paceCategory } = parsed.data;
 
-  const userId = session.user.id;
+  const userId = athlete.id;
   const registrationEmail = session.user.email?.toLowerCase() ?? email.toLowerCase();
 
   const existing = await prisma.registration.findFirst({

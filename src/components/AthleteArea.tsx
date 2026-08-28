@@ -84,12 +84,31 @@ export function AthleteArea({ initialDashboard }: AthleteAreaProps) {
   }
 
   const dashboard = initialDashboard;
-  if (!dashboard) return null;
+  const profile =
+    dashboard?.profile ??
+    ({
+      email: session.user.email ?? "",
+      firstName: session.user.name?.split(" ")[0] ?? "",
+      lastName: session.user.name?.split(" ").slice(1).join(" ") ?? "",
+      phone: "",
+      paceCategory: "Medio 5:00/km" as const,
+      medicalNotes: "",
+    } satisfies AthleteDashboard["profile"]);
 
-  const { profile, stats, registrations } = dashboard;
+  const stats = dashboard?.stats ?? {
+    totalRegistrations: 0,
+    eventsAttended: 0,
+    upcomingEvents: 0,
+  };
+  const registrations = dashboard?.registrations ?? [];
 
   return (
     <div className="space-y-8">
+      {!dashboard && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+          Benvenuto! Completa il tuo profilo qui sotto per prenotare gli eventi più velocemente.
+        </div>
+      )}
       <div>
         <p className="text-sm font-semibold uppercase tracking-widest text-emerald-500">
           Area Atleta

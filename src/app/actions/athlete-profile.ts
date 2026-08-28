@@ -46,15 +46,54 @@ function resolveProfile(user: {
   };
 }
 
+function profileFromSession(session: {
+  user?: { email?: string | null; name?: string | null };
+}): AthleteProfile {
+  const fromName = splitName(session.user?.name);
+  return {
+    email: session.user?.email?.toLowerCase() ?? "",
+    firstName: fromName.firstName,
+    lastName: fromName.lastName,
+    phone: "",
+    paceCategory: PACE_CATEGORIES[1],
+    medicalNotes: "",
+  };
+}
+
+async function ensureAthleteUser(session: {
+  user?: { id?: string; email?: string | null; name?: string | null; image?: string | null };
+}) {
+  const email = session.user?.email?.toLowerCase();
+  if (!email) return null;
+
+  const byEmail = await prisma.user.findUnique({ where: { email } });
+  if (byEmail) return byEmail;
+
+  const userId = session.user?.id;
+  if (userId) {
+    const byId = await prisma.user.findUnique({ where: { id: userId } });
+    if (byId) return byId;
+  }
+
+  try {
+    return await prisma.user.create({
+      data: {
+        email,
+        name: session.user?.name ?? null,
+        image: session.user?.image ?? null,
+      },
+    });
+  } catch {
+    return prisma.user.findUnique({ where: { email } });
+  }
+}
+
 export async function getAthleteProfile(): Promise<AthleteProfile | null> {
   const session = await auth();
-  if (!session?.user?.id) return null;
+  if (!session?.user?.email) return null;
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-  });
-
-  if (!user) return null;
+  const user = await ensureAthleteUser(session);
+  if (!user) return profileFromSession(session);
   return resolveProfile(user);
 }
 
@@ -62,11 +101,17 @@ export async function getAthleteProfileForBooking(): Promise<AthleteProfile | nu
   return getAthleteProfile();
 }
 
+export async function getOrCreateAthleteUser() {
+  const session = await auth();
+  if (!session?.user?.email) return null;
+  return ensureAthleteUser(session);
+}
+
 export async function updateAthleteProfile(
   data: AthleteProfileData,
 ): Promise<ProfileUpdateResult> {
   const session = await auth();
-  if (!session?.user?.id) {
+  if (!session?.user?.email) {
     return { success: false, error: "Devi essere autenticato." };
   }
 
@@ -79,11 +124,16 @@ export async function updateAthleteProfile(
     };
   }
 
+  const athlete = await ensureAthleteUser(session);
+  if (!athlete) {
+    return { success: false, error: "Impossibile caricare il profilo. Riprova." };
+  }
+
   const { firstName, lastName, phone, paceCategory, medicalNotes } = parsed.data;
   const fullName = `${firstName} ${lastName}`.trim();
 
   const user = await prisma.user.update({
-    where: { id: session.user.id },
+    where: { id: athlete.id },
     data: {
       name: fullName,
       firstName,

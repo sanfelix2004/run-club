@@ -1,6 +1,7 @@
 "use client";
 
 import { signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,9 +35,22 @@ export function AuthButtons({ scrolled = true, className }: AuthButtonsProps) {
         <Link
           href="/area-atleta"
           aria-label={`Area atleta di ${name}`}
-          className={`inline-flex items-center gap-1.5 rounded-full p-2 text-sm font-medium transition-colors sm:px-3 sm:py-2 ${profileStyles}`}
+          className={`inline-flex items-center gap-1.5 rounded-full p-1 text-sm font-medium transition-colors sm:px-3 sm:py-2 ${profileStyles}`}
         >
-          <User className="h-5 w-5 sm:h-4 sm:w-4" />
+          {session.user.image ? (
+            <Image
+              src={session.user.image}
+              alt={name}
+              width={32}
+              height={32}
+              className="h-8 w-8 rounded-full border border-white/30 object-cover"
+              unoptimized
+            />
+          ) : (
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white">
+              <User className="h-4 w-4" />
+            </span>
+          )}
           <span className="hidden sm:inline">{name}</span>
         </Link>
         <Button
