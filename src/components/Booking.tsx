@@ -25,9 +25,9 @@ export function Booking() {
 
           <ul className="mt-10 space-y-4 text-left">
             {[
+              "Accedi o crea un account dal menu in alto",
               "Clicca sulla card dell'evento che ti interessa",
-              "Compila nome, contatti e fascia di passo nella scheda",
-              "Scarica il PDF con QR code — la quota si paga all'arrivo",
+              "Compila i dati e scarica il PDF con QR code — la quota si paga all'arrivo",
             ].map((item) => (
               <li key={item} className="flex items-center gap-3 text-forest/70">
                 <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />

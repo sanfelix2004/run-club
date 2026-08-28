@@ -33,6 +33,15 @@ export type RegistrationResult =
 export async function registerForMeetup(
   data: RegistrationFormData & { eventId?: string },
 ): Promise<RegistrationResult> {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return {
+      success: false,
+      error: "Devi accedere o registrarti per prenotare un evento.",
+    };
+  }
+
   const parsed = registrationSchema.safeParse(data);
 
   if (!parsed.success) {
@@ -65,9 +74,8 @@ export async function registerForMeetup(
   const { firstName, lastName, email, phone, emergencyName, emergencyPhone, paceCategory } =
     parsed.data;
 
-  const session = await auth();
-  const userId = session?.user?.id ?? null;
-  const registrationEmail = session?.user?.email?.toLowerCase() ?? email.toLowerCase();
+  const userId = session.user.id;
+  const registrationEmail = session.user.email?.toLowerCase() ?? email.toLowerCase();
 
   const existing = await prisma.registration.findFirst({
     where: {

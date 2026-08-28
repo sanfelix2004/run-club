@@ -166,7 +166,8 @@ export function EventRegistrationSheet({
           ) : (
             <form key={formKey} onSubmit={handleSubmit} className="space-y-4">
               <p className="text-sm text-forest/60">
-                Compila i dati per prenotare il tuo posto. Riceverai subito il PDF con QR code.
+                Compila i dati per prenotare il tuo posto come{" "}
+                <strong>{user?.email}</strong>. Riceverai subito il PDF con QR code.
               </p>
 
               <div className="grid gap-4 sm:grid-cols-2">
