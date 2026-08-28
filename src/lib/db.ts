@@ -11,12 +11,8 @@ function ensureServerlessSqlite() {
 
   if (existsSync(target)) return;
 
-  const candidates = [
-    path.join(process.cwd(), "prisma", "dev.db"),
-    path.join(process.cwd(), "prisma", "seed.db"),
-  ];
-  const source = candidates.find((p) => existsSync(p));
-  if (source) {
+  const source = path.join(process.cwd(), "prisma", "seed.db");
+  if (existsSync(source)) {
     mkdirSync("/tmp", { recursive: true });
     copyFileSync(source, target);
   }
