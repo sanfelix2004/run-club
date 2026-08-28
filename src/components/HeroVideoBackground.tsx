@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const VIDEO_SRC = "/videos/kling_20260828_VIDEO_Cinematic__4944_0.mp4";
+const VIDEO_SRC = "/api/hero-video";
 
 export function HeroVideoBackground() {
   const videoRef = useRef<HTMLVideoElement>(null);
