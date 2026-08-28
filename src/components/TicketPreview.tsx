@@ -129,6 +129,14 @@ export function TicketPreview({ registration, onRegisterAnother }: TicketPreview
           Nuova iscrizione
         </Button>
       </div>
+
+      <p className="text-center text-sm text-forest/50">
+        Puoi rivedere tutte le tue iscrizioni in{" "}
+        <a href="/area-atleta" className="font-medium text-emerald-600 hover:underline">
+          Area Atleta
+        </a>
+        .
+      </p>
     </div>
   );
 }

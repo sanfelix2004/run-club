@@ -1,0 +1,43 @@
+import Link from "next/link";
+import { AthleteArea } from "@/components/AthleteArea";
+import { Footer } from "@/components/Footer";
+import { getAthleteDashboard } from "@/app/actions/athlete-area";
+import { SITE } from "@/lib/constants";
+
+export const metadata = {
+  title: `Area Atleta — ${SITE.name}`,
+  description: "Consulta i tuoi dati e lo storico eventi del Run Club Giovinazzo.",
+};
+
+export default async function AthleteAreaPage() {
+  const dashboard = await getAthleteDashboard();
+
+  return (
+    <>
+      <header className="border-b border-emerald-100 bg-white/90 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-4 sm:px-6">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold text-white">
+              R
+            </span>
+            <span className="text-sm font-semibold text-forest sm:text-base">
+              {SITE.name}
+            </span>
+          </Link>
+          <Link
+            href="/#booking"
+            className="rounded-full bg-emerald-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-600"
+          >
+            Prenota evento
+          </Link>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
+        <AthleteArea initialDashboard={dashboard} />
+      </main>
+
+      <Footer />
+    </>
+  );
+}

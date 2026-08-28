@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { SITE, SOCIAL_LINKS } from "@/lib/constants";
 
 function InstagramIcon({ className }: { className?: string }) {
@@ -42,22 +43,30 @@ export function Footer() {
           &copy; {year} {SITE.name}. All rights reserved.
         </p>
 
-        <div className="flex items-center gap-4">
-          {SOCIAL_LINKS.map((link) => {
-            const Icon = ICONS[link.icon];
-            return (
-              <a
-                key={link.label}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={link.label}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-forest/40 transition-colors hover:bg-emerald-50 hover:text-emerald-500"
-              >
-                <Icon className="h-4 w-4" />
-              </a>
-            );
-          })}
+        <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-6">
+          <Link
+            href="/area-atleta"
+            className="text-sm font-medium text-emerald-600 transition-colors hover:text-emerald-700"
+          >
+            Area Atleta
+          </Link>
+          <div className="flex items-center gap-4">
+            {SOCIAL_LINKS.map((link) => {
+              const Icon = ICONS[link.icon];
+              return (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={link.label}
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-forest/40 transition-colors hover:bg-emerald-50 hover:text-emerald-500"
+                >
+                  <Icon className="h-4 w-4" />
+                </a>
+              );
+            })}
+          </div>
         </div>
       </div>
     </footer>
