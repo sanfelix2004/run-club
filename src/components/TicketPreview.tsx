@@ -6,6 +6,7 @@ import QRCode from "qrcode";
 import { Calendar, Download, MapPin, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { RegistrationResult } from "@/app/actions/registration";
+import { buildQrPayload } from "@/lib/qr";
 
 type TicketPreviewProps = {
   registration: Extract<RegistrationResult, { success: true }>["registration"];
@@ -28,7 +29,7 @@ export function TicketPreview({ registration, onRegisterAnother }: TicketPreview
   });
 
   useEffect(() => {
-    QRCode.toDataURL(registration.qrToken, {
+    QRCode.toDataURL(buildQrPayload(registration.qrToken), {
       width: 280,
       margin: 2,
       errorCorrectionLevel: "H",
@@ -46,7 +47,7 @@ export function TicketPreview({ registration, onRegisterAnother }: TicketPreview
             Run Club Giovinazzo
           </p>
           <h3 className="mt-1 text-lg font-bold">{registration.event.title}</h3>
-          <p className="text-xs opacity-70">Pass Ufficiale / Official Bib</p>
+          <p className="text-xs opacity-70">Prenotazione confermata</p>
         </div>
 
         <div className="p-6">
@@ -90,7 +91,7 @@ export function TicketPreview({ registration, onRegisterAnother }: TicketPreview
                 </div>
               )}
               <p className="mt-2 text-center text-xs text-forest/40">
-                Scansiona al check-in
+                QR prenotazione · mostra al check-in
               </p>
             </div>
           </div>
@@ -103,7 +104,8 @@ export function TicketPreview({ registration, onRegisterAnother }: TicketPreview
           </div>
 
           <p className="mt-4 text-xs leading-relaxed text-forest/50">
-            Presenta questo pass (stampato o su smartphone) al punto di ritrovo.
+            La prenotazione è confermata per questo evento. Scarica il PDF e
+            presenta il QR (stampato o su smartphone) al punto di ritrovo.
             La quota va saldata in contanti o POS. Partecipi sotto la tua
             responsabilità — consulta un medico se hai dubbi sulla salute.
           </p>
@@ -117,7 +119,7 @@ export function TicketPreview({ registration, onRegisterAnother }: TicketPreview
           className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-emerald-500 py-5 text-sm font-medium text-white transition-colors hover:bg-emerald-600"
         >
           <Download className="h-4 w-4" />
-          Scarica Pass PDF
+          Scarica PDF prenotazione
         </a>
         <Button
           variant="outline"

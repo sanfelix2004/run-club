@@ -50,7 +50,7 @@ export function Booking({ events }: BookingProps) {
 
     if (result.success) {
       setRegistration(result.registration);
-      toast.success("Iscrizione completata! Scarica il tuo pass.");
+      toast.success("Prenotazione confermata! Scarica il PDF con il QR code.");
     } else {
       if (result.fieldErrors) setFieldErrors(result.fieldErrors);
       toast.error(result.error);
@@ -72,8 +72,9 @@ export function Booking({ events }: BookingProps) {
               Registrati alla prossima corsa
             </h2>
             <p className="mt-4 text-lg leading-relaxed text-forest/70">
-              Compila il modulo, scarica il pass PDF con QR code e presentalo al
-              ritrovo. La quota di{" "}
+              Compila il modulo per prenotare il tuo posto. Riceverai subito un
+              PDF con l&apos;importo da pagare e un QR code valido come
+              prenotazione. La quota di{" "}
               <strong className="text-forest">
                 {selectedEvent?.priceAmount.toFixed(2).replace(".", ",") ?? "5,00"}€
               </strong>{" "}
@@ -97,8 +98,8 @@ export function Booking({ events }: BookingProps) {
 
             <ul className="mt-8 space-y-4">
               {[
-                "Pass PDF con QR code generato subito",
-                "Pagamento €5 sul posto (contanti/POS)",
+                "PDF con quota da pagare e QR prenotazione",
+                "Pagamento sul posto (contanti/POS)",
                 "Check-in rapido con scansione QR",
               ].map((item) => (
                 <li key={item} className="flex items-center gap-3 text-forest/70">

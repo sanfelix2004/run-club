@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf";
 import QRCode from "qrcode";
+import { buildQrPayload } from "@/lib/qr";
 
 export type TicketData = {
   eventTitle: string;
@@ -19,7 +20,7 @@ export async function generateTicketPdf(data: TicketData): Promise<Uint8Array> {
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 12;
 
-  const qrDataUrl = await QRCode.toDataURL(data.qrToken, {
+  const qrDataUrl = await QRCode.toDataURL(buildQrPayload(data.qrToken), {
     width: 400,
     margin: 1,
     errorCorrectionLevel: "H",
@@ -37,7 +38,7 @@ export async function generateTicketPdf(data: TicketData): Promise<Uint8Array> {
   doc.text(data.eventTitle.toUpperCase(), margin, 18);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
-  doc.text("PASS UFFICIALE / OFFICIAL BIB", margin, 24);
+  doc.text("PRENOTAZIONE CONFERMATA", margin, 24);
 
   let y = 36;
   doc.setTextColor(6, 78, 59);
@@ -73,7 +74,7 @@ export async function generateTicketPdf(data: TicketData): Promise<Uint8Array> {
   doc.addImage(qrDataUrl, "PNG", qrX, qrY, qrSize, qrSize);
   doc.setFontSize(7);
   doc.setTextColor(120, 120, 120);
-  doc.text("Scansiona per check-in", qrX + qrSize / 2, qrY + qrSize + 4, {
+  doc.text("QR valido come prenotazione per questo evento", qrX + qrSize / 2, qrY + qrSize + 4, {
     align: "center",
   });
 
@@ -100,11 +101,11 @@ export async function generateTicketPdf(data: TicketData): Promise<Uint8Array> {
   doc.setTextColor(90, 90, 90);
   doc.setFontSize(7);
   const disclaimer = [
-    "• Presenta questo pass (stampato o digitale) al punto di ritrovo.",
+    "• Questo documento conferma la tua prenotazione per l'evento indicato.",
+    "• Presenta il QR (stampato o digitale) al punto di ritrovo per il check-in.",
     "• La quota di partecipazione va saldata in contanti o POS all'arrivo.",
     "• Partecipi sotto la tua responsabilità. Consulta un medico prima di correre se hai dubbi sulla salute.",
     "• In caso di emergenza, il contatto indicato in registrazione verrà avvisato.",
-    "• Lo scarico di responsabilità è accettato al momento dell'iscrizione.",
   ];
   disclaimer.forEach((line) => {
     doc.text(line, margin, y);
@@ -113,7 +114,7 @@ export async function generateTicketPdf(data: TicketData): Promise<Uint8Array> {
 
   doc.setFontSize(6);
   doc.setTextColor(160, 160, 160);
-  doc.text(`Token: ${data.qrToken.slice(0, 20)}...`, margin, doc.internal.pageSize.getHeight() - 6);
+  doc.text(`Codice: ${data.qrToken.slice(0, 8).toUpperCase()}`, margin, doc.internal.pageSize.getHeight() - 6);
 
   return new Uint8Array(doc.output("arraybuffer"));
 }

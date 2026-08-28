@@ -2,11 +2,11 @@
 
 import { prisma } from "@/lib/db";
 import { generateQrToken } from "@/lib/qr";
+import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 import {
   registrationSchema,
   type RegistrationFormData,
 } from "@/lib/validations/registration";
-import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 
 export type RegistrationResult =
   | {
@@ -63,6 +63,22 @@ export async function registerForMeetup(
 
   const { firstName, lastName, email, phone, emergencyName, emergencyPhone, paceCategory } =
     parsed.data;
+
+  const existing = await prisma.registration.findFirst({
+    where: {
+      eventId: event.id,
+      email,
+      status: { not: REGISTRATION_STATUSES.CANCELLED },
+    },
+  });
+
+  if (existing) {
+    return {
+      success: false,
+      error:
+        "Sei già iscritto a questo evento con questa email. Controlla la tua casella o scarica di nuovo il pass.",
+    };
+  }
 
   const qrToken = generateQrToken();
   const emergencyContact = `${emergencyName} — ${emergencyPhone}`;

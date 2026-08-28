@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/db";
-import { isValidQrToken } from "@/lib/qr";
+import { isValidQrToken, parseQrPayload } from "@/lib/qr";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 import { isAdminAuthenticated } from "@/app/actions/admin-auth";
 
@@ -20,6 +20,8 @@ export type ScanResult =
       };
       event: {
         title: string;
+        dateTime: string;
+        locationName: string;
         priceAmount: number;
       };
     }
@@ -31,12 +33,14 @@ export async function lookupRegistrationByQr(qrToken: string): Promise<ScanResul
     return { success: false, error: "Accesso non autorizzato." };
   }
 
-  if (!isValidQrToken(qrToken)) {
+  const token = parseQrPayload(qrToken);
+
+  if (!isValidQrToken(token)) {
     return { success: false, error: "QR code non valido o corrotto." };
   }
 
   const registration = await prisma.registration.findUnique({
-    where: { qrToken },
+    where: { qrToken: token },
     include: { event: true },
   });
 
@@ -58,6 +62,8 @@ export async function lookupRegistrationByQr(qrToken: string): Promise<ScanResul
     },
     event: {
       title: registration.event.title,
+      dateTime: registration.event.dateTime.toISOString(),
+      locationName: registration.event.locationName,
       priceAmount: registration.event.priceAmount,
     },
   };

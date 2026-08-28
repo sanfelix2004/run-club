@@ -5,8 +5,10 @@ import { Html5Qrcode } from "html5-qrcode";
 import {
   AlertTriangle,
   Banknote,
+  Calendar,
   CheckCircle2,
   LogOut,
+  MapPin,
   QrCode,
   RefreshCw,
   ScanLine,
@@ -334,6 +336,23 @@ export function AdminCheckIn() {
                 <p className="mt-1 text-sm text-forest/60">
                   Gruppo: {scanResult.registration.paceCategory}
                 </p>
+                <p className="mt-2 text-sm font-medium text-forest">
+                  {scanResult.event.title}
+                </p>
+                <p className="mt-1 flex items-center gap-1.5 text-xs text-forest/60">
+                  <Calendar className="h-3.5 w-3.5 text-emerald-500" />
+                  {new Date(scanResult.event.dateTime).toLocaleString("it-IT", {
+                    weekday: "short",
+                    day: "numeric",
+                    month: "short",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+                <p className="mt-0.5 flex items-center gap-1.5 text-xs text-forest/60">
+                  <MapPin className="h-3.5 w-3.5 text-emerald-500" />
+                  {scanResult.event.locationName}
+                </p>
               </div>
               <span
                 className={`rounded-full px-3 py-1 text-xs font-semibold ${
@@ -371,7 +390,7 @@ export function AdminCheckIn() {
               >
                 {checkInLoading
                   ? "Conferma in corso..."
-                  : "Conferma Presenza e Incassa 5,00€"}
+                  : `Conferma Presenza e Incassa ${scanResult.event.priceAmount.toFixed(2).replace(".", ",")}€`}
               </Button>
             )}
 
