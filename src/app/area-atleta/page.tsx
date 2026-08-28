@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AthleteArea } from "@/components/AthleteArea";
+import { AuthButtons } from "@/components/AuthButtons";
 import { Footer } from "@/components/Footer";
 import { getAthleteDashboard } from "@/app/actions/athlete-area";
 import { SITE } from "@/lib/constants";
@@ -24,12 +25,15 @@ export default async function AthleteAreaPage() {
               {SITE.name}
             </span>
           </Link>
-          <Link
-            href="/#booking"
-            className="rounded-full bg-emerald-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-600"
-          >
-            Prenota evento
-          </Link>
+          <div className="flex items-center gap-3">
+            <AuthButtons scrolled />
+            <Link
+              href="/#booking"
+              className="hidden rounded-full bg-emerald-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-600 sm:inline-block"
+            >
+              Prenota evento
+            </Link>
+          </div>
         </div>
       </header>
 

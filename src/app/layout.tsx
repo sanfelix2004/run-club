@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
+import { auth } from "@/auth";
+import { AuthProvider } from "@/components/AuthProvider";
+import { AuthUIProvider } from "@/components/AuthUIProvider";
 import { SITE } from "@/lib/constants";
 
 const dmSans = DM_Sans({
@@ -20,9 +23,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const session = await auth();
+
   return (
-    <html lang="en" className={`${dmSans.variable} h-full scroll-smooth`}>
+    <html lang="it" className={`${dmSans.variable} h-full scroll-smooth`}>
       <head>
         <link
           rel="preload"
@@ -33,7 +38,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="min-h-full bg-[#FAFDFB] font-sans text-forest antialiased">
-        {children}
+        <AuthProvider session={session}>
+          <AuthUIProvider>
+            {children}
+          </AuthUIProvider>
+        </AuthProvider>
         <Toaster position="top-center" richColors closeButton />
       </body>
     </html>

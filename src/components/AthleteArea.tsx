@@ -1,27 +1,19 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import {
   Calendar,
   CheckCircle2,
   Clock,
   Download,
-  LogOut,
   MapPin,
   Ticket,
   User,
 } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  getAthleteDashboard,
-  loginAthleteArea,
-  logoutAthleteArea,
-  type AthleteDashboard,
-} from "@/app/actions/athlete-area";
+import { useAuthUI } from "@/components/AuthUIProvider";
+import type { AthleteDashboard } from "@/app/actions/athlete-area";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
@@ -44,96 +36,47 @@ type AthleteAreaProps = {
 };
 
 export function AthleteArea({ initialDashboard }: AthleteAreaProps) {
-  const [dashboard, setDashboard] = useState<AthleteDashboard | null>(initialDashboard);
-  const [loading, setLoading] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const { data: session, status } = useSession();
+  const { openLogin, openRegister } = useAuthUI();
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setFieldErrors({});
-
-    const formData = new FormData(e.currentTarget);
-    const result = await loginAthleteArea({
-      email: formData.get("email") as string,
-      phone: formData.get("phone") as string,
-    });
-
-    setLoading(false);
-
-    if (result.success) {
-      const data = await getAthleteDashboard();
-      setDashboard(data);
-      toast.success("Accesso effettuato");
-    } else {
-      if (result.fieldErrors) setFieldErrors(result.fieldErrors);
-      toast.error(result.error);
-    }
-  };
-
-  const handleLogout = async () => {
-    await logoutAthleteArea();
-    setDashboard(null);
-    toast.success("Sei uscito dall'area atleta");
-  };
-
-  if (!dashboard) {
+  if (status === "loading") {
     return (
-      <div className="mx-auto w-full max-w-md">
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!session?.user) {
+    return (
+      <div className="mx-auto w-full max-w-md text-center">
         <div className="rounded-2xl border border-emerald-100 bg-white p-8 shadow-lg">
-          <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 text-white">
+          <div className="mx-auto mb-6 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 text-white">
             <User className="h-6 w-6" />
           </div>
           <h1 className="text-2xl font-bold text-forest">Area Atleta</h1>
           <p className="mt-2 text-sm text-forest/60">
-            Accedi con email e telefono usati in iscrizione per vedere i tuoi dati
-            e lo storico eventi.
+            Accedi o registrati per vedere i tuoi dati e lo storico eventi.
           </p>
-
-          <form onSubmit={handleLogin} className="mt-6 space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                required
-                placeholder="marco@example.com"
-                className="rounded-xl border-emerald-100"
-              />
-              {fieldErrors.email && (
-                <p className="text-xs text-red-500">{fieldErrors.email[0]}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="phone">Telefono</Label>
-              <Input
-                id="phone"
-                name="phone"
-                type="tel"
-                required
-                placeholder="+39 333 123 4567"
-                className="rounded-xl border-emerald-100"
-              />
-              {fieldErrors.phone && (
-                <p className="text-xs text-red-500">{fieldErrors.phone[0]}</p>
-              )}
-            </div>
-
+          <div className="mt-6 flex flex-col gap-3">
             <Button
-              type="submit"
-              disabled={loading}
+              onClick={openLogin}
               className="w-full rounded-full bg-emerald-500 py-5 text-white hover:bg-emerald-600"
             >
-              {loading ? "Accesso..." : "Accedi"}
+              Accedi
             </Button>
-          </form>
-
-          <p className="mt-6 text-center text-sm text-forest/50">
-            Non sei ancora iscritto?{" "}
+            <Button
+              variant="outline"
+              onClick={openRegister}
+              className="w-full rounded-full border-emerald-200 py-5"
+            >
+              Registrati
+            </Button>
+          </div>
+          <p className="mt-6 text-sm text-forest/50">
+            Non sei ancora iscritto a un evento?{" "}
             <Link href="/#booking" className="font-medium text-emerald-600 hover:underline">
-              Prenota un evento
+              Prenota ora
             </Link>
           </p>
         </div>
@@ -141,30 +84,21 @@ export function AthleteArea({ initialDashboard }: AthleteAreaProps) {
     );
   }
 
+  const dashboard = initialDashboard;
+  if (!dashboard) return null;
+
   const { profile, stats, registrations } = dashboard;
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-widest text-emerald-500">
-            Area Atleta
-          </p>
-          <h1 className="mt-2 text-3xl font-bold text-forest">
-            Ciao, {profile.firstName}!
-          </h1>
-          <p className="mt-1 text-forest/60">
-            {profile.firstName} {profile.lastName} · {profile.email}
-          </p>
-        </div>
-        <Button
-          variant="outline"
-          onClick={handleLogout}
-          className="shrink-0 rounded-full border-emerald-200"
-        >
-          <LogOut className="mr-2 h-4 w-4" />
-          Esci
-        </Button>
+      <div>
+        <p className="text-sm font-semibold uppercase tracking-widest text-emerald-500">
+          Area Atleta
+        </p>
+        <h1 className="mt-2 text-3xl font-bold text-forest">
+          Ciao, {session.user.name?.split(" ")[0] ?? profile.firstName}!
+        </h1>
+        <p className="mt-1 text-forest/60">{session.user.email}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
@@ -185,105 +119,122 @@ export function AthleteArea({ initialDashboard }: AthleteAreaProps) {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-forest">I tuoi dati</h2>
-        <dl className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div>
-            <dt className="text-xs font-medium uppercase tracking-wide text-forest/40">
-              Telefono
-            </dt>
-            <dd className="mt-1 font-medium text-forest">{profile.phone}</dd>
-          </div>
-          <div>
-            <dt className="text-xs font-medium uppercase tracking-wide text-forest/40">
-              Gruppo di passo
-            </dt>
-            <dd className="mt-1 font-medium text-forest">{profile.paceCategory}</dd>
-          </div>
-          <div className="sm:col-span-2">
-            <dt className="text-xs font-medium uppercase tracking-wide text-forest/40">
-              Contatto di emergenza
-            </dt>
-            <dd className="mt-1 font-medium text-forest">{profile.emergencyContact}</dd>
-          </div>
-        </dl>
-      </div>
+      {stats.totalRegistrations > 0 && (
+        <div className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-forest">I tuoi dati</h2>
+          <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div>
+              <dt className="text-xs font-medium uppercase tracking-wide text-forest/40">
+                Nome
+              </dt>
+              <dd className="mt-1 font-medium text-forest">
+                {profile.firstName} {profile.lastName}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs font-medium uppercase tracking-wide text-forest/40">
+                Telefono
+              </dt>
+              <dd className="mt-1 font-medium text-forest">{profile.phone}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-medium uppercase tracking-wide text-forest/40">
+                Gruppo di passo
+              </dt>
+              <dd className="mt-1 font-medium text-forest">{profile.paceCategory}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-medium uppercase tracking-wide text-forest/40">
+                Contatto di emergenza
+              </dt>
+              <dd className="mt-1 font-medium text-forest">{profile.emergencyContact}</dd>
+            </div>
+          </dl>
+        </div>
+      )}
 
       <div>
         <h2 className="text-lg font-semibold text-forest">Storico eventi</h2>
-        <p className="mt-1 text-sm text-forest/60">
-          Tutte le tue iscrizioni, dalla più recente.
-        </p>
+        {registrations.length === 0 ? (
+          <p className="mt-4 rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/50 p-8 text-center text-sm text-forest/60">
+            Non hai ancora prenotato nessun evento.{" "}
+            <Link href="/#booking" className="font-medium text-emerald-600 hover:underline">
+              Prenota il tuo primo meetup
+            </Link>
+          </p>
+        ) : (
+          <ul className="mt-4 space-y-4">
+            {registrations.map((registration) => {
+              const eventDate = new Date(registration.event.dateTime);
+              const status = STATUS_LABELS[registration.status] ?? {
+                label: registration.status,
+                className: "bg-gray-100 text-gray-700",
+              };
+              const isUpcoming = eventDate >= new Date();
 
-        <ul className="mt-4 space-y-4">
-          {registrations.map((registration) => {
-            const eventDate = new Date(registration.event.dateTime);
-            const status = STATUS_LABELS[registration.status] ?? {
-              label: registration.status,
-              className: "bg-gray-100 text-gray-700",
-            };
-            const isUpcoming = eventDate >= new Date();
+              return (
+                <li
+                  key={registration.id}
+                  className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm"
+                >
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-semibold text-forest">
+                          {registration.event.title}
+                        </h3>
+                        <span
+                          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${status.className}`}
+                        >
+                          {status.label}
+                        </span>
+                      </div>
 
-            return (
-              <li
-                key={registration.id}
-                className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm"
-              >
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="font-semibold text-forest">{registration.event.title}</h3>
-                      <span
-                        className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${status.className}`}
-                      >
-                        {status.label}
-                      </span>
-                    </div>
-
-                    <div className="mt-3 space-y-1.5 text-sm text-forest/60">
-                      <p className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-emerald-500" />
-                        {eventDate.toLocaleDateString("it-IT", {
-                          weekday: "long",
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })}
-                        {" · "}
-                        {eventDate.toLocaleTimeString("it-IT", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </p>
-                      <p className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-emerald-500" />
-                        {registration.event.locationName}
-                      </p>
-                      {registration.checkedInAt && (
-                        <p className="text-xs text-emerald-600">
-                          Check-in:{" "}
-                          {new Date(registration.checkedInAt).toLocaleString("it-IT")}
+                      <div className="mt-3 space-y-1.5 text-sm text-forest/60">
+                        <p className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-emerald-500" />
+                          {eventDate.toLocaleDateString("it-IT", {
+                            weekday: "long",
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}
+                          {" · "}
+                          {eventDate.toLocaleTimeString("it-IT", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
                         </p>
-                      )}
+                        <p className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4 text-emerald-500" />
+                          {registration.event.locationName}
+                        </p>
+                        {registration.checkedInAt && (
+                          <p className="text-xs text-emerald-600">
+                            Check-in:{" "}
+                            {new Date(registration.checkedInAt).toLocaleString("it-IT")}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
 
-                  {isUpcoming &&
-                    registration.status === REGISTRATION_STATUSES.PENDING_PAYMENT && (
-                      <a
-                        href={`/api/ticket/${registration.qrToken}`}
-                        download
-                        className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-600"
-                      >
-                        <Download className="h-4 w-4" />
-                        Scarica PDF
-                      </a>
-                    )}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+                    {isUpcoming &&
+                      registration.status === REGISTRATION_STATUSES.PENDING_PAYMENT && (
+                        <a
+                          href={`/api/ticket/${registration.qrToken}`}
+                          download
+                          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-600"
+                        >
+                          <Download className="h-4 w-4" />
+                          Scarica PDF
+                        </a>
+                      )}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
 
       <div className="text-center">

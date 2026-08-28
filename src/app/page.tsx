@@ -10,9 +10,17 @@ import { Sessions } from "@/components/Sessions";
 import { Stats } from "@/components/Stats";
 import { Testimonials } from "@/components/Testimonials";
 import { getUpcomingEvents } from "@/app/actions/events";
+import { auth } from "@/auth";
 
 export default async function Home() {
   const events = await getUpcomingEvents();
+  const session = await auth();
+  const user = session?.user
+    ? {
+        name: session.user.name ?? "",
+        email: session.user.email ?? "",
+      }
+    : null;
 
   return (
     <>
@@ -25,7 +33,7 @@ export default async function Home() {
         <Stats />
         <Pricing />
         <Testimonials />
-        <Booking events={events} />
+        <Booking events={events} user={user} />
         <Location />
       </main>
       <Footer />

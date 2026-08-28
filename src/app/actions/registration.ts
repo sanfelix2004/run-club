@@ -1,5 +1,6 @@
 "use server";
 
+import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { generateQrToken } from "@/lib/qr";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
@@ -64,10 +65,14 @@ export async function registerForMeetup(
   const { firstName, lastName, email, phone, emergencyName, emergencyPhone, paceCategory } =
     parsed.data;
 
+  const session = await auth();
+  const userId = session?.user?.id ?? null;
+  const registrationEmail = session?.user?.email?.toLowerCase() ?? email.toLowerCase();
+
   const existing = await prisma.registration.findFirst({
     where: {
       eventId: event.id,
-      email,
+      email: registrationEmail,
       status: { not: REGISTRATION_STATUSES.CANCELLED },
     },
   });
@@ -86,9 +91,10 @@ export async function registerForMeetup(
   const registration = await prisma.registration.create({
     data: {
       eventId: event.id,
+      userId,
       firstName,
       lastName,
-      email,
+      email: registrationEmail,
       phone,
       emergencyContact,
       paceCategory,

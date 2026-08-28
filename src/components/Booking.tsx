@@ -14,11 +14,26 @@ import type { RegistrationFormData } from "@/lib/validations/registration";
 
 import type { PublicEvent } from "@/app/actions/events";
 
+type BookingUser = {
+  name: string;
+  email: string;
+} | null;
+
 type BookingProps = {
   events: PublicEvent[];
+  user?: BookingUser;
 };
 
-export function Booking({ events }: BookingProps) {
+function splitName(fullName: string) {
+  const parts = fullName.trim().split(/\s+/);
+  return {
+    firstName: parts[0] ?? "",
+    lastName: parts.slice(1).join(" "),
+  };
+}
+
+export function Booking({ events, user = null }: BookingProps) {
+  const userNames = user?.name ? splitName(user.name) : { firstName: "", lastName: "" };
   const [selectedEventId, setSelectedEventId] = useState(events[0]?.id ?? "");
   const selectedEvent = events.find((e) => e.id === selectedEventId) ?? events[0] ?? null;
   const [loading, setLoading] = useState(false);
@@ -151,6 +166,7 @@ export function Booking({ events }: BookingProps) {
                         id="firstName"
                         name="firstName"
                         required
+                        defaultValue={userNames.firstName}
                         placeholder="Marco"
                         className="rounded-xl border-emerald-100"
                       />
@@ -164,6 +180,7 @@ export function Booking({ events }: BookingProps) {
                         id="lastName"
                         name="lastName"
                         required
+                        defaultValue={userNames.lastName}
                         placeholder="Rossi"
                         className="rounded-xl border-emerald-100"
                       />
@@ -180,6 +197,8 @@ export function Booking({ events }: BookingProps) {
                       name="email"
                       type="email"
                       required
+                      defaultValue={user?.email ?? ""}
+                      readOnly={Boolean(user?.email)}
                       placeholder="marco@example.com"
                       className="rounded-xl border-emerald-100"
                     />

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { NAV_LINKS, SITE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { AuthButtons } from "@/components/AuthButtons";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -61,80 +62,83 @@ export function Navbar() {
           </span>
         </a>
 
-        <ul className="hidden items-center gap-1 md:flex">
-          {NAV_LINKS.map((link) => (
-            <li key={link.href}>
-              <a
-                href={link.href}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick(link.href);
-                }}
-                className={cn(
-                  "rounded-full px-3 py-2 text-sm font-medium transition-colors",
-                  scrolled
-                    ? "text-forest/80 hover:bg-emerald-50 hover:text-emerald-600"
-                    : "text-white/90 hover:bg-white/10 hover:text-white",
-                )}
-              >
-                {link.label}
-              </a>
-            </li>
-          ))}
-          <li>
-            <Button
-              size="sm"
-              className="ml-2 rounded-full bg-emerald-500 px-5 text-white hover:bg-emerald-600"
-              onClick={() => handleNavClick("#booking")}
-            >
-              Join a Run
-            </Button>
-          </li>
-        </ul>
-
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden"
-                aria-label="Open menu"
-              >
-                <Menu
+        <div className="hidden items-center gap-2 md:flex">
+          <ul className="flex items-center gap-1">
+            {NAV_LINKS.map((link) => (
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavClick(link.href);
+                  }}
                   className={cn(
-                    "h-5 w-5",
-                    scrolled ? "text-forest" : "text-white",
+                    "rounded-full px-3 py-2 text-sm font-medium transition-colors",
+                    scrolled
+                      ? "text-forest/80 hover:bg-emerald-50 hover:text-emerald-600"
+                      : "text-white/90 hover:bg-white/10 hover:text-white",
                   )}
-                />
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <AuthButtons scrolled={scrolled} />
+          <Button
+            size="sm"
+            className="rounded-full bg-emerald-500 px-5 text-white hover:bg-emerald-600"
+            onClick={() => handleNavClick("#booking")}
+          >
+            Join a Run
+          </Button>
+        </div>
+
+        <div className="flex items-center gap-2 md:hidden">
+          <AuthButtons scrolled={scrolled} />
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Open menu"
+                >
+                  <Menu
+                    className={cn(
+                      "h-5 w-5",
+                      scrolled ? "text-forest" : "text-white",
+                    )}
+                  />
+                </Button>
+              }
+            />
+            <SheetContent side="right" className="w-[280px] border-emerald-100">
+              <SheetHeader>
+                <SheetTitle className="text-left text-forest">{SITE.name}</SheetTitle>
+              </SheetHeader>
+              <ul className="mt-8 flex flex-col gap-1">
+                {NAV_LINKS.map((link) => (
+                  <li key={link.href}>
+                    <button
+                      type="button"
+                      onClick={() => handleNavClick(link.href)}
+                      className="w-full rounded-lg px-3 py-3 text-left text-base font-medium text-forest/80 transition-colors hover:bg-emerald-50 hover:text-emerald-600"
+                    >
+                      {link.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <Button
+                className="mt-6 w-full rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
+                onClick={() => handleNavClick("#booking")}
+              >
+                Join a Run
               </Button>
-            }
-          />
-          <SheetContent side="right" className="w-[280px] border-emerald-100">
-            <SheetHeader>
-              <SheetTitle className="text-left text-forest">{SITE.name}</SheetTitle>
-            </SheetHeader>
-            <ul className="mt-8 flex flex-col gap-1">
-              {NAV_LINKS.map((link) => (
-                <li key={link.href}>
-                  <button
-                    type="button"
-                    onClick={() => handleNavClick(link.href)}
-                    className="w-full rounded-lg px-3 py-3 text-left text-base font-medium text-forest/80 transition-colors hover:bg-emerald-50 hover:text-emerald-600"
-                  >
-                    {link.label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <Button
-              className="mt-6 w-full rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
-              onClick={() => handleNavClick("#booking")}
-            >
-              Join a Run
-            </Button>
-          </SheetContent>
-        </Sheet>
+            </SheetContent>
+          </Sheet>
+        </div>
       </nav>
     </header>
   );

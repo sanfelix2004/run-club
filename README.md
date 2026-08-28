@@ -21,7 +21,18 @@ Includes a full **registration & ticketing system** for weekly meetups with PDF 
 - Professional PDF bib/ticket download (`/api/ticket/[token]`)
 - €5 on-site payment flow (PENDING_PAYMENT → PAID_AND_CHECKED_IN)
 
-### Admin Check-in (`/admin/checkin`)
+### Area Atleta (`/area-atleta`)
+- Login with email/password, Google, or Apple ID
+- View profile data and event history
+- Stats: bookings, attended events, upcoming reservations
+
+### Authentication
+- **Accedi / Registrati** buttons always visible in the navbar
+- Welcome popup on first visit for new users (dismissible)
+- Email + password registration
+- Google and Apple OAuth (configure env vars)
+- Session-linked event bookings
+
 - PIN-protected staff access (default: `runclub2026`)
 - Live camera QR scanner (html5-qrcode)
 - Runner lookup with payment status
@@ -61,6 +72,12 @@ Open [http://localhost:43123](http://localhost:43123) for the site.
 | `DATABASE_URL` | Prisma connection string | `file:./dev.db` |
 | `ADMIN_PIN` | Staff check-in PIN | `runclub2026` |
 | `QR_SECRET` | HMAC secret for QR tokens | built-in dev key |
+| `AUTH_SECRET` | Auth.js session secret | required |
+| `AUTH_URL` | App URL for OAuth callbacks | `http://localhost:43123` |
+| `AUTH_GOOGLE_ID` | Google OAuth client ID | optional |
+| `AUTH_GOOGLE_SECRET` | Google OAuth client secret | optional |
+| `AUTH_APPLE_ID` | Apple Sign In service ID | optional |
+| `AUTH_APPLE_SECRET` | Apple Sign In secret | optional |
 
 For PostgreSQL / Supabase production:
 
