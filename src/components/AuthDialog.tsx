@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { registerWithEmail } from "@/app/actions/auth";
-import { getOAuthProviders, type OAuthProviders } from "@/app/actions/oauth";
 import { ModalPortal } from "@/components/ModalPortal";
 import { PrivacyConsentField } from "@/components/PrivacyConsentField";
 
@@ -18,6 +17,7 @@ type AuthDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   defaultMode?: AuthMode;
+  googleOAuthEnabled: boolean;
 };
 
 function GoogleIcon({ className }: { className?: string }) {
@@ -43,22 +43,19 @@ function GoogleIcon({ className }: { className?: string }) {
   );
 }
 
-export function AuthDialog({ open, onOpenChange, defaultMode = "login" }: AuthDialogProps) {
+export function AuthDialog({
+  open,
+  onOpenChange,
+  defaultMode = "login",
+  googleOAuthEnabled,
+}: AuthDialogProps) {
   const [mode, setMode] = useState<AuthMode>(defaultMode);
   const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
-  const [oauthProviders, setOauthProviders] = useState<OAuthProviders>({
-    google: false,
-  });
 
   useEffect(() => {
     if (open) setMode(defaultMode);
   }, [open, defaultMode]);
-
-  useEffect(() => {
-    if (!open) return;
-    getOAuthProviders().then(setOauthProviders);
-  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -73,10 +70,10 @@ export function AuthDialog({ open, onOpenChange, defaultMode = "login" }: AuthDi
     };
   }, [open, onOpenChange]);
 
-  const googleNotConfigured = !oauthProviders.google;
+  const googleNotConfigured = !googleOAuthEnabled;
 
-  const handleGoogleOAuth = async () => {
-    if (!oauthProviders.google) {
+  const handleGoogleOAuth = () => {
+    if (!googleOAuthEnabled) {
       toast.error(
         "Accesso con Google non ancora attivo. Usa email e password oppure chiedi allo staff di configurare OAuth.",
         { duration: 5000 },
@@ -85,33 +82,7 @@ export function AuthDialog({ open, onOpenChange, defaultMode = "login" }: AuthDi
     }
 
     setLoading(true);
-    try {
-      const result = await signIn("google", {
-        callbackUrl: window.location.href,
-        redirect: false,
-      });
-
-      if (result?.url) {
-        window.location.assign(result.url);
-        return;
-      }
-
-      setLoading(false);
-
-      if (result?.error) {
-        toast.error(
-          result.error === "Configuration"
-            ? "Accesso con Google non configurato correttamente sul server."
-            : "Impossibile avviare l'accesso con Google.",
-        );
-        return;
-      }
-
-      toast.error("Impossibile avviare l'accesso con Google.");
-    } catch {
-      setLoading(false);
-      toast.error("Impossibile accedere con Google.");
-    }
+    void signIn("google", { callbackUrl: window.location.href });
   };
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {

@@ -21,9 +21,10 @@ export function useAuthUI() {
 
 type AuthUIProviderProps = {
   children: React.ReactNode;
+  googleOAuthEnabled: boolean;
 };
 
-export function AuthUIProvider({ children }: AuthUIProviderProps) {
+export function AuthUIProvider({ children, googleOAuthEnabled }: AuthUIProviderProps) {
   const { status } = useSession();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [mode, setMode] = useState<"login" | "register">("register");
@@ -63,7 +64,12 @@ export function AuthUIProvider({ children }: AuthUIProviderProps) {
   return (
     <AuthUIContext.Provider value={{ openLogin, openRegister }}>
       {children}
-      <AuthDialog open={dialogOpen} onOpenChange={handleOpenChange} defaultMode={mode} />
+      <AuthDialog
+        open={dialogOpen}
+        onOpenChange={handleOpenChange}
+        defaultMode={mode}
+        googleOAuthEnabled={googleOAuthEnabled}
+      />
     </AuthUIContext.Provider>
   );
 }

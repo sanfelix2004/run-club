@@ -7,6 +7,7 @@ import { AuthProvider } from "@/components/AuthProvider";
 import { AuthUIProvider } from "@/components/AuthUIProvider";
 import { CookieBanner } from "@/components/CookieBanner";
 import { SITE } from "@/lib/constants";
+import { isGoogleOAuthEnabled } from "@/lib/oauth-config";
 
 const dmSans = DM_Sans({
   variable: "--font-sans",
@@ -26,6 +27,7 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const session = await auth();
+  const googleOAuthEnabled = isGoogleOAuthEnabled();
 
   return (
     <html lang="it" className={`${dmSans.variable} h-full scroll-smooth`}>
@@ -40,7 +42,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="min-h-full bg-[#FAFDFB] font-sans text-forest antialiased">
         <AuthProvider session={session}>
-          <AuthUIProvider>
+          <AuthUIProvider googleOAuthEnabled={googleOAuthEnabled}>
             {children}
           </AuthUIProvider>
         </AuthProvider>
