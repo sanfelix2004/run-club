@@ -83,7 +83,7 @@ model Registration {
   lastName         String    @map("last_name")
   email            String
   phone            String
-  emergencyContact String    @map("emergency_contact")
+  emergencyContact String?   @map("emergency_contact")
   paceCategory     String    @map("pace_category")
   qrToken          String    @unique @map("qr_token")
   status           String    @default("PENDING_PAYMENT")

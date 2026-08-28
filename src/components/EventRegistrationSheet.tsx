@@ -85,8 +85,6 @@ export function EventRegistrationSheet({
       lastName: formData.get("lastName") as string,
       email: formData.get("email") as string,
       phone: formData.get("phone") as string,
-      emergencyName: formData.get("emergencyName") as string,
-      emergencyPhone: formData.get("emergencyPhone") as string,
       paceCategory: formData.get("paceCategory") as RegistrationFormData["paceCategory"],
       acceptPrivacy: formData.get("acceptPrivacy") === "true",
     };
@@ -241,39 +239,6 @@ export function EventRegistrationSheet({
                 )}
               </div>
 
-              <div className="rounded-xl border border-emerald-50 bg-emerald-50/50 p-4">
-                <p className="mb-3 text-sm font-medium text-forest">Contatto di emergenza</p>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="sheet-emergencyName">Nome</Label>
-                    <Input
-                      id="sheet-emergencyName"
-                      name="emergencyName"
-                      required
-                      placeholder="Laura Rossi"
-                      className="rounded-xl border-emerald-100 bg-white"
-                    />
-                    {fieldErrors.emergencyName && (
-                      <p className="text-xs text-red-500">{fieldErrors.emergencyName[0]}</p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="sheet-emergencyPhone">Telefono</Label>
-                    <Input
-                      id="sheet-emergencyPhone"
-                      name="emergencyPhone"
-                      type="tel"
-                      required
-                      placeholder="+39 333 987 6543"
-                      className="rounded-xl border-emerald-100 bg-white"
-                    />
-                    {fieldErrors.emergencyPhone && (
-                      <p className="text-xs text-red-500">{fieldErrors.emergencyPhone[0]}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
               <div className="space-y-2">
                 <Label htmlFor="sheet-paceCategory">Fascia di passo</Label>
                 <select
@@ -300,8 +265,7 @@ export function EventRegistrationSheet({
               <PrivacyConsentField id="sheet-acceptPrivacy" error={fieldErrors.acceptPrivacy?.[0]} />
 
               <p className="text-xs leading-relaxed text-forest/50">
-                Confermi inoltre di essere in condizioni fisiche adeguate per partecipare e di
-                aver fornito un contatto di emergenza valido.
+                Confermi di essere in condizioni fisiche adeguate per partecipare.
               </p>
 
               <Button

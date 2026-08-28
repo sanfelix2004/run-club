@@ -15,14 +15,6 @@ export const registrationSchema = z.object({
     .string()
     .min(8, "Inserisci un numero di telefono valido")
     .max(20),
-  emergencyName: z
-    .string()
-    .min(2, "Inserisci il nome del contatto di emergenza")
-    .max(80),
-  emergencyPhone: z
-    .string()
-    .min(8, "Inserisci un telefono di emergenza valido")
-    .max(20),
   paceCategory: z.enum(PACE_CATEGORIES, {
     message: "Seleziona una fascia di passo",
   }),

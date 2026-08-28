@@ -27,7 +27,6 @@ export type AthleteDashboard = {
     email: string;
     phone: string;
     paceCategory: string;
-    emergencyContact: string;
   };
   stats: {
     totalRegistrations: number;
@@ -60,7 +59,6 @@ export async function getAthleteDashboard(): Promise<AthleteDashboard | null> {
         email,
         phone: "—",
         paceCategory: "—",
-        emergencyContact: "—",
       },
       stats: {
         totalRegistrations: 0,
@@ -81,7 +79,6 @@ export async function getAthleteDashboard(): Promise<AthleteDashboard | null> {
       email: latest.email,
       phone: latest.phone,
       paceCategory: latest.paceCategory,
-      emergencyContact: latest.emergencyContact,
     },
     stats: {
       totalRegistrations: registrations.length,

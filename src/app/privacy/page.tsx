@@ -38,8 +38,8 @@ export default function PrivacyPage() {
             conservata in forma crittografata), eventuale immagine profilo da login social.
           </li>
           <li>
-            <strong>Dati di iscrizione agli eventi:</strong> fascia di passo, contatto di
-            emergenza, stato prenotazione e pagamento, token QR per il check-in.
+            <strong>Dati di iscrizione agli eventi:</strong> fascia di passo, telefono,
+            stato prenotazione e pagamento, token QR per il check-in.
           </li>
           <li>
             <strong>Recensioni:</strong> testo della recensione e nome visualizzato.

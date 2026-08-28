@@ -105,7 +105,6 @@ export async function generateTicketPdf(data: TicketData): Promise<Uint8Array> {
     "• Presenta il QR (stampato o digitale) al punto di ritrovo per il check-in.",
     "• La quota di partecipazione va saldata in contanti o POS all'arrivo.",
     "• Partecipi sotto la tua responsabilità. Consulta un medico prima di correre se hai dubbi sulla salute.",
-    "• In caso di emergenza, il contatto indicato in registrazione verrà avvisato.",
   ];
   disclaimer.forEach((line) => {
     doc.text(line, margin, y);

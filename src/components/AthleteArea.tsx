@@ -143,12 +143,6 @@ export function AthleteArea({ initialDashboard }: AthleteAreaProps) {
               </dt>
               <dd className="mt-1 font-medium text-forest">{profile.paceCategory}</dd>
             </div>
-            <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-forest/40">
-                Contatto di emergenza
-              </dt>
-              <dd className="mt-1 font-medium text-forest">{profile.emergencyContact}</dd>
-            </div>
           </dl>
         </div>
       )}

@@ -71,8 +71,7 @@ export async function registerForMeetup(
     };
   }
 
-  const { firstName, lastName, email, phone, emergencyName, emergencyPhone, paceCategory } =
-    parsed.data;
+  const { firstName, lastName, email, phone, paceCategory } = parsed.data;
 
   const userId = session.user.id;
   const registrationEmail = session.user.email?.toLowerCase() ?? email.toLowerCase();
@@ -94,7 +93,6 @@ export async function registerForMeetup(
   }
 
   const qrToken = generateQrToken();
-  const emergencyContact = `${emergencyName} — ${emergencyPhone}`;
 
   const registration = await prisma.registration.create({
     data: {
@@ -104,7 +102,6 @@ export async function registerForMeetup(
       lastName,
       email: registrationEmail,
       phone,
-      emergencyContact,
       paceCategory,
       qrToken,
       status: REGISTRATION_STATUSES.PENDING_PAYMENT,
