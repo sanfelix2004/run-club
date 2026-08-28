@@ -79,6 +79,19 @@ Open [http://localhost:43123](http://localhost:43123) for the site.
 | `AUTH_APPLE_ID` | Apple Sign In service ID | optional |
 | `AUTH_APPLE_SECRET` | Apple Sign In secret | optional |
 
+### Google OAuth (local)
+
+1. Open [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials).
+2. Create an **OAuth 2.0 Client ID** (type: Web application).
+3. **Authorized JavaScript origins:** `http://localhost:43123`
+4. **Authorized redirect URIs:** `http://localhost:43123/api/auth/callback/google`  
+   (must match exactly — not `/api/` alone)
+5. Copy Client ID and Client Secret into `.env` as `AUTH_GOOGLE_ID` and `AUTH_GOOGLE_SECRET`.
+6. If the app is in **Testing** mode, add your Gmail under OAuth consent screen → **Test users**.
+7. Restart the dev server after changing `.env`.
+
+For production, repeat steps 3–4 with your live domain (e.g. `https://tuodominio.it` and `https://tuodominio.it/api/auth/callback/google`) and set `AUTH_URL` to that domain on your host.
+
 For PostgreSQL / Supabase production:
 
 ```
