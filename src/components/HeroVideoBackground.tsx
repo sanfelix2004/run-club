@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
-const VIDEO_SRC = "/api/hero-video";
+const VIDEO_SRC = "/videos/kling_20260828_VIDEO_Cinematic__4944_0.mp4";
 
 export function HeroVideoBackground() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -14,25 +14,23 @@ export function HeroVideoBackground() {
     const video = videoRef.current;
     if (!video) return;
 
-    const play = async () => {
-      try {
-        await video.play();
-        setReady(true);
-      } catch {
-        setFailed(true);
-      }
+    const tryPlay = () => {
+      setReady(true);
+      video.play().catch(() => {
+        /* autoplay blocked — video still visible on interaction */
+      });
     };
 
-    play();
-
-    const onCanPlay = () => setReady(true);
+    const onLoadedData = () => tryPlay();
     const onError = () => setFailed(true);
 
-    video.addEventListener("canplay", onCanPlay);
+    video.addEventListener("loadeddata", onLoadedData);
     video.addEventListener("error", onError);
 
+    if (video.readyState >= 2) tryPlay();
+
     return () => {
-      video.removeEventListener("canplay", onCanPlay);
+      video.removeEventListener("loadeddata", onLoadedData);
       video.removeEventListener("error", onError);
     };
   }, []);
@@ -40,7 +38,7 @@ export function HeroVideoBackground() {
   return (
     <div className="absolute inset-0 overflow-hidden bg-forest">
       {!failed && (
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 overflow-hidden">
           <video
             ref={videoRef}
             autoPlay
@@ -49,11 +47,11 @@ export function HeroVideoBackground() {
             playsInline
             preload="auto"
             aria-hidden="true"
-            className={`absolute left-1/2 top-1/2 h-full w-full min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 object-cover transition-opacity duration-1000 ${
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
               ready ? "opacity-100" : "opacity-0"
             }`}
             style={{
-              transform: "translate(-50%, -50%) scale(1.25)",
+              transform: "scale(1.25)",
               objectPosition: "center 36%",
             }}
           >
@@ -62,13 +60,10 @@ export function HeroVideoBackground() {
         </div>
       )}
 
-      <div className="absolute inset-0 bg-forest/40" />
-      <div className="absolute inset-0 bg-gradient-to-r from-forest/75 via-forest/30 to-forest/10" />
-      <div className="absolute inset-0 bg-gradient-to-b from-forest/35 via-transparent to-[#FAFDFB]/90" />
+      <div className="absolute inset-0 bg-forest/25" />
+      <div className="absolute inset-0 bg-gradient-to-r from-forest/60 via-forest/20 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-forest/25 via-transparent to-[#FAFDFB]/80" />
       <div className="absolute inset-0 bg-gradient-to-t from-[#FAFDFB] via-transparent to-transparent" />
-
-      <div className="absolute -right-32 top-1/4 h-96 w-96 rounded-full bg-emerald-500/15 blur-3xl" />
-      <div className="absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-emerald-400/10 blur-3xl" />
 
       {failed && (
         <>

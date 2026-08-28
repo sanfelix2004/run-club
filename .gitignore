@@ -37,6 +37,10 @@ yarn-error.log*
 prisma/dev.db
 prisma/dev.db-journal
 
+# uploaded hero video (use /upload-video page)
+download/*.mp4
+public/videos/*.mp4
+
 # vercel
 .vercel
 
