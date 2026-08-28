@@ -113,6 +113,44 @@ Update `provider` in `prisma/schema.prisma` from `sqlite` to `postgresql`.
 - **events** — title, date_time, location_name, price_amount (5.00), currency
 - **registrations** — runner details, qr_token, status, optional user_id link
 
+## Pubblicare online (Vercel)
+
+Il codice è pronto, ma **non posso pubblicarlo io al posto tuo** senza accesso al tuo account Vercel/GitHub. Segui questi passi:
+
+### 1. Crea il repository
+Clicca **Create repo** nell’agent Cursor (o carica il progetto su GitHub).
+
+### 2. Database PostgreSQL (obbligatorio online)
+SQLite funziona solo in locale. Su Vercel usa un DB gratuito:
+- [Neon](https://neon.tech) o [Supabase](https://supabase.com)
+
+In `prisma/schema.prisma` cambia `provider = "sqlite"` in `provider = "postgresql"`, poi:
+
+```bash
+DATABASE_URL="postgresql://..." npx prisma db push
+```
+
+### 3. Deploy su Vercel
+1. Vai su [vercel.com](https://vercel.com) → **Import** dal tuo repo GitHub
+2. Aggiungi le variabili d’ambiente:
+
+| Variabile | Valore |
+|-----------|--------|
+| `DATABASE_URL` | URL PostgreSQL |
+| `AUTH_SECRET` | stringa casuale lunga |
+| `AUTH_URL` | `https://tuodominio.vercel.app` |
+| `AUTH_GOOGLE_ID` | da Google Cloud |
+| `AUTH_GOOGLE_SECRET` | da Google Cloud |
+| `ADMIN_PIN` | PIN staff |
+| `QR_SECRET` | stringa casuale |
+
+3. In Google Cloud aggiungi redirect: `https://tuodominio.vercel.app/api/auth/callback/google`
+4. Clicca **Deploy**
+
+### 4. Dopo il deploy
+- Admin eventi: `https://tuodominio.vercel.app/admin/events`
+- Check-in QR: `https://tuodominio.vercel.app/admin/checkin`
+
 ## Build for Production
 
 ```bash

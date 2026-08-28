@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 
 const ERROR_MESSAGES: Record<string, { title: string; description: string }> = {
   Configuration: {
@@ -68,12 +67,18 @@ export default async function AuthErrorPage({ searchParams }: PageProps) {
         )}
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Button asChild className="rounded-full bg-emerald-500 hover:bg-emerald-600">
-            <Link href="/">Torna alla home</Link>
-          </Button>
-          <Button asChild variant="outline" className="rounded-full border-emerald-100">
-            <Link href="/?auth=login">Accedi con email</Link>
-          </Button>
+          <Link
+            href="/"
+            className="inline-flex items-center justify-center rounded-full bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600"
+          >
+            Torna alla home
+          </Link>
+          <Link
+            href="/?auth=login"
+            className="inline-flex items-center justify-center rounded-full border border-emerald-100 px-4 py-2 text-sm font-medium text-forest hover:bg-emerald-50"
+          >
+            Accedi con email
+          </Link>
         </div>
       </div>
     </main>
