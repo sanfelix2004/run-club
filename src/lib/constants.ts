@@ -9,6 +9,7 @@ export const NAV_LINKS = [
   { href: "#home", label: "Home" },
   { href: "#events", label: "Eventi" },
   { href: "#about", label: "Chi siamo" },
+  { href: "#partners", label: "Partner" },
   { href: "#pricing", label: "Prezzi" },
   { href: "#booking", label: "Iscrizione" },
   { href: "#reviews", label: "Recensioni" },

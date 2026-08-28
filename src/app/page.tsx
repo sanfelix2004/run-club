@@ -5,6 +5,7 @@ import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/Hero";
 import { Location } from "@/components/Location";
 import { Navbar } from "@/components/Navbar";
+import { Partners } from "@/components/Partners";
 import { Pricing } from "@/components/Pricing";
 import { Testimonials } from "@/components/Testimonials";
 import { getUpcomingEvents } from "@/app/actions/events";
@@ -33,6 +34,7 @@ export default async function Home() {
         <Hero />
         <Events events={events} />
         <About />
+        <Partners />
         <Pricing />
         <Testimonials initialReviews={reviews} />
         <Booking />
