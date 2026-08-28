@@ -6,17 +6,21 @@ import { isAdminAuthenticated } from "@/app/actions/admin-auth";
 
 export type EventAttendee = {
   id: string;
+  userId: string | null;
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
+  emergencyContact: string | null;
   paceCategory: string;
+  qrToken: string;
   status: string;
   checkedInAt: string | null;
   createdAt: string;
 };
 
 export type EventAttendanceSummary = {
+  eventTitle: string;
   totalRegistered: number;
   checkedIn: number;
   pending: number;
@@ -45,16 +49,20 @@ export async function getEventAttendance(
   ).length;
 
   return {
+    eventTitle: event.title,
     totalRegistered: registrations.length,
     checkedIn,
     pending: registrations.length - checkedIn,
     attendees: registrations.map((r) => ({
       id: r.id,
+      userId: r.userId,
       firstName: r.firstName,
       lastName: r.lastName,
       email: r.email,
       phone: r.phone,
+      emergencyContact: r.emergencyContact,
       paceCategory: r.paceCategory,
+      qrToken: r.qrToken,
       status: r.status,
       checkedInAt: r.checkedInAt?.toISOString() ?? null,
       createdAt: r.createdAt.toISOString(),
