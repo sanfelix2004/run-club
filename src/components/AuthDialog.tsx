@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { registerWithEmail } from "@/app/actions/auth";
+import { getOAuthProviders, type OAuthProviders } from "@/app/actions/oauth";
 import { ModalPortal } from "@/components/ModalPortal";
 
 type AuthMode = "login" | "register";
@@ -53,10 +54,19 @@ export function AuthDialog({ open, onOpenChange, defaultMode = "login" }: AuthDi
   const [mode, setMode] = useState<AuthMode>(defaultMode);
   const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const [oauthProviders, setOauthProviders] = useState<OAuthProviders>({
+    google: false,
+    apple: false,
+  });
 
   useEffect(() => {
     if (open) setMode(defaultMode);
   }, [open, defaultMode]);
+
+  useEffect(() => {
+    if (!open) return;
+    getOAuthProviders().then(setOauthProviders);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -71,13 +81,50 @@ export function AuthDialog({ open, onOpenChange, defaultMode = "login" }: AuthDi
     };
   }, [open, onOpenChange]);
 
+  const oauthNotConfigured =
+    !oauthProviders.google && !oauthProviders.apple;
+
   const handleOAuth = async (provider: "google" | "apple") => {
+    const providerEnabled =
+      provider === "google" ? oauthProviders.google : oauthProviders.apple;
+
+    if (!providerEnabled) {
+      toast.error(
+        provider === "google"
+          ? "Accesso con Google non ancora attivo. Usa email e password oppure chiedi allo staff di configurare OAuth."
+          : "Accesso con Apple non ancora attivo. Usa email e password oppure chiedi allo staff di configurare OAuth.",
+        { duration: 5000 },
+      );
+      return;
+    }
+
     setLoading(true);
     try {
-      await signIn(provider, { callbackUrl: window.location.href });
-    } catch {
-      toast.error(`Impossibile accedere con ${provider === "google" ? "Google" : "Apple"}.`);
+      const result = await signIn(provider, {
+        callbackUrl: window.location.href,
+        redirect: false,
+      });
+
+      if (result?.url) {
+        window.location.assign(result.url);
+        return;
+      }
+
       setLoading(false);
+
+      if (result?.error) {
+        toast.error(
+          result.error === "Configuration"
+            ? "Accesso social non configurato correttamente sul server."
+            : `Impossibile avviare l'accesso con ${provider === "google" ? "Google" : "Apple"}.`,
+        );
+        return;
+      }
+
+      toast.error(`Impossibile avviare l'accesso con ${provider === "google" ? "Google" : "Apple"}.`);
+    } catch {
+      setLoading(false);
+      toast.error(`Impossibile accedere con ${provider === "google" ? "Google" : "Apple"}.`);
     }
   };
 
@@ -186,21 +233,28 @@ export function AuthDialog({ open, onOpenChange, defaultMode = "login" }: AuthDi
             variant="outline"
             disabled={loading}
             onClick={() => handleOAuth("google")}
-            className="h-11 w-full rounded-xl border-emerald-100"
+            className={`h-11 w-full rounded-xl border-emerald-100 ${!oauthProviders.google ? "opacity-70" : ""}`}
           >
             <GoogleIcon className="mr-2 h-5 w-5" />
-            Continua con Google
+            {loading ? "Reindirizzamento..." : "Continua con Google"}
           </Button>
           <Button
             type="button"
             variant="outline"
             disabled={loading}
             onClick={() => handleOAuth("apple")}
-            className="h-11 w-full rounded-xl border-emerald-100"
+            className={`h-11 w-full rounded-xl border-emerald-100 ${!oauthProviders.apple ? "opacity-70" : ""}`}
           >
             <AppleIcon className="mr-2 h-5 w-5" />
-            Continua con Apple
+            {loading ? "Reindirizzamento..." : "Continua con Apple"}
           </Button>
+          {oauthNotConfigured && (
+            <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs leading-relaxed text-amber-900">
+              Google e Apple non sono ancora collegati a questo sito. Per ora usa{" "}
+              <strong>email e password</strong>. Per attivarli serve configurare le
+              credenziali OAuth nel file <code className="rounded bg-amber-100 px-1">.env</code>.
+            </p>
+          )}
         </div>
 
         <div className="my-6 flex items-center gap-3">
