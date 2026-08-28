@@ -117,8 +117,15 @@ Update `provider` in `prisma/schema.prisma` from `sqlite` to `postgresql`.
 
 Il codice è pronto, ma **non posso pubblicarlo io al posto tuo** senza accesso al tuo account Vercel/GitHub. Segui questi passi:
 
-### 1. Crea il repository
-Clicca **Create repo** nell’agent Cursor (o carica il progetto su GitHub).
+### 1. Repository GitHub
+Repo: **https://github.com/sanfelix2004/run-club**
+
+```bash
+git remote add github https://github.com/sanfelix2004/run-club.git
+git push -u github main
+```
+
+Guida completa dominio personalizzato (`runclubgiovinazzo.com`): vedi [`docs/DEPLOY-DOMINIO.md`](docs/DEPLOY-DOMINIO.md).
 
 ### 2. Database PostgreSQL (obbligatorio online)
 SQLite funziona solo in locale. Su Vercel usa un DB gratuito:
