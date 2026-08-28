@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { TicketPreview } from "@/components/TicketPreview";
 import { registerForMeetup, type RegistrationResult } from "@/app/actions/registration";
 import type { PublicEvent } from "@/app/actions/events";
+import { ModalPortal } from "@/components/ModalPortal";
 import { PACE_CATEGORIES } from "@/lib/registration-types";
 import type { RegistrationFormData } from "@/lib/validations/registration";
 
@@ -101,20 +102,21 @@ export function EventRegistrationSheet({
   };
 
   return (
-    <div className="fixed inset-0 z-[90] flex items-end justify-center p-0 sm:items-center sm:p-4">
-      <button
-        type="button"
-        className="absolute inset-0 bg-forest/50 backdrop-blur-sm"
-        aria-label="Chiudi"
-        onClick={() => !registration && onOpenChange(false)}
-      />
+    <ModalPortal>
+      <div className="fixed inset-0 z-[200] flex items-end justify-center overflow-y-auto p-0 sm:items-center sm:p-4">
+        <button
+          type="button"
+          className="fixed inset-0 z-0 bg-forest/70 backdrop-blur-md"
+          aria-label="Chiudi"
+          onClick={() => !registration && onOpenChange(false)}
+        />
 
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="event-registration-title"
-        className="relative z-10 flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-3xl border border-emerald-100 bg-white shadow-2xl sm:max-h-[90vh] sm:max-w-lg sm:rounded-3xl"
-      >
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="event-registration-title"
+          className="relative z-[1] my-auto flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-3xl border border-emerald-100 bg-white shadow-2xl sm:max-h-[90vh] sm:max-w-lg sm:rounded-3xl"
+        >
         <div className="shrink-0 border-b border-emerald-50 bg-gradient-to-r from-forest to-emerald-700 px-5 py-4 text-white sm:px-6">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1 pr-2">
@@ -299,7 +301,8 @@ export function EventRegistrationSheet({
             </form>
           )}
         </div>
+        </div>
       </div>
-    </div>
+    </ModalPortal>
   );
 }

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { registerWithEmail } from "@/app/actions/auth";
+import { ModalPortal } from "@/components/ModalPortal";
 
 type AuthMode = "login" | "register";
 
@@ -69,8 +70,6 @@ export function AuthDialog({ open, onOpenChange, defaultMode = "login" }: AuthDi
       document.body.style.overflow = "";
     };
   }, [open, onOpenChange]);
-
-  if (!open) return null;
 
   const handleOAuth = async (provider: "google" | "apple") => {
     setLoading(true);
@@ -146,20 +145,23 @@ export function AuthDialog({ open, onOpenChange, defaultMode = "login" }: AuthDi
     window.location.reload();
   };
 
+  if (!open) return null;
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <button
-        type="button"
-        className="absolute inset-0 bg-forest/40 backdrop-blur-sm"
-        aria-label="Chiudi"
-        onClick={() => onOpenChange(false)}
-      />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="auth-dialog-title"
-        className="relative z-10 w-full max-w-md rounded-2xl border border-emerald-100 bg-white p-6 shadow-2xl sm:p-8"
-      >
+    <ModalPortal>
+      <div className="fixed inset-0 z-[200] flex items-center justify-center overflow-y-auto p-4">
+        <button
+          type="button"
+          className="fixed inset-0 z-0 bg-forest/70 backdrop-blur-md"
+          aria-label="Chiudi"
+          onClick={() => onOpenChange(false)}
+        />
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="auth-dialog-title"
+          className="relative z-[1] my-auto w-full max-w-md rounded-2xl border border-emerald-100 bg-white p-6 shadow-2xl sm:p-8"
+        >
         <button
           type="button"
           onClick={() => onOpenChange(false)}
@@ -343,7 +345,8 @@ export function AuthDialog({ open, onOpenChange, defaultMode = "login" }: AuthDi
             </>
           )}
         </p>
+        </div>
       </div>
-    </div>
+    </ModalPortal>
   );
 }

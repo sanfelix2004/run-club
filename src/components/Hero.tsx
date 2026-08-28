@@ -36,7 +36,7 @@ export function Hero() {
     >
       <motion.div
         style={{ y: yBg, scale }}
-        className="absolute inset-0"
+        className="absolute inset-0 z-0"
         initial={{ opacity: 0 }}
         animate={{ opacity: ready ? 1 : 0 }}
         transition={REVEAL}
@@ -46,66 +46,66 @@ export function Hero() {
 
       <motion.div
         style={{ y: yContent, opacity: scrollOpacity }}
-        className="relative z-10 mx-auto w-full max-w-6xl px-4 py-32 sm:px-6 lg:px-8"
+        className="relative z-[1] mx-auto w-full max-w-6xl px-4 py-32 sm:px-6 lg:px-8"
       >
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: ready ? 1 : 0, y: ready ? 0 : 16 }}
           transition={REVEAL}
         >
-        <div className="max-w-3xl">
-          <p className="mb-5 inline-flex items-center gap-2.5 rounded-full border border-white/25 bg-black/40 px-5 py-2 text-base font-medium text-white shadow-lg backdrop-blur-md">
-            <MapPin className="h-4 w-4 text-emerald-300" />
-            Giovinazzo, Puglia — Costa adriatica
-          </p>
+          <div className="max-w-3xl">
+            <p className="mb-5 inline-flex items-center gap-2.5 rounded-full border border-white/25 bg-black/40 px-5 py-2 text-base font-medium text-white shadow-lg backdrop-blur-md">
+              <MapPin className="h-4 w-4 text-emerald-300" />
+              Giovinazzo, Puglia — Costa adriatica
+            </p>
 
-          <h1
-            className="text-6xl font-bold leading-[1.08] tracking-tight text-white sm:text-7xl lg:text-8xl"
-            style={{
-              textShadow:
-                "0 2px 20px rgba(0,0,0,0.8), 0 4px 40px rgba(0,0,0,0.5)",
-            }}
-          >
-            {SITE.tagline}
-            <span className="block text-emerald-300">insieme.</span>
-          </h1>
-
-          <p className="mt-7 max-w-xl rounded-2xl border border-white/10 bg-black/35 px-6 py-5 text-xl leading-relaxed text-white shadow-xl backdrop-blur-sm">
-            {SITE.description}
-          </p>
-
-          <div className="mt-12 flex flex-wrap gap-5">
-            <Button
-              size="lg"
-              className="h-12 rounded-full bg-emerald-500 px-10 text-base font-semibold text-white shadow-lg shadow-black/30 hover:bg-emerald-400 sm:h-14 sm:text-lg"
-              onClick={() => scrollTo("#events")}
+            <h1
+              className="text-6xl font-bold leading-[1.08] tracking-tight text-white sm:text-7xl lg:text-8xl"
+              style={{
+                textShadow:
+                  "0 2px 20px rgba(0,0,0,0.8), 0 4px 40px rgba(0,0,0,0.5)",
+              }}
             >
-              Prenota la tua prima corsa
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="h-12 rounded-full border-white/40 bg-black/30 px-10 text-base font-semibold text-white shadow-lg backdrop-blur-md hover:bg-black/50 sm:h-14 sm:text-lg"
-              onClick={() => scrollTo("#sessions")}
-            >
-              Vedi gli allenamenti
-            </Button>
+              {SITE.tagline}
+              <span className="block text-emerald-300">insieme.</span>
+            </h1>
+
+            <p className="mt-7 max-w-xl rounded-2xl border border-white/10 bg-black/35 px-6 py-5 text-xl leading-relaxed text-white shadow-xl backdrop-blur-sm">
+              {SITE.description}
+            </p>
+
+            <div className="mt-12 flex flex-wrap gap-5">
+              <Button
+                size="lg"
+                className="h-12 rounded-full bg-emerald-500 px-10 text-base font-semibold text-white shadow-lg shadow-black/30 hover:bg-emerald-400 sm:h-14 sm:text-lg"
+                onClick={() => scrollTo("#events")}
+              >
+                Prenota la tua prima corsa
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-12 rounded-full border-white/40 bg-black/30 px-10 text-base font-semibold text-white shadow-lg backdrop-blur-md hover:bg-black/50 sm:h-14 sm:text-lg"
+                onClick={() => scrollTo("#sessions")}
+              >
+                Vedi gli allenamenti
+              </Button>
+            </div>
           </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => scrollTo("#about")}
-          className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-white/70 transition-colors hover:text-emerald-300"
-          aria-label="Scorri alla sezione chi siamo"
-        >
-          <span className="text-xs font-medium uppercase tracking-widest drop-shadow-md">
-            Scorri
-          </span>
-          <ArrowDown className="h-4 w-4 animate-bounce drop-shadow-md" />
-        </button>
         </motion.div>
       </motion.div>
+
+      <button
+        type="button"
+        onClick={() => scrollTo("#about")}
+        className="absolute bottom-8 left-1/2 z-[2] flex -translate-x-1/2 flex-col items-center gap-2 text-white/70 transition-colors hover:text-emerald-300"
+        aria-label="Scorri alla sezione chi siamo"
+      >
+        <span className="text-xs font-medium uppercase tracking-widest drop-shadow-md">
+          Scorri
+        </span>
+        <ArrowDown className="h-4 w-4 animate-bounce drop-shadow-md" />
+      </button>
     </section>
   );
 }

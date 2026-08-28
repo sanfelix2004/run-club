@@ -43,7 +43,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
             {children}
           </AuthUIProvider>
         </AuthProvider>
-        <Toaster position="top-center" richColors closeButton />
+        <Toaster position="top-center" richColors closeButton className="z-[300]" />
       </body>
     </html>
   );
