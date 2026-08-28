@@ -88,6 +88,14 @@ Open [http://localhost:43123](http://localhost:43123) for the site.
 6. If the app is in **Testing** mode, add your Gmail under OAuth consent screen → **Test users**.
 7. Restart the dev server after changing `.env`.
 
+**Troubleshooting Google login**
+
+| Symptom | Fix |
+|---------|-----|
+| "Server error / Configuration" after Google redirect | Client secret is wrong or doesn't match the client ID. In Google Cloud Console open the OAuth client, copy a **new** client secret, set `AUTH_GOOGLE_SECRET` in `.env`, restart `npm run dev`. |
+| Redirect works but "Access denied" | Add your Gmail under OAuth consent screen → **Test users** (while the app is in Testing). |
+| Works on `127.0.0.1` but not `localhost` (or vice versa) | Use one host consistently. Set `AUTH_URL` to the same origin you open in the browser and add that origin + callback URL in Google Console. |
+
 For production, repeat steps 3–4 with your live domain (e.g. `https://tuodominio.it` and `https://tuodominio.it/api/auth/callback/google`) and set `AUTH_URL` to that domain on your host.
 
 For PostgreSQL / Supabase production:

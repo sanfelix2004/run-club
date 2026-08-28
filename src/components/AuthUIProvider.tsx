@@ -41,6 +41,15 @@ export function AuthUIProvider({ children, googleOAuthEnabled }: AuthUIProviderP
   }, []);
 
   useEffect(() => {
+    const authParam = new URLSearchParams(window.location.search).get("auth");
+    if (authParam === "login") {
+      openLogin();
+    } else if (authParam === "register") {
+      openRegister();
+    }
+  }, [openLogin, openRegister]);
+
+  useEffect(() => {
     if (status !== "unauthenticated") return;
 
     const dismissed = localStorage.getItem("auth_prompt_dismissed");
@@ -65,6 +74,7 @@ export function AuthUIProvider({ children, googleOAuthEnabled }: AuthUIProviderP
     <AuthUIContext.Provider value={{ openLogin, openRegister }}>
       {children}
       <AuthDialog
+        key={dialogOpen ? mode : "closed"}
         open={dialogOpen}
         onOpenChange={handleOpenChange}
         defaultMode={mode}
