@@ -54,7 +54,7 @@ export function Navbar() {
           <span
             className={cn(
               "text-sm font-semibold tracking-tight transition-colors sm:text-base",
-              scrolled ? "text-forest" : "text-forest",
+              scrolled ? "text-forest" : "text-white",
             )}
           >
             {SITE.name}
@@ -70,7 +70,12 @@ export function Navbar() {
                   e.preventDefault();
                   handleNavClick(link.href);
                 }}
-                className="rounded-full px-3 py-2 text-sm font-medium text-forest/80 transition-colors hover:bg-emerald-50 hover:text-emerald-600"
+                className={cn(
+                  "rounded-full px-3 py-2 text-sm font-medium transition-colors",
+                  scrolled
+                    ? "text-forest/80 hover:bg-emerald-50 hover:text-emerald-600"
+                    : "text-white/90 hover:bg-white/10 hover:text-white",
+                )}
               >
                 {link.label}
               </a>
@@ -96,7 +101,12 @@ export function Navbar() {
                 className="md:hidden"
                 aria-label="Open menu"
               >
-                <Menu className="h-5 w-5 text-forest" />
+                <Menu
+                  className={cn(
+                    "h-5 w-5",
+                    scrolled ? "text-forest" : "text-white",
+                  )}
+                />
               </Button>
             }
           />

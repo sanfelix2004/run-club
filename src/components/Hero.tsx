@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowDown, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ParticleCanvas } from "@/components/ParticleCanvas";
+import { HeroVideoBackground } from "@/components/HeroVideoBackground";
 import { SITE } from "@/lib/constants";
 
 export function Hero() {
@@ -14,9 +14,10 @@ export function Hero() {
     offset: ["start start", "end start"],
   });
 
-  const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
-  const yContent = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
+  const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const yContent = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
 
   const scrollTo = (id: string) => {
     document.querySelector(id)?.scrollIntoView({ behavior: "smooth" });
@@ -28,11 +29,8 @@ export function Hero() {
       ref={ref}
       className="relative flex min-h-screen items-center overflow-hidden"
     >
-      <motion.div style={{ y: yBg }} className="absolute inset-0">
-        <ParticleCanvas />
-        <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/60 via-white/40 to-white" />
-        <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-emerald-200/30 blur-3xl" />
-        <div className="absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-forest/10 blur-3xl" />
+      <motion.div style={{ y: yBg, scale }} className="absolute inset-0">
+        <HeroVideoBackground />
       </motion.div>
 
       <motion.div
@@ -44,7 +42,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white/70 px-4 py-1.5 text-sm font-medium text-emerald-700 backdrop-blur-sm"
+            className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-md"
           >
             <MapPin className="h-3.5 w-3.5" />
             Giovinazzo, Puglia — Adriatic coast
@@ -54,17 +52,17 @@ export function Hero() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl font-bold leading-[1.1] tracking-tight text-forest sm:text-6xl lg:text-7xl"
+            className="text-5xl font-bold leading-[1.1] tracking-tight text-white drop-shadow-lg sm:text-6xl lg:text-7xl"
           >
             {SITE.tagline}
-            <span className="block text-emerald-500">together.</span>
+            <span className="block text-emerald-400">together.</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-6 max-w-lg text-lg leading-relaxed text-forest/70"
+            className="mt-6 max-w-lg text-lg leading-relaxed text-white/85 drop-shadow-md"
           >
             {SITE.description}
           </motion.p>
@@ -77,7 +75,7 @@ export function Hero() {
           >
             <Button
               size="lg"
-              className="rounded-full bg-emerald-500 px-8 text-white hover:bg-emerald-600"
+              className="rounded-full bg-emerald-500 px-8 text-white shadow-lg shadow-emerald-900/30 hover:bg-emerald-400"
               onClick={() => scrollTo("#booking")}
             >
               Book Your First Run
@@ -85,7 +83,7 @@ export function Hero() {
             <Button
               size="lg"
               variant="outline"
-              className="rounded-full border-emerald-200 bg-white/70 px-8 text-forest backdrop-blur-sm hover:bg-emerald-50"
+              className="rounded-full border-white/30 bg-white/10 px-8 text-white backdrop-blur-md hover:bg-white/20"
               onClick={() => scrollTo("#sessions")}
             >
               See Sessions
@@ -99,7 +97,7 @@ export function Hero() {
           animate={{ opacity: 1 }}
           transition={{ delay: 1, duration: 0.5 }}
           onClick={() => scrollTo("#about")}
-          className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-forest/50 transition-colors hover:text-emerald-500"
+          className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-white/60 transition-colors hover:text-emerald-300"
           aria-label="Scroll to about section"
         >
           <span className="text-xs font-medium uppercase tracking-widest">Scroll</span>
