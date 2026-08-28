@@ -25,28 +25,30 @@ export function AuthButtons({ scrolled = true, className }: AuthButtonsProps) {
 
   if (session?.user) {
     const name = session.user.name?.split(" ")[0] ?? "Atleta";
+    const profileStyles = scrolled
+      ? "text-forest/80 hover:bg-emerald-50 hover:text-emerald-600"
+      : "text-white/90 hover:bg-white/10 hover:text-white";
+
     return (
-      <div className={`flex items-center gap-2 ${className ?? ""}`}>
+      <div className={`flex items-center gap-1 sm:gap-2 ${className ?? ""}`}>
         <Link
           href="/area-atleta"
-          className={`hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium transition-colors sm:inline-flex ${
-            scrolled
-              ? "text-forest/80 hover:bg-emerald-50 hover:text-emerald-600"
-              : "text-white/90 hover:bg-white/10 hover:text-white"
-          }`}
+          aria-label={`Area atleta di ${name}`}
+          className={`inline-flex items-center gap-1.5 rounded-full p-2 text-sm font-medium transition-colors sm:px-3 sm:py-2 ${profileStyles}`}
         >
-          <User className="h-4 w-4" />
-          {name}
+          <User className="h-5 w-5 sm:h-4 sm:w-4" />
+          <span className="hidden sm:inline">{name}</span>
         </Link>
         <Button
           variant="ghost"
           size="sm"
           onClick={() => signOut({ callbackUrl: "/" })}
-          className={`rounded-full ${
+          aria-label="Esci"
+          className={`rounded-full p-2 sm:px-3 ${
             scrolled ? "text-forest/60 hover:text-forest" : "text-white/70 hover:text-white"
           }`}
         >
-          <LogOut className="h-4 w-4 sm:mr-1" />
+          <LogOut className="h-5 w-5 sm:h-4 sm:w-4 sm:mr-1" />
           <span className="hidden sm:inline">Esci</span>
         </Button>
       </div>

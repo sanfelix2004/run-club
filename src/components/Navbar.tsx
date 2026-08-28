@@ -13,6 +13,7 @@ import {
 import { NAV_LINKS, SITE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { AuthButtons } from "@/components/AuthButtons";
+import { MobileNavExtras } from "@/components/MobileNavExtras";
 import { ClubLogo } from "@/components/ClubLogo";
 
 export function Navbar() {
@@ -122,6 +123,7 @@ export function Navbar() {
                   </li>
                 ))}
               </ul>
+              <MobileNavExtras onNavigate={() => setOpen(false)} />
               <Button
                 className="mt-6 w-full rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
                 onClick={() => handleNavClick("#events")}

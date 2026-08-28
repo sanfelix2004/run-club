@@ -18,9 +18,15 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: `${SITE.name} — ${SITE.tagline}`,
   description: SITE.description,
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: SITE.name,
+    statusBarStyle: "default",
+  },
   icons: {
     icon: [{ url: "/logo.png", type: "image/png" }, { url: "/icon.svg", type: "image/svg+xml" }],
-    apple: "/logo.png",
+    apple: [{ url: "/logo.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
     title: SITE.name,
