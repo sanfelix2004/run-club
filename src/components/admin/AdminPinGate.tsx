@@ -67,7 +67,6 @@ export function AdminPinGate({ title, subtitle, children }: AdminPinGateProps) {
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <Input
               type="password"
-              inputMode="numeric"
               placeholder="PIN organizzatore"
               value={pin}
               onChange={(e) => setPin(e.target.value)}
