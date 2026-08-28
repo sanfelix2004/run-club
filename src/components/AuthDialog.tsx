@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { registerWithEmail } from "@/app/actions/auth";
 import { getOAuthProviders, type OAuthProviders } from "@/app/actions/oauth";
 import { ModalPortal } from "@/components/ModalPortal";
+import { PrivacyConsentField } from "@/components/PrivacyConsentField";
 
 type AuthMode = "login" | "register";
 
@@ -148,6 +149,7 @@ export function AuthDialog({ open, onOpenChange, defaultMode = "login" }: AuthDi
       email: formData.get("email") as string,
       password: formData.get("password") as string,
       confirmPassword: formData.get("confirmPassword") as string,
+      acceptPrivacy: formData.get("acceptPrivacy") === "true",
     };
 
     const result = await registerWithEmail(data);
@@ -333,6 +335,10 @@ export function AuthDialog({ open, onOpenChange, defaultMode = "login" }: AuthDi
                 <p className="text-xs text-red-500">{fieldErrors.confirmPassword[0]}</p>
               )}
             </div>
+            <PrivacyConsentField
+              id="register-acceptPrivacy"
+              error={fieldErrors.acceptPrivacy?.[0]}
+            />
             <Button
               type="submit"
               disabled={loading}

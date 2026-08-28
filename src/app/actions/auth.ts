@@ -13,6 +13,7 @@ export async function registerWithEmail(data: {
   email: string;
   password: string;
   confirmPassword: string;
+  acceptPrivacy: boolean;
 }): Promise<RegisterResult> {
   const parsed = registerSchema.safeParse(data);
 

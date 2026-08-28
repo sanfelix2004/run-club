@@ -5,6 +5,7 @@ import "./globals.css";
 import { auth } from "@/auth";
 import { AuthProvider } from "@/components/AuthProvider";
 import { AuthUIProvider } from "@/components/AuthUIProvider";
+import { CookieBanner } from "@/components/CookieBanner";
 import { SITE } from "@/lib/constants";
 
 const dmSans = DM_Sans({
@@ -44,6 +45,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           </AuthUIProvider>
         </AuthProvider>
         <Toaster position="top-center" richColors closeButton className="z-[300]" />
+        <CookieBanner />
       </body>
     </html>
   );

@@ -47,6 +47,7 @@ function serializeEvent(
 }
 
 export async function getUpcomingEvents(): Promise<PublicEvent[]> {
+  try {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
 
@@ -57,6 +58,10 @@ export async function getUpcomingEvents(): Promise<PublicEvent[]> {
   });
 
   return events.map(serializeEvent);
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    return [];
+  }
 }
 
 export async function getAllEventsAdmin(): Promise<PublicEvent[]> {

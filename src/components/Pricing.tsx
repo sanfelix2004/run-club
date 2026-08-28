@@ -3,12 +3,14 @@
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/FadeIn";
-import { PRICING } from "@/lib/constants";
+import { PRICING_PLANS } from "@/lib/constants";
 
 export function Pricing() {
   const scrollToEvents = () => {
     document.querySelector("#events")?.scrollIntoView({ behavior: "smooth" });
   };
+
+  const pricing = PRICING_PLANS[0];
 
   return (
     <section id="pricing" className="py-20 sm:py-28">
@@ -31,14 +33,14 @@ export function Pricing() {
             <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-emerald-500 px-4 py-1 text-xs font-semibold text-white">
               Unica tariffa
             </span>
-            <h3 className="text-xl font-semibold">Corsa di gruppo</h3>
-            <p className="mt-2 text-sm text-emerald-100/80">{PRICING.description}</p>
+            <h3 className="text-xl font-semibold">{pricing.name}</h3>
+            <p className="mt-2 text-sm text-emerald-100/80">{pricing.description}</p>
             <div className="mt-6 flex items-baseline gap-1">
-              <span className="text-5xl font-bold">€{PRICING.price}</span>
-              <span className="text-sm text-emerald-100/70">{PRICING.period}</span>
+              <span className="text-5xl font-bold">€{pricing.price}</span>
+              <span className="text-sm text-emerald-100/70">{pricing.period}</span>
             </div>
             <ul className="mt-8 space-y-3">
-              {PRICING.features.map((feature) => (
+              {pricing.features.map((feature) => (
                 <li key={feature} className="flex items-start gap-3 text-sm">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />
                   <span className="text-emerald-50/90">{feature}</span>

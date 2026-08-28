@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { TicketPreview } from "@/components/TicketPreview";
 import { registerForMeetup, type RegistrationResult } from "@/app/actions/registration";
 import type { PublicEvent } from "@/app/actions/events";
+import { PrivacyConsentField } from "@/components/PrivacyConsentField";
 import { ModalPortal } from "@/components/ModalPortal";
 import { PACE_CATEGORIES } from "@/lib/registration-types";
 import type { RegistrationFormData } from "@/lib/validations/registration";
@@ -87,6 +88,7 @@ export function EventRegistrationSheet({
       emergencyName: formData.get("emergencyName") as string,
       emergencyPhone: formData.get("emergencyPhone") as string,
       paceCategory: formData.get("paceCategory") as RegistrationFormData["paceCategory"],
+      acceptPrivacy: formData.get("acceptPrivacy") === "true",
     };
 
     const result = await registerForMeetup({ ...data, eventId: event.id });
@@ -286,9 +288,11 @@ export function EventRegistrationSheet({
                 )}
               </div>
 
+              <PrivacyConsentField id="sheet-acceptPrivacy" error={fieldErrors.acceptPrivacy?.[0]} />
+
               <p className="text-xs leading-relaxed text-forest/50">
-                Iscrivendoti accetti lo scarico di responsabilità e confermi di essere in
-                condizioni fisiche adeguate per partecipare.
+                Confermi inoltre di essere in condizioni fisiche adeguate per partecipare e di
+                aver fornito un contatto di emergenza valido.
               </p>
 
               <Button

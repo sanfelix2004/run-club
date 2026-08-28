@@ -26,6 +26,11 @@ export const registrationSchema = z.object({
   paceCategory: z.enum(PACE_CATEGORIES, {
     message: "Seleziona una fascia di passo",
   }),
+  acceptPrivacy: z
+    .boolean()
+    .refine((value) => value === true, {
+      message: "Devi accettare privacy e termini per procedere.",
+    }),
 });
 
 export type RegistrationFormData = z.infer<typeof registrationSchema>;

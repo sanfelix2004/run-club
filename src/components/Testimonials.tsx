@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FadeIn } from "@/components/FadeIn";
+import Link from "next/link";
 import { submitReview, type PublicReview } from "@/app/actions/reviews";
 
 type TestimonialsProps = {
@@ -223,6 +224,13 @@ export function Testimonials({ initialReviews }: TestimonialsProps) {
                   <p className="text-xs text-red-500">{fieldErrors.message[0]}</p>
                 )}
               </div>
+              <p className="text-xs text-forest/50">
+                Pubblicando accetti la nostra{" "}
+                <Link href="/privacy" className="text-emerald-600 hover:underline">
+                  privacy policy
+                </Link>
+                .
+              </p>
               <Button
                 type="submit"
                 disabled={loading}

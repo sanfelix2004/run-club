@@ -2,7 +2,7 @@
 
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { FadeIn } from "@/components/FadeIn";
-import { MAP_EMBED_URL } from "@/lib/constants";
+import { MapsEmbed } from "@/components/MapsEmbed";
 
 export function Location() {
   return (
@@ -66,17 +66,7 @@ export function Location() {
 
           <FadeIn delay={0.15} className="lg:col-span-3">
             <div className="overflow-hidden rounded-2xl border border-emerald-100 shadow-sm">
-              <iframe
-                title="Posizione Run Club Giovinazzo su Google Maps"
-                src={MAP_EMBED_URL}
-                width="100%"
-                height="400"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                className="w-full"
-              />
+              <MapsEmbed />
             </div>
           </FadeIn>
         </div>

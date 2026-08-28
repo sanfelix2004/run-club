@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { SITE, SOCIAL_LINKS } from "@/lib/constants";
+import { LEGAL_LINKS } from "@/lib/legal";
+import { openCookieSettings } from "@/components/CookieBanner";
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -37,35 +41,57 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-emerald-100 bg-white py-6">
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6 lg:px-8">
-        <p className="text-sm text-forest/50">
-          &copy; {year} {SITE.name}. Tutti i diritti riservati.
-        </p>
-
-        <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-6">
-          <Link
-            href="/area-atleta"
-            className="text-sm font-medium text-emerald-600 transition-colors hover:text-emerald-700"
-          >
-            Area Atleta
-          </Link>
-          <div className="flex items-center gap-4">
-            {SOCIAL_LINKS.map((link) => {
-              const Icon = ICONS[link.icon];
-              return (
-                <a
-                  key={link.label}
+    <footer className="border-t border-emerald-100 bg-white py-8">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col items-center justify-between gap-6 sm:flex-row sm:items-start">
+          <div className="text-center sm:text-left">
+            <p className="text-sm text-forest/50">
+              &copy; {year} {SITE.name}. Tutti i diritti riservati.
+            </p>
+            <nav aria-label="Link legali" className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-2 sm:justify-start">
+              {LEGAL_LINKS.map((link) => (
+                <Link
+                  key={link.href}
                   href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={link.label}
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-forest/40 transition-colors hover:bg-emerald-50 hover:text-emerald-500"
+                  className="text-xs text-forest/50 transition-colors hover:text-emerald-600"
                 >
-                  <Icon className="h-4 w-4" />
-                </a>
-              );
-            })}
+                  {link.label}
+                </Link>
+              ))}
+              <button
+                type="button"
+                onClick={openCookieSettings}
+                className="text-xs text-forest/50 transition-colors hover:text-emerald-600"
+              >
+                Gestisci cookie
+              </button>
+            </nav>
+          </div>
+
+          <div className="flex flex-col items-center gap-3 sm:items-end">
+            <Link
+              href="/area-atleta"
+              className="text-sm font-medium text-emerald-600 transition-colors hover:text-emerald-700"
+            >
+              Area Atleta
+            </Link>
+            <div className="flex items-center gap-4">
+              {SOCIAL_LINKS.map((link) => {
+                const Icon = ICONS[link.icon];
+                return (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={link.label}
+                    className="flex h-9 w-9 items-center justify-center rounded-full text-forest/40 transition-colors hover:bg-emerald-50 hover:text-emerald-500"
+                  >
+                    <Icon className="h-4 w-4" />
+                  </a>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

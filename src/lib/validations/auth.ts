@@ -9,6 +9,11 @@ export const registerSchema = z
       .min(8, "La password deve avere almeno 8 caratteri")
       .max(72),
     confirmPassword: z.string(),
+    acceptPrivacy: z
+      .boolean()
+      .refine((value) => value === true, {
+        message: "Devi accettare privacy e termini per registrarti.",
+      }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Le password non coincidono",
