@@ -7,8 +7,8 @@ export const SITE = {
     "Giovinazzo Sunset Run — corsa di 3,5 km al tramonto. Ritrovo ore 18:30 al Piazzale dell'Aereonautica, arrivo a Buonvento con DJ set, avocado toast e acqua.",
   phone: "+39 366 934 7250",
   phoneTel: "+393669347250",
-  instagram: "https://www.instagram.com/sunsetrun.giovinazzo/",
-  instagramHandle: "@sunsetrun.giovinazzo",
+  instagram: "https://www.instagram.com/giovinazzo_sunset_run/",
+  instagramHandle: "@giovinazzo_sunset_run",
   insuranceNote:
     "Durante l'evento siete coperti da assicurazione per la partecipazione alla manifestazione.",
 } as const;
