@@ -26,20 +26,20 @@ export function About() {
               {SITE.name}
             </h2>
             <p className="mt-6 text-lg leading-relaxed text-forest/70">
-              Una serata di corsa al tramonto sul lungomare di Giovinazzo. Un percorso leggero,
-              atmosfera rilassata e un momento per correre insieme prima di festeggiare con sandwich
-              e bevanda inclusi.
+              Una serata di corsa al tramonto a Giovinazzo. Ci ritroviamo alle ore 19:00 alla
+              palestra Netium per il riscaldamento, con avocado toast e acqua offerti da Netium.
+              Poi si corre verso il tramonto e si festeggia con sandwich e bevanda inclusi.
             </p>
             <p className="mt-4 text-lg leading-relaxed text-forest/70">
               Niente pressione: che tu corra per la prima volta o da anni, l&apos;importante è
-              godersi il tramonto e l&apos;energia della serata. Il punto di ritrovo viene
-              comunicato prima dell&apos;11 settembre.
+              godersi la serata. Il percorso della corsa verrà comunicato prima dell&apos;11
+              settembre.
             </p>
             <ul className="mt-8 grid gap-4 sm:grid-cols-2">
               {[
-                "Tutti i livelli benvenuti",
+                "Riscaldamento alle 19:00 — Netium",
+                "Avocado toast e acqua al ritrovo",
                 "Corsa al tramonto",
-                "Sandwich e bevanda inclusi",
                 "Prenotazione con QR code",
               ].map((item) => (
                 <li

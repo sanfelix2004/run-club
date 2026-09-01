@@ -2,7 +2,7 @@ export const SITE = {
   name: "Sunset Run Giovinazzo",
   tagline: "Corri al tramonto",
   description:
-    "Una corsa al tramonto a Giovinazzo — quota €5 con sandwich e bevanda inclusi dopo la gara.",
+    "Una corsa al tramonto a Giovinazzo — quota €5 con riscaldamento alla palestra Netium, avocado toast, acqua e dopo la gara sandwich e bevanda.",
   phone: "+39 366 934 7250",
   phoneTel: "+393669347250",
   instagram: "https://www.instagram.com/sunsetrun.giovinazzo/",
@@ -15,10 +15,10 @@ export const FEATURED_EVENT = {
   id: "sunset-run-2026-09-11",
   title: "Sunset Run Giovinazzo — 11 settembre",
   description:
-    "Corsa al tramonto sul lungomare. Ritrovo e percorso definitivi verranno comunicati prima dell'evento. Dopo la gara: sandwich e bevanda inclusi.",
-  /** 11 settembre 2026, ore 18:30 (Italia) */
-  dateTimeIso: "2026-09-11T16:30:00.000Z",
-  locationName: "Luogo da stabilire in base all'evento",
+    "Ore 19:00 ritrovo e riscaldamento alla palestra Netium con avocado toast e acqua inclusi. Poi corsa al tramonto sul lungomare. Dopo la gara: sandwich e bevanda.",
+  /** 11 settembre 2026, ore 19:00 (Italia) */
+  dateTimeIso: "2026-09-11T17:00:00.000Z",
+  locationName: "Palestra Netium Giovinazzo — riscaldamento ore 19:00",
   priceAmount: 5,
   currency: "EUR",
 } as const;
@@ -42,11 +42,11 @@ export const PRICING_PLANS = [
     description: "Un prezzo chiaro, tutto incluso dopo la corsa.",
     highlighted: true,
     features: [
-      "Partecipazione alla Sunset Run",
-      "Sandwich incluso",
-      "Bevanda a piacere",
+      "Riscaldamento ore 19:00 alla palestra Netium",
+      "Avocado toast e acqua al ritrovo",
+      "Corsa al tramonto",
+      "Sandwich e bevanda dopo la gara",
       "Prenotazione con QR code",
-      "Tutti i livelli benvenuti",
     ],
   },
 ] as const;
