@@ -7,6 +7,8 @@ import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 
 export type AthleteRegistration = {
   id: string;
+  firstName: string;
+  lastName: string;
   qrToken: string;
   status: string;
   paceCategory: string;
@@ -64,6 +66,8 @@ export async function getAthleteDashboard(): Promise<AthleteDashboard | null> {
     },
     registrations: registrations.map((r) => ({
       id: r.id,
+      firstName: r.firstName,
+      lastName: r.lastName,
       qrToken: r.qrToken,
       status: r.status,
       paceCategory: r.paceCategory,

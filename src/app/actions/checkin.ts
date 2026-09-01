@@ -43,6 +43,10 @@ export async function lookupRegistrationByQr(qrToken: string): Promise<ScanResul
     return { success: false, error: "Biglietto non trovato nel sistema." };
   }
 
+  if (registration.status === REGISTRATION_STATUSES.CANCELLED) {
+    return { success: false, error: "Questa prenotazione è stata annullata." };
+  }
+
   return {
     success: true,
     registration: {

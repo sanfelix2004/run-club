@@ -6,15 +6,16 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
-  Download,
   MapPin,
   Ticket,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AthleteProfileForm } from "@/components/AthleteProfileForm";
+import { AthleteRegistrationTicket } from "@/components/AthleteRegistrationTicket";
 import { ClubLogo } from "@/components/ClubLogo";
 import { useAuthUI } from "@/components/AuthUIProvider";
 import type { AthleteDashboard } from "@/app/actions/athlete-area";
+import { EVENT_TIMEZONE } from "@/lib/constants";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
@@ -156,7 +157,6 @@ export function AthleteArea({ initialDashboard }: AthleteAreaProps) {
                 label: registration.status,
                 className: "bg-gray-100 text-gray-700",
               };
-              const isUpcoming = eventDate >= new Date();
 
               return (
                 <li
@@ -184,11 +184,13 @@ export function AthleteArea({ initialDashboard }: AthleteAreaProps) {
                             day: "numeric",
                             month: "long",
                             year: "numeric",
+                            timeZone: EVENT_TIMEZONE,
                           })}
                           {" · "}
                           {eventDate.toLocaleTimeString("it-IT", {
                             hour: "2-digit",
                             minute: "2-digit",
+                            timeZone: EVENT_TIMEZONE,
                           })}
                         </p>
                         <p className="flex items-center gap-2">
@@ -204,17 +206,7 @@ export function AthleteArea({ initialDashboard }: AthleteAreaProps) {
                       </div>
                     </div>
 
-                    {isUpcoming &&
-                      registration.status === REGISTRATION_STATUSES.PENDING_PAYMENT && (
-                        <a
-                          href={`/api/ticket/${registration.qrToken}`}
-                          download
-                          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-600"
-                        >
-                          <Download className="h-4 w-4" />
-                          Scarica PDF
-                        </a>
-                      )}
+                    <AthleteRegistrationTicket registration={registration} />
                   </div>
                 </li>
               );
