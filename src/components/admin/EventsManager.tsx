@@ -19,7 +19,7 @@ import type { EventFormData } from "@/lib/validations/event";
 const emptyForm: EventFormData = {
   title: "",
   dateTime: "",
-  locationName: "Piazza Vittorio Emanuele II, Giovinazzo",
+  locationName: "Piazzale dell'Aereonautica, Giovinazzo",
   priceAmount: 5,
   currency: "EUR",
   description: "",

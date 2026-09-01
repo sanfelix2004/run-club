@@ -1,10 +1,10 @@
 "use client";
 
-import { Calendar, MapPin, Sparkles, Users } from "lucide-react";
+import { Calendar, Flag, MapPin, Sparkles, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/FadeIn";
 import { useEventRegistration } from "@/components/EventRegistrationProvider";
-import { FEATURED_EVENT } from "@/lib/constants";
+import { FEATURED_EVENT, EVENT_TIMEZONE } from "@/lib/constants";
 import type { PublicEvent } from "@/app/actions/events";
 
 type EventsProps = {
@@ -19,10 +19,12 @@ function formatFeaturedDate() {
       day: "numeric",
       month: "long",
       year: "numeric",
+      timeZone: EVENT_TIMEZONE,
     }),
     time: date.toLocaleTimeString("it-IT", {
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: EVENT_TIMEZONE,
     }),
   };
 }
@@ -76,6 +78,10 @@ export function Events({ events }: EventsProps) {
                 <p className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 shrink-0 text-emerald-500" />
                   {featured.locationName}
+                </p>
+                <p className="flex items-center gap-2">
+                  <Flag className="h-4 w-4 shrink-0 text-emerald-500" />
+                  {FEATURED_EVENT.distanceKm} km · arrivo {FEATURED_EVENT.arrivalLocation}
                 </p>
                 <p className="flex items-center gap-2">
                   <Users className="h-4 w-4 shrink-0 text-emerald-500" />

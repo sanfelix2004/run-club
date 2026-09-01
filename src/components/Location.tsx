@@ -27,7 +27,7 @@ const CONTACT_ITEMS = [
   {
     icon: MapPin,
     title: "Luogo",
-    text: "Da stabilire in base all'evento",
+    text: "11 settembre — Piazzale dell'Aereonautica (ritrovo ore 18:30)",
   },
   {
     icon: Phone,
@@ -55,8 +55,8 @@ export function Location() {
             Resta in contatto con noi
           </h2>
           <p className="mt-4 text-lg text-forest/70">
-            Il punto di ritrovo viene comunicato per ogni evento. Per domande chiama o scrivici su
-            Instagram.
+            Il punto di ritrovo è il Piazzale dell&apos;Aereonautica alle ore 18:30. Per domande
+            chiama o scrivici su Instagram.
           </p>
         </FadeIn>
 

@@ -149,6 +149,8 @@ export async function generateTicketPdf(data: TicketData): Promise<Uint8Array> {
   return new Uint8Array(doc.output("arraybuffer"));
 }
 
+import { EVENT_TIMEZONE } from "@/lib/constants";
+
 export function formatEventDate(date: Date): { date: string; time: string } {
   return {
     date: date.toLocaleDateString("it-IT", {
@@ -156,10 +158,12 @@ export function formatEventDate(date: Date): { date: string; time: string } {
       day: "numeric",
       month: "long",
       year: "numeric",
+      timeZone: EVENT_TIMEZONE,
     }),
     time: date.toLocaleTimeString("it-IT", {
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: EVENT_TIMEZONE,
     }),
   };
 }

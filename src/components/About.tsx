@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { FadeIn } from "@/components/FadeIn";
-import { SITE } from "@/lib/constants";
+import { FEATURED_EVENT, SITE } from "@/lib/constants";
 
 export function About() {
   const ref = useRef<HTMLElement>(null);
@@ -23,24 +23,26 @@ export function About() {
               L&apos;evento
             </p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight text-forest sm:text-4xl">
-              {SITE.name}
+              Giovinazzo Sunset Run
             </h2>
             <p className="mt-6 text-lg leading-relaxed text-forest/70">
-              Una serata di corsa al tramonto a Giovinazzo. Ci ritroviamo alle ore 19:00 alla
-              palestra Netium per il riscaldamento, con avocado toast e acqua offerti da Netium.
-              Poi si corre verso il tramonto e si festeggia con sandwich e bevanda inclusi.
+              Evento organizzato da <strong>Corner Giovinazzo</strong>, in collaborazione con{" "}
+              <strong>Netium</strong> e <strong>Buonvento</strong>. Ci ritroviamo alle ore{" "}
+              <strong>18:30</strong> al <strong>Piazzale dell&apos;Aereonautica</strong>: Netium
+              guida il riscaldamento, poi partiamo per una corsa di{" "}
+              <strong>{FEATURED_EVENT.distanceKm} km</strong> al tramonto.
             </p>
             <p className="mt-4 text-lg leading-relaxed text-forest/70">
-              Niente pressione: che tu corra per la prima volta o da anni, l&apos;importante è
-              godersi la serata. Il percorso della corsa verrà comunicato prima dell&apos;11
-              settembre.
+              Il traguardo è a <strong>Buonvento</strong>, con DJ set a cura di Buonvento.
+              Corner mette a disposizione <strong>avocado toast e acqua</strong> per tutti.
+              Tutti i livelli sono benvenuti.
             </p>
             <ul className="mt-8 grid gap-4 sm:grid-cols-2">
               {[
-                "Riscaldamento alle 19:00 — Netium",
-                "Avocado toast e acqua al ritrovo",
-                "Corsa al tramonto",
-                "Prenotazione con QR code",
+                "Ritrovo ore 18:30 — Piazzale dell'Aereonautica",
+                "Riscaldamento a cura di Netium",
+                "3,5 km al tramonto",
+                "Arrivo a Buonvento con DJ set",
               ].map((item) => (
                 <li
                   key={item}

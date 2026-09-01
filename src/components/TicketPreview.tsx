@@ -7,7 +7,7 @@ import { Calendar, Download, MapPin, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { RegistrationResult } from "@/app/actions/registration";
 import { buildQrPayload } from "@/lib/qr";
-import { SITE } from "@/lib/constants";
+import { EVENT_TIMEZONE, SITE } from "@/lib/constants";
 
 type TicketPreviewProps = {
   registration: Extract<RegistrationResult, { success: true }>["registration"];

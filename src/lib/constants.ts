@@ -1,8 +1,10 @@
+export const EVENT_TIMEZONE = "Europe/Rome";
+
 export const SITE = {
   name: "Sunset Run Giovinazzo",
   tagline: "Corri al tramonto",
   description:
-    "Una corsa al tramonto a Giovinazzo — quota €5 con riscaldamento alla palestra Netium, avocado toast, acqua e dopo la gara sandwich e bevanda.",
+    "Giovinazzo Sunset Run — corsa di 3,5 km al tramonto. Ritrovo ore 18:30 al Piazzale dell'Aereonautica, arrivo a Buonvento con DJ set, avocado toast e acqua.",
   phone: "+39 366 934 7250",
   phoneTel: "+393669347250",
   instagram: "https://www.instagram.com/sunsetrun.giovinazzo/",
@@ -13,12 +15,14 @@ export const SITE = {
 
 export const FEATURED_EVENT = {
   id: "sunset-run-2026-09-11",
-  title: "Sunset Run Giovinazzo — 11 settembre",
+  title: "Giovinazzo Sunset Run — 11 settembre",
   description:
-    "Ore 19:00 ritrovo e riscaldamento alla palestra Netium con avocado toast e acqua inclusi. Poi corsa al tramonto sul lungomare. Dopo la gara: sandwich e bevanda.",
-  /** 11 settembre 2026, ore 19:00 (Italia) */
-  dateTimeIso: "2026-09-11T17:00:00.000Z",
-  locationName: "Palestra Netium Giovinazzo — riscaldamento ore 19:00",
+    "Evento organizzato da Corner Giovinazzo, in collaborazione con Netium e Buonvento. Ore 18:30 ritrovo e riscaldamento al Piazzale dell'Aereonautica (a cura di Netium). Corsa di 3,5 km al tramonto. Arrivo a Buonvento con DJ set, avocado toast e acqua offerti da Corner.",
+  /** 11 settembre 2026, ore 18:30 (Europe/Rome) */
+  dateTimeIso: "2026-09-11T16:30:00.000Z",
+  locationName: "Piazzale dell'Aereonautica, Giovinazzo — ritrovo ore 18:30",
+  arrivalLocation: "Buonvento Giovinazzo — arrivo, DJ set e ristoro",
+  distanceKm: 3.5,
   priceAmount: 5,
   currency: "EUR",
 } as const;
@@ -39,13 +43,13 @@ export const PRICING_PLANS = [
     name: "Quota evento",
     price: "5",
     period: "a persona",
-    description: "Un prezzo chiaro, tutto incluso dopo la corsa.",
+    description: "Un prezzo chiaro per partecipare alla Sunset Run.",
     highlighted: true,
     features: [
-      "Riscaldamento ore 19:00 alla palestra Netium",
-      "Avocado toast e acqua al ritrovo",
-      "Corsa al tramonto",
-      "Sandwich e bevanda dopo la gara",
+      "Riscaldamento ore 18:30 — Piazzale dell'Aereonautica",
+      "Corsa di 3,5 km al tramonto",
+      "Arrivo a Buonvento con DJ set",
+      "Avocado toast e acqua offerti da Corner",
       "Prenotazione con QR code",
     ],
   },
