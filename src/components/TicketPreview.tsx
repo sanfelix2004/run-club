@@ -28,10 +28,12 @@ export function TicketPreview({
     day: "numeric",
     month: "long",
     year: "numeric",
+    timeZone: EVENT_TIMEZONE,
   });
   const formattedTime = eventDate.toLocaleTimeString("it-IT", {
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: EVENT_TIMEZONE,
   });
 
   useEffect(() => {
