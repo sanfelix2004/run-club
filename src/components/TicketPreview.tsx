@@ -7,6 +7,7 @@ import { Calendar, Download, MapPin, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { RegistrationResult } from "@/app/actions/registration";
 import { buildQrPayload } from "@/lib/qr";
+import { SITE } from "@/lib/constants";
 
 type TicketPreviewProps = {
   registration: Extract<RegistrationResult, { success: true }>["registration"];
@@ -49,7 +50,7 @@ export function TicketPreview({
       <div className="overflow-hidden rounded-2xl border-2 border-emerald-200 bg-white shadow-lg">
         <div className="bg-forest px-6 py-4 text-white">
           <p className="text-xs font-medium uppercase tracking-widest opacity-80">
-            Giovinazzo Sunset Run
+            {SITE.name}
           </p>
           <h3 className="mt-1 text-lg font-bold">{registration.event.title}</h3>
           <p className="text-xs opacity-70">Prenotazione confermata</p>
@@ -109,10 +110,18 @@ export function TicketPreview({
           </div>
 
           <p className="mt-4 text-xs leading-relaxed text-forest/50">
-            La prenotazione è confermata per questo evento. Scarica il PDF e
-            presenta il QR (stampato o su smartphone) al punto di ritrovo.
-            La quota va saldata in contanti o POS. Partecipi sotto la tua
-            responsabilità — consulta un medico se hai dubbi sulla salute.
+            La prenotazione è confermata per questo evento. Scarica il PDF e presenta il QR
+            (stampato o su smartphone) al punto di ritrovo. La quota va saldata in contanti o POS.
+            {` ${SITE.insuranceNote}`} Per informazioni:{" "}
+            <a
+              href={SITE.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-emerald-600 hover:underline"
+            >
+              {SITE.instagramHandle}
+            </a>{" "}
+            o {SITE.phone}.
           </p>
         </div>
       </div>

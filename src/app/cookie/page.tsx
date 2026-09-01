@@ -77,11 +77,16 @@ export default function CookiePage() {
 
       <LegalSection title="4. Titolare e contatti">
         <p>
-          Titolare: {LEGAL.owner} — {LEGAL.address}. Email:{" "}
-          <a href={`mailto:${LEGAL.privacyEmail}`} className="text-emerald-600 hover:underline">
-            {LEGAL.privacyEmail}
+          Titolare: {LEGAL.owner} — {LEGAL.address}. Instagram:{" "}
+          <a
+            href={LEGAL.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-emerald-600 hover:underline"
+          >
+            {LEGAL.instagramHandle}
           </a>
-          . Per il trattamento dei dati personali vedi anche la{" "}
+          . Telefono: {LEGAL.phone}. Per il trattamento dei dati personali vedi anche la{" "}
           <Link href="/privacy" className="text-emerald-600 hover:underline">
             Privacy Policy
           </Link>

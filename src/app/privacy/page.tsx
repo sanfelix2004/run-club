@@ -18,11 +18,16 @@ export default function PrivacyPage() {
         <p>
           Il titolare del trattamento è <strong>{LEGAL.owner}</strong>, con sede in{" "}
           {LEGAL.address}. Per qualsiasi richiesta relativa ai tuoi dati personali puoi
-          scrivere a{" "}
-          <a href={`mailto:${LEGAL.privacyEmail}`} className="text-emerald-600 hover:underline">
-            {LEGAL.privacyEmail}
-          </a>
-          .
+          contattarci su{" "}
+          <a
+            href={LEGAL.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-emerald-600 hover:underline"
+          >
+            {LEGAL.instagramHandle}
+          </a>{" "}
+          o al numero {LEGAL.phone}.
         </p>
       </LegalSection>
 
@@ -111,10 +116,16 @@ export default function PrivacyPage() {
       <LegalSection title="7. Diritti dell'interessato">
         <p>
           Puoi esercitare in qualsiasi momento i diritti di accesso, rettifica, cancellazione,
-          limitazione, opposizione e portabilità scrivendo a{" "}
-          <a href={`mailto:${LEGAL.privacyEmail}`} className="text-emerald-600 hover:underline">
-            {LEGAL.privacyEmail}
-          </a>
+          limitazione, opposizione e portabilità contattandoci su{" "}
+          <a
+            href={LEGAL.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-emerald-600 hover:underline"
+          >
+            {LEGAL.instagramHandle}
+          </a>{" "}
+          o al numero {LEGAL.phone}
           . Hai inoltre il diritto di proporre reclamo al Garante per la protezione dei dati
           personali (
           <a

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { MapPin } from "lucide-react";
-import { MAP_EMBED_URL } from "@/lib/constants";
+import { MAP_EMBED_URL, SITE } from "@/lib/constants";
 import { useCookieConsent, openCookieSettings } from "@/components/CookieBanner";
 
 export function MapsEmbed() {
@@ -37,7 +37,7 @@ export function MapsEmbed() {
 
   return (
     <iframe
-      title="Posizione Giovinazzo Sunset Run su Google Maps"
+      title={`Posizione ${SITE.name} su Google Maps`}
       src={MAP_EMBED_URL}
       width="100%"
       height="400"

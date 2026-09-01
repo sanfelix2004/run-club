@@ -22,13 +22,21 @@ export default function NoteLegaliPage() {
             <strong>Sede:</strong> {LEGAL.address}
           </li>
           <li>
-            <strong>Email:</strong>{" "}
-            <a href={`mailto:${LEGAL.email}`} className="text-emerald-600 hover:underline">
-              {LEGAL.email}
+            <strong>Instagram:</strong>{" "}
+            <a
+              href={LEGAL.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-emerald-600 hover:underline"
+            >
+              {LEGAL.instagramHandle}
             </a>
           </li>
           <li>
-            <strong>Telefono:</strong> {LEGAL.phone}
+            <strong>Telefono:</strong>{" "}
+            <a href={`tel:${LEGAL.phone.replace(/\s/g, "")}`} className="text-emerald-600 hover:underline">
+              {LEGAL.phone}
+            </a>
           </li>
           <li>
             <strong>P. IVA / C.F.:</strong> {LEGAL.vatOrFiscalCode}
@@ -59,11 +67,16 @@ export default function NoteLegaliPage() {
 
       <LegalSection title="Reclami e segnalazioni">
         <p>
-          Per segnalazioni su contenuti illeciti, errori o richieste legali scrivi a{" "}
-          <a href={`mailto:${LEGAL.email}`} className="text-emerald-600 hover:underline">
-            {LEGAL.email}
-          </a>
-          .
+          Per segnalazioni su contenuti illeciti, errori o richieste legali contattaci su{" "}
+          <a
+            href={LEGAL.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-emerald-600 hover:underline"
+          >
+            {LEGAL.instagramHandle}
+          </a>{" "}
+          o al numero {LEGAL.phone}.
         </p>
       </LegalSection>
     </LegalShell>

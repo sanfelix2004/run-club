@@ -25,6 +25,7 @@ import {
   type ScanResult,
 } from "@/app/actions/checkin";
 import { AdminNav } from "@/components/admin/AdminNav";
+import { SITE } from "@/lib/constants";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 
 const SCANNER_ID = "qr-reader";
@@ -190,7 +191,7 @@ export function AdminCheckIn() {
           <div className="min-w-0">
             <h1 className="text-sm font-bold text-forest">Check-in organizzatore</h1>
             <p className="truncate text-xs text-forest/50">
-              {stats.eventTitle || "Giovinazzo Sunset Run"}
+              {stats.eventTitle || SITE.name}
             </p>
           </div>
           <AdminNav />

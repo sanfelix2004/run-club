@@ -8,7 +8,7 @@ import { SITE } from "@/lib/constants";
 
 export const metadata = {
   title: `Area Atleta — ${SITE.name}`,
-  description: "Consulta i tuoi dati e lo storico eventi del Giovinazzo Sunset Run.",
+  description: "Consulta i tuoi dati e lo storico eventi di Sunset Run Giovinazzo.",
 };
 
 export default async function AthleteAreaPage() {

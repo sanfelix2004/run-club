@@ -58,7 +58,7 @@ export function Hero() {
               className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-emerald-300 sm:text-base"
               style={{ textShadow: "0 2px 12px rgba(0,0,0,0.7)" }}
             >
-              Giovinazzo Sunset Run
+              {SITE.name}
             </p>
             <p className="mb-5 inline-flex items-center gap-2.5 rounded-full border border-white/25 bg-black/40 px-5 py-2 text-base font-medium text-white shadow-lg backdrop-blur-md">
               <MapPin className="h-4 w-4 text-emerald-300" />

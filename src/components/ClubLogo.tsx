@@ -9,7 +9,7 @@ export function ClubLogo({ size = 48, className }: ClubLogoProps) {
   return (
     <img
       src="/logo.png"
-      alt="Giovinazzo Sunset Run"
+      alt="Sunset Run Giovinazzo"
       width={size}
       height={size}
       className={cn(

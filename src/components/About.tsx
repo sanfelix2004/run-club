@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { FadeIn } from "@/components/FadeIn";
+import { SITE } from "@/lib/constants";
 
 export function About() {
   const ref = useRef<HTMLElement>(null);
@@ -22,7 +23,7 @@ export function About() {
               Chi siamo
             </p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight text-forest sm:text-4xl">
-              Giovinazzo Sunset Run
+              {SITE.name}
             </h2>
             <p className="mt-6 text-lg leading-relaxed text-forest/70">
               Siamo partiti come un gruppo di amici che si ritrovava al porto vecchio

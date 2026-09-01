@@ -44,7 +44,7 @@ export default function TerminiPage() {
             diverse per singolo evento.
           </li>
           <li>
-            Il club si riserva di modificare orario, percorso o punto di ritrovo per motivi di
+            L&apos;organizzazione si riserva di modificare orario, percorso o punto di ritrovo per motivi di
             sicurezza o forza maggiore, informando gli iscritti quando possibile.
           </li>
         </ul>
@@ -53,7 +53,8 @@ export default function TerminiPage() {
       <LegalSection title="4. Salute e responsabilità">
         <p>
           Partecipando alle corse dichiari di essere in condizioni fisiche idonee e di partecipare
-          volontariamente, assumendoti la responsabilità della tua attività fisica. Il club non
+          volontariamente, assumendoti la responsabilità della tua attività fisica. Durante
+          l&apos;evento i partecipanti sono coperti da assicurazione per la manifestazione. L&apos;organizzazione non
           è responsabile per infortuni derivanti da condizioni preesistenti non comunicate o da
           comportamenti non conformi alle indicazioni dello staff.
         </p>
@@ -94,11 +95,16 @@ export default function TerminiPage() {
       <LegalSection title="9. Modifiche e contatti">
         <p>
           Possiamo aggiornare questi termini pubblicando la nuova versione sul sito. Per
-          informazioni:{" "}
-          <a href={`mailto:${LEGAL.email}`} className="text-emerald-600 hover:underline">
-            {LEGAL.email}
-          </a>
-          . Il trattamento dei dati personali è descritto nella{" "}
+          informazioni contattaci su{" "}
+          <a
+            href={LEGAL.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-emerald-600 hover:underline"
+          >
+            {LEGAL.instagramHandle}
+          </a>{" "}
+          o al numero {LEGAL.phone}. Il trattamento dei dati personali è descritto nella{" "}
           <Link href="/privacy" className="text-emerald-600 hover:underline">
             Privacy Policy
           </Link>

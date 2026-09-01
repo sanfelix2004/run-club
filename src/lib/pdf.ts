@@ -3,8 +3,9 @@ import QRCode from "qrcode";
 import { readFile } from "fs/promises";
 import path from "path";
 import { buildQrPayload } from "@/lib/qr";
+import { SITE } from "@/lib/constants";
 
-/** Brand colors from Giovinazzo Sunset Run logo */
+/** Brand colors from Sunset Run Giovinazzo logo */
 const NAVY = { r: 10, g: 42, b: 92 }; // #0A2A5C
 const ORANGE = { r: 255, g: 107, b: 0 }; // #FF6B00
 
@@ -54,9 +55,9 @@ export async function generateTicketPdf(data: TicketData): Promise<Uint8Array> {
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(8);
   doc.setFont("helvetica", "bold");
-  doc.text("GIOVINAZZO", margin, 10);
+  doc.text("SUNSET RUN", margin, 10);
   doc.setTextColor(ORANGE.r, ORANGE.g, ORANGE.b);
-  doc.text("SUNSET RUN", margin, 15);
+  doc.text("GIOVINAZZO", margin, 15);
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(11);
   doc.text(data.eventTitle.toUpperCase(), margin, 22);
@@ -129,7 +130,8 @@ export async function generateTicketPdf(data: TicketData): Promise<Uint8Array> {
     "• Questo documento conferma la tua prenotazione per l'evento indicato.",
     "• Presenta il QR (stampato o digitale) al punto di ritrovo per il check-in.",
     "• La quota di partecipazione va saldata in contanti o POS all'arrivo.",
-    "• Partecipi sotto la tua responsabilità. Consulta un medico prima di correre se hai dubbi sulla salute.",
+    `• ${SITE.insuranceNote}`,
+    `• Contatti: ${SITE.phone} · ${SITE.instagramHandle}`,
   ];
   disclaimer.forEach((line) => {
     doc.text(line, margin, y);
@@ -139,7 +141,7 @@ export async function generateTicketPdf(data: TicketData): Promise<Uint8Array> {
   doc.setFontSize(6);
   doc.setTextColor(160, 160, 160);
   doc.text(
-    `Codice: ${data.qrToken.slice(0, 8).toUpperCase()}  ·  Giovinazzo Sunset Run`,
+    `Codice: ${data.qrToken.slice(0, 8).toUpperCase()}  ·  ${SITE.name}`,
     margin,
     doc.internal.pageSize.getHeight() - 6,
   );

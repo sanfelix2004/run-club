@@ -26,9 +26,9 @@ export function Partners() {
             Nato dalla collaborazione di tre realtà di Giovinazzo
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-forest/70">
-            Il Run Club nasce dall&apos;incontro tra sport, convivialità e territorio. Netium,
-            Corner Pub e Buonvento hanno messo insieme energia, ospitalità e passione per far
-            crescere questa community di runner sulla costa adriatica.
+            Sunset Run Giovinazzo nasce dall&apos;incontro tra sport, convivialità e territorio.
+            Netium, Corner Pub e Buonvento hanno messo insieme energia, ospitalità e passione per
+            far crescere questa community di runner sulla costa adriatica.
           </p>
         </FadeIn>
 

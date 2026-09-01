@@ -1,8 +1,14 @@
 export const SITE = {
-  name: "Giovinazzo Sunset Run",
+  name: "Sunset Run Giovinazzo",
   tagline: "Corri al tramonto",
   description:
     "Community di running sulla costa adriatica — corse al tramonto, percorsi sul mare e persone fantastiche a Giovinazzo.",
+  phone: "+39 366 934 7250",
+  phoneTel: "+393669347250",
+  instagram: "https://www.instagram.com/sunsetrun.giovinazzo/",
+  instagramHandle: "@sunsetrun.giovinazzo",
+  insuranceNote:
+    "Durante l'evento siete coperti da assicurazione per la partecipazione alla manifestazione.",
 } as const;
 
 export const NAV_LINKS = [
@@ -34,9 +40,7 @@ export const PRICING_PLANS = [
 ] as const;
 
 export const SOCIAL_LINKS = [
-  { href: "https://instagram.com", label: "Instagram", icon: "instagram" as const },
-  { href: "https://facebook.com", label: "Facebook", icon: "facebook" as const },
-  { href: "https://strava.com", label: "Strava", icon: "strava" as const },
+  { href: SITE.instagram, label: "Instagram", icon: "instagram" as const },
 ] as const;
 
 export const MAP_EMBED_URL =

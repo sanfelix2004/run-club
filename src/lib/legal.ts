@@ -1,12 +1,14 @@
+import { SITE } from "@/lib/constants";
+
 export const LEGAL = {
-  siteName: "Giovinazzo Sunset Run",
-  owner: "Giovinazzo Sunset Run",
+  siteName: SITE.name,
+  owner: SITE.name,
   address: "Piazza Vittorio Emanuele II, 70054 Giovinazzo (BA), Italia",
-  email: "ciao@runclubgiovinazzo.it",
-  phone: "+39 080 123 4567",
+  phone: SITE.phone,
+  instagram: SITE.instagram,
+  instagramHandle: SITE.instagramHandle,
   vatOrFiscalCode: "—",
-  privacyEmail: "privacy@runclubgiovinazzo.it",
-  lastUpdated: "28 agosto 2026",
+  lastUpdated: "1 settembre 2026",
 } as const;
 
 export const LEGAL_LINKS = [

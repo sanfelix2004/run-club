@@ -157,7 +157,7 @@ export function EventsManager() {
                 id="title"
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
-                placeholder="Meetup settimanale del Run Club"
+                placeholder="Meetup settimanale Sunset Run Giovinazzo"
                 required
                 className="rounded-xl border-emerald-100"
               />
