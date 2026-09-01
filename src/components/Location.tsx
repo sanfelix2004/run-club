@@ -1,8 +1,7 @@
 "use client";
 
-import { Clock, MapPin, Phone } from "lucide-react";
+import { MapPin, Phone } from "lucide-react";
 import { FadeIn } from "@/components/FadeIn";
-import { MapsEmbed } from "@/components/MapsEmbed";
 import { SITE } from "@/lib/constants";
 
 function InstagramIcon({ className }: { className?: string }) {
@@ -24,6 +23,26 @@ function InstagramIcon({ className }: { className?: string }) {
   );
 }
 
+const CONTACT_ITEMS = [
+  {
+    icon: MapPin,
+    title: "Luogo",
+    text: "Da stabilire in base all'evento",
+  },
+  {
+    icon: Phone,
+    title: "Telefono",
+    text: SITE.phone,
+    href: `tel:${SITE.phoneTel}`,
+  },
+  {
+    icon: InstagramIcon,
+    title: "Instagram",
+    text: `${SITE.instagramHandle} — scrivici in DM`,
+    href: SITE.instagram,
+  },
+] as const;
+
 export function Location() {
   return (
     <section id="contact" className="bg-emerald-50/50 py-20 sm:py-28">
@@ -33,75 +52,39 @@ export function Location() {
             Contatti
           </p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-forest sm:text-4xl">
-            Trovaci a Giovinazzo
+            Resta in contatto con noi
           </h2>
           <p className="mt-4 text-lg text-forest/70">
-            Ci ritroviamo al porto vicino a Piazza Vittorio Emanuele. Cerca la
-            bandiera verde — non puoi sbagliare.
+            Il punto di ritrovo viene comunicato per ogni evento. Per domande chiama o scrivici su
+            Instagram.
           </p>
         </FadeIn>
 
-        <div className="mt-14 grid gap-8 lg:grid-cols-5">
-          <FadeIn className="lg:col-span-2">
-            <div className="flex h-full flex-col gap-6">
-              {[
-                {
-                  icon: MapPin,
-                  title: "Indirizzo",
-                  text: "Piazza Vittorio Emanuele II\n70054 Giovinazzo BA, Italia",
-                },
-                {
-                  icon: Clock,
-                  title: "Orari segreteria",
-                  text: "Lun–Ven: 9:00 – 18:00\nSab–Dom: solo orari sessioni",
-                },
-                {
-                  icon: InstagramIcon,
-                  title: "Instagram",
-                  text: SITE.instagramHandle,
-                  href: SITE.instagram,
-                },
-                {
-                  icon: Phone,
-                  title: "Telefono",
-                  text: SITE.phone,
-                  href: `tel:${SITE.phoneTel}`,
-                },
-              ].map((item) => (
-                <div
-                  key={item.title}
-                  className="flex gap-4 rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm"
-                >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100">
-                    <item.icon className="h-5 w-5 text-emerald-600" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-forest">{item.title}</p>
-                    {"href" in item && item.href ? (
-                      <a
-                        href={item.href}
-                        target={item.href.startsWith("http") ? "_blank" : undefined}
-                        rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                        className="mt-1 block whitespace-pre-line text-sm text-emerald-600 hover:underline"
-                      >
-                        {item.text}
-                      </a>
-                    ) : (
-                      <p className="mt-1 whitespace-pre-line text-sm text-forest/60">
-                        {item.text}
-                      </p>
-                    )}
-                  </div>
+        <div className="mx-auto mt-14 grid max-w-2xl gap-4">
+          {CONTACT_ITEMS.map((item, index) => (
+            <FadeIn key={item.title} delay={index * 0.06}>
+              <div className="flex gap-4 rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100">
+                  <item.icon className="h-5 w-5 text-emerald-600" />
                 </div>
-              ))}
-            </div>
-          </FadeIn>
-
-          <FadeIn delay={0.15} className="lg:col-span-3">
-            <div className="overflow-hidden rounded-2xl border border-emerald-100 shadow-sm">
-              <MapsEmbed />
-            </div>
-          </FadeIn>
+                <div>
+                  <p className="font-semibold text-forest">{item.title}</p>
+                  {"href" in item && item.href ? (
+                    <a
+                      href={item.href}
+                      target={item.href.startsWith("http") ? "_blank" : undefined}
+                      rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                      className="mt-1 block text-sm text-emerald-600 hover:underline"
+                    >
+                      {item.text}
+                    </a>
+                  ) : (
+                    <p className="mt-1 text-sm text-forest/60">{item.text}</p>
+                  )}
+                </div>
+              </div>
+            </FadeIn>
+          ))}
         </div>
       </div>
     </section>
