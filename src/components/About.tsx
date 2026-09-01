@@ -20,28 +20,27 @@ export function About() {
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <FadeIn>
             <p className="text-sm font-semibold uppercase tracking-widest text-emerald-500">
-              Chi siamo
+              L&apos;evento
             </p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight text-forest sm:text-4xl">
               {SITE.name}
             </h2>
             <p className="mt-6 text-lg leading-relaxed text-forest/70">
-              Siamo partiti come un gruppo di amici che si ritrovava al porto vecchio
-              per le corse mattutine. Oggi siamo una vera community di runner —
-              locali, expat e visitatori — uniti dalla passione per mettere un piede
-              davanti all&apos;altro.
+              Una serata di corsa al tramonto sul lungomare di Giovinazzo. Un percorso leggero,
+              atmosfera rilassata e un momento per correre insieme prima di festeggiare con sandwich
+              e bevanda inclusi.
             </p>
             <p className="mt-4 text-lg leading-relaxed text-forest/70">
-              Niente egos, niente pressione. Che tu stia preparando il tuo primo 5K o
-              il decimo maratona, qui trovi il tuo ritmo. Corriamo sul lungomare
-              all&apos;alba, in collina nel weekend e festeggiamo ogni traguardo insieme.
+              Niente pressione: che tu corra per la prima volta o da anni, l&apos;importante è
+              godersi il tramonto e l&apos;energia della serata. Il punto di ritrovo viene
+              comunicato prima dell&apos;11 settembre.
             </p>
             <ul className="mt-8 grid gap-4 sm:grid-cols-2">
               {[
                 "Tutti i livelli benvenuti",
-                "Sessioni guidate dai coach",
-                "Percorsi costieri e trail",
-                "Eventi tutto l'anno",
+                "Corsa al tramonto",
+                "Sandwich e bevanda inclusi",
+                "Prenotazione con QR code",
               ].map((item) => (
                 <li
                   key={item}

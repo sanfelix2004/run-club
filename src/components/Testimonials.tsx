@@ -99,7 +99,7 @@ export function Testimonials({ initialReviews }: TestimonialsProps) {
             Dicono di noi
           </p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-forest sm:text-4xl">
-            Cosa dicono i nostri runner
+            Cosa dicono i partecipanti
           </h2>
           <p className="mt-4 text-lg text-forest/70">
             Recensioni vere lasciate da chi ha corso con noi. Anche tu puoi condividere

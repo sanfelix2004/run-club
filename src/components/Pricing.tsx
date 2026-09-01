@@ -51,7 +51,7 @@ export function Pricing() {
               className="mt-8 w-full rounded-full bg-emerald-500 text-white hover:bg-emerald-400"
               onClick={scrollToEvents}
             >
-              Prenota la prossima corsa
+              Iscriviti all&apos;evento dell&apos;11 settembre
             </Button>
           </div>
         </FadeIn>

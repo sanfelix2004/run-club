@@ -2,7 +2,7 @@ export const SITE = {
   name: "Sunset Run Giovinazzo",
   tagline: "Corri al tramonto",
   description:
-    "Community di running sulla costa adriatica — corse al tramonto, percorsi sul mare e persone fantastiche a Giovinazzo.",
+    "Una corsa al tramonto a Giovinazzo — quota €5 con sandwich e bevanda inclusi dopo la gara.",
   phone: "+39 366 934 7250",
   phoneTel: "+393669347250",
   instagram: "https://www.instagram.com/sunsetrun.giovinazzo/",
@@ -11,9 +11,21 @@ export const SITE = {
     "Durante l'evento siete coperti da assicurazione per la partecipazione alla manifestazione.",
 } as const;
 
+export const FEATURED_EVENT = {
+  id: "sunset-run-2026-09-11",
+  title: "Sunset Run Giovinazzo — 11 settembre",
+  description:
+    "Corsa al tramonto sul lungomare. Ritrovo e percorso definitivi verranno comunicati prima dell'evento. Dopo la gara: sandwich e bevanda inclusi.",
+  /** 11 settembre 2026, ore 18:30 (Italia) */
+  dateTimeIso: "2026-09-11T16:30:00.000Z",
+  locationName: "Luogo da stabilire in base all'evento",
+  priceAmount: 5,
+  currency: "EUR",
+} as const;
+
 export const NAV_LINKS = [
   { href: "#home", label: "Home" },
-  { href: "#events", label: "Eventi" },
+  { href: "#events", label: "Evento" },
   { href: "#about", label: "Chi siamo" },
   { href: "#partners", label: "Partner" },
   { href: "#pricing", label: "Prezzi" },
@@ -24,13 +36,13 @@ export const NAV_LINKS = [
 
 export const PRICING_PLANS = [
   {
-    name: "Corsa Singola",
+    name: "Quota evento",
     price: "5",
-    period: "a corsa",
+    period: "a persona",
     description: "Un prezzo chiaro, tutto incluso dopo la corsa.",
     highlighted: true,
     features: [
-      "Corsa di gruppo sul lungomare di Giovinazzo",
+      "Partecipazione alla Sunset Run",
       "Sandwich incluso",
       "Bevanda a piacere",
       "Prenotazione con QR code",

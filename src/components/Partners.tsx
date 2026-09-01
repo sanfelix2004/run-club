@@ -27,8 +27,8 @@ export function Partners() {
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-forest/70">
             Sunset Run Giovinazzo nasce dall&apos;incontro tra sport, convivialità e territorio.
-            Netium, Corner Pub e Buonvento hanno messo insieme energia, ospitalità e passione per
-            far crescere questa community di runner sulla costa adriatica.
+            Netium, Corner Pub e Buonvento mettono insieme energia, ospitalità e passione per
+            portare in pista questo evento sulla costa adriatica.
           </p>
         </FadeIn>
 

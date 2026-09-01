@@ -86,7 +86,7 @@ export function Hero() {
                 className="h-12 rounded-full bg-emerald-500 px-10 text-base font-semibold text-white shadow-lg shadow-black/30 hover:bg-emerald-400 sm:h-14 sm:text-lg"
                 onClick={() => scrollTo("#events")}
               >
-                Prenota la tua prima corsa
+                Iscriviti all&apos;evento dell&apos;11 settembre
               </Button>
               <Button
                 size="lg"

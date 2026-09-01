@@ -19,14 +19,14 @@ export function Booking() {
             Prenota in pochi click
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-forest/70">
-            Scegli un evento dalla lista, compila la scheda fluttuante con i tuoi dati e
+            Scegli l&apos;evento dell&apos;11 settembre, compila la scheda con i tuoi dati e
             scarica subito il PDF con l&apos;importo da pagare e il QR code di prenotazione.
           </p>
 
           <ul className="mt-10 space-y-4 text-left">
             {[
               "Accedi o crea un account dal menu in alto",
-              "Clicca sulla card dell'evento che ti interessa",
+              "Vai alla sezione evento dell'11 settembre",
               "Compila i dati e scarica il PDF con QR code — la quota si paga all'arrivo",
             ].map((item) => (
               <li key={item} className="flex items-center gap-3 text-forest/70">
@@ -41,7 +41,7 @@ export function Booking() {
             onClick={scrollToEvents}
             className="mt-10 inline-flex rounded-full bg-emerald-500 px-8 py-3.5 text-sm font-medium text-white transition-colors hover:bg-emerald-600"
           >
-            Vedi gli eventi
+            Vedi l&apos;evento dell&apos;11 settembre
           </button>
         </FadeIn>
       </div>

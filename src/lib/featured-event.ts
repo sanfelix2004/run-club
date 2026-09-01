@@ -1,9 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/db";
 import { FEATURED_EVENT } from "@/lib/constants";
 
-const prisma = new PrismaClient();
-
-async function main() {
+export async function ensureFeaturedEvent() {
   const dateTime = new Date(FEATURED_EVENT.dateTimeIso);
 
   await prisma.event.upsert({
@@ -26,13 +24,4 @@ async function main() {
       currency: FEATURED_EVENT.currency,
     },
   });
-
-  console.log(`Evento creato/aggiornato: ${FEATURED_EVENT.title}`);
 }
-
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(() => prisma.$disconnect());

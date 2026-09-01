@@ -6,6 +6,7 @@ import { formatEventDate } from "@/lib/pdf";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 import { isAdminAuthenticated } from "@/app/actions/admin-auth";
 import { eventSchema, type EventFormData } from "@/lib/validations/event";
+import { ensureFeaturedEvent } from "@/lib/featured-event";
 
 export type PublicEvent = {
   id: string;
@@ -53,6 +54,8 @@ function serializeEvent(
 
 export async function getUpcomingEvents(): Promise<PublicEvent[]> {
   try {
+  await ensureFeaturedEvent();
+
   const now = new Date();
   now.setHours(0, 0, 0, 0);
 

@@ -3,6 +3,8 @@
 import { prisma } from "@/lib/db";
 import { isValidQrToken, parseQrPayload } from "@/lib/qr";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
+import { ensureFeaturedEvent } from "@/lib/featured-event";
+import { FEATURED_EVENT } from "@/lib/constants";
 export type ScanResult =
   | {
       success: true;
@@ -118,6 +120,13 @@ export type PresentAttendee = {
 };
 
 async function getActiveEvent() {
+  await ensureFeaturedEvent();
+
+  const featured = await prisma.event.findUnique({
+    where: { id: FEATURED_EVENT.id },
+  });
+  if (featured) return featured;
+
   const now = new Date();
   return (
     (await prisma.event.findFirst({

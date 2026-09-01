@@ -83,7 +83,7 @@ export function Navbar() {
             className="rounded-full bg-emerald-500 px-5 text-white hover:bg-emerald-600"
             onClick={() => handleNavClick("#events")}
           >
-            Prenota un evento
+            Iscriviti all&apos;11 settembre
           </Button>
         </div>
 
@@ -128,7 +128,7 @@ export function Navbar() {
                 className="mt-6 w-full rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
                 onClick={() => handleNavClick("#events")}
               >
-                Prenota un evento
+                Iscriviti all&apos;11 settembre
               </Button>
             </SheetContent>
           </Sheet>

@@ -21,7 +21,7 @@ export const PARTNERS = [
     id: "buonvento",
     name: "Buonvento Giovinazzo",
     tagline: "Food & Drink",
-    description: "Accoglienza sul territorio con sapori locali e l'energia della community.",
+    description: "Accoglienza sul territorio con sapori locali e l'energia della serata.",
     instagram: "https://www.instagram.com/buonvento_giovinazzo/",
     logo: "/images/partners/buonvento.jpg",
     logoClassName: "bg-white p-3",
