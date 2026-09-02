@@ -8,6 +8,8 @@ import {
   CheckCircle2,
   RefreshCw,
   ScanLine,
+  Undo2,
+  UserPlus,
   Users,
   X,
 } from "lucide-react";
@@ -20,12 +22,14 @@ import {
   getCheckInStats,
   getPresentAttendees,
   lookupRegistrationByQr,
+  registerWalkIn,
+  undoCheckIn,
   type CheckInStats,
   type PresentAttendee,
   type ScanResult,
 } from "@/app/actions/checkin";
 import { AdminNav } from "@/components/admin/AdminNav";
-import { SITE } from "@/lib/constants";
+import { SITE, FEATURED_EVENT } from "@/lib/constants";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 
 const SCANNER_ID = "qr-reader";
@@ -49,6 +53,14 @@ export function AdminCheckIn() {
     totalCollected: 0,
   });
   const [presentList, setPresentList] = useState<PresentAttendee[]>([]);
+  const [undoingId, setUndoingId] = useState<string | null>(null);
+  const [walkInForm, setWalkInForm] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    hasPaid: true,
+  });
+  const [walkInSubmitting, setWalkInSubmitting] = useState(false);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const lastScannedRef = useRef<string>("");
   const processingRef = useRef(false);
@@ -177,6 +189,39 @@ export function AdminCheckIn() {
     await handleScan(token.trim());
   };
 
+  const handleUndoCheckIn = useCallback(
+    async (registrationId: string) => {
+      setUndoingId(registrationId);
+      const result = await undoCheckIn(registrationId);
+      setUndoingId(null);
+
+      if (result.success) {
+        toast.success(result.message);
+        await refreshDashboard();
+        closeModal();
+      } else {
+        toast.error(result.error);
+      }
+    },
+    [closeModal, refreshDashboard],
+  );
+
+  const handleWalkInSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setWalkInSubmitting(true);
+
+    const result = await registerWalkIn(walkInForm);
+    setWalkInSubmitting(false);
+
+    if (result.success) {
+      toast.success(result.message);
+      setWalkInForm({ firstName: "", lastName: "", phone: "", hasPaid: true });
+      await refreshDashboard();
+    } else {
+      toast.error(result.error);
+    }
+  };
+
   const modalResult =
     modal.type === "confirming" ||
     modal.type === "success" ||
@@ -255,6 +300,63 @@ export function AdminCheckIn() {
         </form>
 
         <div className="rounded-2xl border border-emerald-100 bg-white shadow-sm">
+          <div className="flex items-center gap-2 border-b border-emerald-50 px-4 py-3">
+            <UserPlus className="h-4 w-4 text-emerald-500" />
+            <h2 className="text-sm font-semibold text-forest">Registrazione in loco</h2>
+          </div>
+          <form onSubmit={handleWalkInSubmit} className="space-y-3 p-4">
+            <div className="grid grid-cols-2 gap-3">
+              <Input
+                placeholder="Nome"
+                value={walkInForm.firstName}
+                onChange={(e) =>
+                  setWalkInForm((prev) => ({ ...prev, firstName: e.target.value }))
+                }
+                required
+                className="rounded-xl border-emerald-100 text-sm"
+              />
+              <Input
+                placeholder="Cognome"
+                value={walkInForm.lastName}
+                onChange={(e) =>
+                  setWalkInForm((prev) => ({ ...prev, lastName: e.target.value }))
+                }
+                required
+                className="rounded-xl border-emerald-100 text-sm"
+              />
+            </div>
+            <Input
+              type="tel"
+              placeholder="Numero di telefono"
+              value={walkInForm.phone}
+              onChange={(e) =>
+                setWalkInForm((prev) => ({ ...prev, phone: e.target.value }))
+              }
+              required
+              className="rounded-xl border-emerald-100 text-sm"
+            />
+            <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-emerald-100 bg-emerald-50/50 px-3 py-2.5 text-sm text-forest">
+              <input
+                type="checkbox"
+                checked={walkInForm.hasPaid}
+                onChange={(e) =>
+                  setWalkInForm((prev) => ({ ...prev, hasPaid: e.target.checked }))
+                }
+                className="h-4 w-4 shrink-0 rounded border-emerald-200 text-emerald-500 focus:ring-emerald-400"
+              />
+              <span>Ha pagato (€{FEATURED_EVENT.priceAmount})</span>
+            </label>
+            <Button
+              type="submit"
+              disabled={walkInSubmitting}
+              className="w-full rounded-xl bg-forest text-white hover:bg-forest/90"
+            >
+              {walkInSubmitting ? "Registrazione..." : walkInForm.hasPaid ? "Registra e segna presente" : "Registra (pagamento in sospeso)"}
+            </Button>
+          </form>
+        </div>
+
+        <div className="rounded-2xl border border-emerald-100 bg-white shadow-sm">
           <div className="border-b border-emerald-50 px-4 py-3">
             <h2 className="text-sm font-semibold text-forest">
               Chi è presente ({presentList.length})
@@ -283,6 +385,17 @@ export function AdminCheckIn() {
                       minute: "2-digit",
                     })}
                   </p>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={() => handleUndoCheckIn(person.id)}
+                    disabled={undoingId === person.id}
+                    aria-label={`Annulla check-in di ${person.firstName} ${person.lastName}`}
+                    className="shrink-0 text-forest/40 hover:bg-red-50 hover:text-red-600"
+                  >
+                    <Undo2 className="h-4 w-4" />
+                  </Button>
                 </li>
               ))}
             </ul>
@@ -367,13 +480,24 @@ export function AdminCheckIn() {
                       : ""}
                     .
                   </p>
-                  <Button
-                    onClick={closeModal}
-                    variant="outline"
-                    className="mt-6 w-full rounded-full border-amber-200"
-                  >
-                    Chiudi
-                  </Button>
+                  <div className="mt-6 space-y-2">
+                    <Button
+                      onClick={() => handleUndoCheckIn(modalResult.registration.id)}
+                      disabled={undoingId === modalResult.registration.id}
+                      variant="outline"
+                      className="w-full rounded-full border-amber-200 text-amber-800 hover:bg-amber-50"
+                    >
+                      <Undo2 className="mr-2 h-4 w-4" />
+                      Annulla check-in
+                    </Button>
+                    <Button
+                      onClick={closeModal}
+                      variant="ghost"
+                      className="w-full rounded-full"
+                    >
+                      Chiudi
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>

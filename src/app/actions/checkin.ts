@@ -1,10 +1,13 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
-import { isValidQrToken, parseQrPayload } from "@/lib/qr";
+import { isValidQrToken, parseQrPayload, generateQrToken } from "@/lib/qr";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 import { ensureFeaturedEvent } from "@/lib/featured-event";
 import { FEATURED_EVENT } from "@/lib/constants";
+import { walkInRegistrationSchema } from "@/lib/validations/walk-in-registration";
+import type { WalkInRegistrationData } from "@/lib/validations/walk-in-registration";
 export type ScanResult =
   | {
       success: true;
@@ -100,9 +103,110 @@ export async function confirmCheckIn(registrationId: string): Promise<CheckInRes
     },
   });
 
+  const event = await prisma.event.findUnique({ where: { id: registration.eventId } });
+  const price = event?.priceAmount ?? 5;
+
   return {
     success: true,
-    message: `${registration.firstName} ${registration.lastName} — presenza confermata e €5,00 incassati.`,
+    message: `${registration.firstName} ${registration.lastName} — presenza confermata e €${price.toFixed(2).replace(".", ",")} incassati.`,
+  };
+}
+
+export async function undoCheckIn(registrationId: string): Promise<CheckInResult> {
+  const registration = await prisma.registration.findUnique({
+    where: { id: registrationId },
+  });
+
+  if (!registration) {
+    return { success: false, error: "Registrazione non trovata." };
+  }
+
+  if (registration.status !== REGISTRATION_STATUSES.PAID_AND_CHECKED_IN) {
+    return { success: false, error: "Questa persona non risulta ancora presente." };
+  }
+
+  await prisma.registration.update({
+    where: { id: registrationId },
+    data: {
+      status: REGISTRATION_STATUSES.PENDING_PAYMENT,
+      checkedInAt: null,
+    },
+  });
+
+  revalidatePath("/admin/checkin");
+  revalidatePath("/admin/events");
+  revalidatePath("/area-atleta");
+
+  return {
+    success: true,
+    message: `${registration.firstName} ${registration.lastName} — check-in annullato. Il QR è di nuovo utilizzabile.`,
+  };
+}
+
+export type WalkInRegistrationResult =
+  | { success: true; message: string }
+  | { success: false; error: string };
+
+export async function registerWalkIn(
+  data: WalkInRegistrationData,
+): Promise<WalkInRegistrationResult> {
+  const parsed = walkInRegistrationSchema.safeParse(data);
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? "Dati non validi." };
+  }
+
+  const event = await getActiveEvent();
+  if (!event) {
+    return { success: false, error: "Nessun evento attivo trovato." };
+  }
+
+  const { firstName, lastName, phone, hasPaid } = parsed.data;
+  const normalizedPhone = phone.replace(/\s/g, "");
+
+  const existing = await prisma.registration.findFirst({
+    where: {
+      eventId: event.id,
+      phone: normalizedPhone,
+      status: { not: REGISTRATION_STATUSES.CANCELLED },
+    },
+  });
+
+  if (existing) {
+    return {
+      success: false,
+      error: `${existing.firstName} ${existing.lastName} è già iscritto con questo numero.`,
+    };
+  }
+
+  const email = `walkin.${normalizedPhone.replace(/\D/g, "")}.${event.id.slice(0, 8)}@giovinazzo-sunset.run`;
+
+  await prisma.registration.create({
+    data: {
+      eventId: event.id,
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email,
+      phone: normalizedPhone,
+      paceCategory: "Medio 5:00/km",
+      qrToken: generateQrToken(),
+      status: hasPaid
+        ? REGISTRATION_STATUSES.PAID_AND_CHECKED_IN
+        : REGISTRATION_STATUSES.PENDING_PAYMENT,
+      checkedInAt: hasPaid ? new Date() : null,
+    },
+  });
+
+  revalidatePath("/admin/checkin");
+  revalidatePath("/admin/events");
+  revalidatePath("/area-atleta");
+
+  const paymentNote = hasPaid
+    ? `€${event.priceAmount.toFixed(2).replace(".", ",")} incassati`
+    : "pagamento in sospeso";
+
+  return {
+    success: true,
+    message: `${firstName} ${lastName} registrato in loco — ${paymentNote}.`,
   };
 }
 
