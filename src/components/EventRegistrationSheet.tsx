@@ -180,6 +180,11 @@ export function EventRegistrationSheet({
                     <Euro className="h-3.5 w-3.5 shrink-0" />
                     {event.priceAmount.toFixed(2).replace(".", ",")}€ da saldare all&apos;arrivo
                   </p>
+                  <p className="flex items-center gap-2 text-sm opacity-90">
+                    {event.isFull
+                      ? `Posti esauriti (${event.registrationCount}/${event.maxRegistrations})`
+                      : `${event.spotsRemaining} posti disponibili su ${event.maxRegistrations}`}
+                  </p>
                 </div>
               </div>
               {!registration && (
@@ -202,6 +207,22 @@ export function EventRegistrationSheet({
                 onRegisterAnother={() => onOpenChange(false)}
                 closeLabel="Chiudi"
               />
+            ) : event.isFull ? (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-6 text-center">
+                <p className="text-lg font-semibold text-amber-900">Posti esauriti</p>
+                <p className="mt-2 text-sm text-amber-800/80">
+                  Sono già state raggiunte le {event.maxRegistrations} prenotazioni massime per
+                  questo evento.
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="mt-5 rounded-full border-amber-200"
+                  onClick={() => onOpenChange(false)}
+                >
+                  Chiudi
+                </Button>
+              </div>
             ) : useQuickBook && bookingProfile ? (
               <form onSubmit={handleQuickSubmit} className="space-y-4">
                 <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-4">

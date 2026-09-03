@@ -29,7 +29,7 @@ import {
   type ScanResult,
 } from "@/app/actions/checkin";
 import { AdminNav } from "@/components/admin/AdminNav";
-import { SITE, FEATURED_EVENT } from "@/lib/constants";
+import { SITE, FEATURED_EVENT, MAX_EVENT_REGISTRATIONS } from "@/lib/constants";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 
 const SCANNER_ID = "qr-reader";
@@ -247,7 +247,9 @@ export function AdminCheckIn() {
         <div className="grid grid-cols-3 gap-3">
           <div className="rounded-xl border border-emerald-100 bg-white p-3 text-center shadow-sm">
             <Users className="mx-auto h-4 w-4 text-emerald-500" />
-            <p className="mt-1 text-xl font-bold text-forest">{stats.totalRegistered}</p>
+            <p className="mt-1 text-xl font-bold text-forest">
+              {stats.totalRegistered}/{MAX_EVENT_REGISTRATIONS}
+            </p>
             <p className="text-[10px] font-medium uppercase tracking-wide text-forest/50">
               Iscritti
             </p>
