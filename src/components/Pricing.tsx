@@ -23,8 +23,7 @@ export function Pricing() {
             Piani semplici e trasparenti
           </h2>
           <p className="mt-4 text-lg text-forest/70">
-            Nessun costo nascosto. Quota €5 per partecipare alla corsa di 3,5 km con ristoro
-            finale. Massimo 100 posti.
+            Nessun costo nascosto. Quota €5 per partecipare alla corsa di 3,5 km con ristoro finale.
           </p>
         </FadeIn>
 

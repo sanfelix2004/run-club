@@ -37,10 +37,6 @@ export default function TerminiPage() {
             diversa indicazione sull&apos;evento.
           </li>
           <li>
-            Ogni evento ha un massimo di <strong>100 prenotazioni</strong>. Al raggiungimento del
-            limite non sono accettate nuove iscrizioni.
-          </li>
-          <li>
             Il PDF con QR code costituisce conferma di prenotazione e va presentato al check-in.
           </li>
           <li>

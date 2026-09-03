@@ -1,8 +1,5 @@
 export const EVENT_TIMEZONE = "Europe/Rome";
 
-/** Limite massimo di prenotazioni attive per ogni evento. */
-export const MAX_EVENT_REGISTRATIONS = 100;
-
 export const SITE = {
   name: "Sunset Run Giovinazzo",
   tagline: "Corri al tramonto",
@@ -54,7 +51,6 @@ export const PRICING_PLANS = [
       "Arrivo a Buonvento con DJ set",
       "Avocado toast e acqua offerti da Corner",
       "Prenotazione con QR code",
-      "Massimo 100 posti disponibili",
     ],
   },
 ] as const;

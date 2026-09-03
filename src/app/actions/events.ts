@@ -7,8 +7,6 @@ import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 import { isAdminAuthenticated } from "@/app/actions/admin-auth";
 import { eventSchema, type EventFormData } from "@/lib/validations/event";
 import { ensureFeaturedEvent } from "@/lib/featured-event";
-import { MAX_EVENT_REGISTRATIONS } from "@/lib/constants";
-import { isEventFull, spotsRemaining } from "@/lib/event-capacity";
 
 export type PublicEvent = {
   id: string;
@@ -21,9 +19,6 @@ export type PublicEvent = {
   priceAmount: number;
   currency: string;
   registrationCount: number;
-  maxRegistrations: number;
-  spotsRemaining: number;
-  isFull: boolean;
 };
 
 export type AdminEvent = PublicEvent & {
@@ -43,7 +38,6 @@ function serializeEvent(
   },
 ): PublicEvent {
   const { date, time } = formatEventDate(event.dateTime);
-  const registrationCount = event._count?.registrations ?? 0;
   return {
     id: event.id,
     title: event.title,
@@ -54,10 +48,7 @@ function serializeEvent(
     locationName: event.locationName,
     priceAmount: event.priceAmount,
     currency: event.currency,
-    registrationCount,
-    maxRegistrations: MAX_EVENT_REGISTRATIONS,
-    spotsRemaining: spotsRemaining(registrationCount),
-    isFull: isEventFull(registrationCount),
+    registrationCount: event._count?.registrations ?? 0,
   };
 }
 

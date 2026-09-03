@@ -26,7 +26,7 @@ export function Booking() {
           <ul className="mt-10 space-y-4 text-left">
             {[
               "Accedi o crea un account dal menu in alto",
-              "Vai alla sezione evento dell'11 settembre (max 100 posti)",
+              "Vai alla sezione evento dell'11 settembre",
               "Compila i dati e scarica il PDF con QR code — la quota si paga all'arrivo",
             ].map((item) => (
               <li key={item} className="flex items-center gap-3 text-forest/70">

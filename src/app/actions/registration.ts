@@ -3,7 +3,6 @@
 import { getOrCreateAthleteUser } from "@/app/actions/athlete-profile";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
-import { assertEventHasCapacity } from "@/lib/event-capacity";
 import { generateQrToken } from "@/lib/qr";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 import {
@@ -103,11 +102,6 @@ export async function registerForMeetup(
         error:
           "Sei già iscritto a questo evento con questa email. Controlla la tua casella o scarica di nuovo il pass.",
       };
-    }
-
-    const capacity = await assertEventHasCapacity(event.id);
-    if (!capacity.ok) {
-      return { success: false, error: capacity.error };
     }
 
     const qrToken = generateQrToken();
