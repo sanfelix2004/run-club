@@ -85,16 +85,19 @@ export function Events({ events }: EventsProps) {
                 </p>
                 <p className="flex items-center gap-2">
                   <Users className="h-4 w-4 shrink-0 text-emerald-500" />
-                  {featured.registrationCount} iscritti
+                  {featured.registrationCount} persone/{featured.maxRegistrations}
                 </p>
               </div>
 
               <div className="border-t border-emerald-100 px-6 py-5 sm:px-8">
                 <Button
-                  className="w-full rounded-full bg-emerald-500 py-6 text-base font-semibold text-white hover:bg-emerald-600"
+                  className="w-full rounded-full bg-emerald-500 py-6 text-base font-semibold text-white hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-60"
                   onClick={() => openRegistration(featured)}
+                  disabled={featured.isFull}
                 >
-                  Iscriviti all&apos;evento dell&apos;11 settembre
+                  {featured.isFull
+                    ? "Iscrizioni chiuse"
+                    : "Iscriviti all'evento dell'11 settembre"}
                 </Button>
               </div>
             </article>

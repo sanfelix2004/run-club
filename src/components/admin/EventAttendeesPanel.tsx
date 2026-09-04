@@ -27,6 +27,7 @@ import {
 } from "@/app/actions/event-attendance";
 import { PACE_CATEGORIES, REGISTRATION_STATUSES, type PaceCategory, type RegistrationStatus } from "@/lib/registration-types";
 import { buildQrPayload } from "@/lib/qr";
+import { MAX_EVENT_REGISTRATIONS } from "@/lib/constants";
 
 type EventAttendeesPanelProps = {
   eventId: string;
@@ -440,7 +441,9 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
         <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-xl border border-emerald-100 bg-white p-3 text-center">
             <Users className="mx-auto h-4 w-4 text-emerald-500" />
-            <p className="mt-1 text-xl font-bold text-forest">{summary.totalRegistered}</p>
+            <p className="mt-1 text-xl font-bold text-forest">
+              {summary.totalRegistered}/{MAX_EVENT_REGISTRATIONS}
+            </p>
             <p className="text-[10px] font-medium uppercase tracking-wide text-forest/50">
               Iscritti attivi
             </p>

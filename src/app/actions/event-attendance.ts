@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 import { isAdminAuthenticated } from "@/app/actions/admin-auth";
+import { assertEventHasCapacity } from "@/lib/event-capacity";
 import {
   adminRegistrationUpdateSchema,
   type AdminRegistrationUpdateData,
@@ -135,6 +136,16 @@ async function updateRegistrationRecord(
 
   const { status, medicalNotes, ...rest } = parsed.data;
 
+  if (
+    existing.status === REGISTRATION_STATUSES.CANCELLED &&
+    status !== REGISTRATION_STATUSES.CANCELLED
+  ) {
+    const capacity = await assertEventHasCapacity(existing.eventId);
+    if (!capacity.ok) {
+      return { success: false, error: capacity.error };
+    }
+  }
+
   let checkedInAt = existing.checkedInAt;
   if (status === REGISTRATION_STATUSES.CANCELLED) {
     checkedInAt = null;
@@ -202,6 +213,13 @@ export async function restoreRegistrationAdmin(
   });
   if (!existing) {
     return { success: false, error: "Iscrizione non trovata." };
+  }
+
+  if (existing.status === REGISTRATION_STATUSES.CANCELLED) {
+    const capacity = await assertEventHasCapacity(existing.eventId);
+    if (!capacity.ok) {
+      return { success: false, error: capacity.error };
+    }
   }
 
   const updated = await prisma.registration.update({

@@ -6,6 +6,7 @@ import { isValidQrToken, parseQrPayload, generateQrToken } from "@/lib/qr";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 import { ensureFeaturedEvent } from "@/lib/featured-event";
 import { FEATURED_EVENT } from "@/lib/constants";
+import { assertEventHasCapacity } from "@/lib/event-capacity";
 import { walkInRegistrationSchema } from "@/lib/validations/walk-in-registration";
 import type { WalkInRegistrationData } from "@/lib/validations/walk-in-registration";
 export type ScanResult =
@@ -176,6 +177,11 @@ export async function registerWalkIn(
       success: false,
       error: `${existing.firstName} ${existing.lastName} è già iscritto con questo numero.`,
     };
+  }
+
+  const capacity = await assertEventHasCapacity(event.id);
+  if (!capacity.ok) {
+    return { success: false, error: capacity.error };
   }
 
   const email = `walkin.${normalizedPhone.replace(/\D/g, "")}.${event.id.slice(0, 8)}@giovinazzo-sunset.run`;

@@ -180,6 +180,9 @@ export function EventRegistrationSheet({
                     <Euro className="h-3.5 w-3.5 shrink-0" />
                     {event.priceAmount.toFixed(2).replace(".", ",")}€ da saldare all&apos;arrivo
                   </p>
+                  <p className="text-sm opacity-90">
+                    {event.registrationCount} persone/{event.maxRegistrations}
+                  </p>
                 </div>
               </div>
               {!registration && (
@@ -202,6 +205,21 @@ export function EventRegistrationSheet({
                 onRegisterAnother={() => onOpenChange(false)}
                 closeLabel="Chiudi"
               />
+            ) : event.isFull ? (
+              <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 px-4 py-6 text-center">
+                <p className="text-lg font-semibold text-forest">Iscrizioni chiuse</p>
+                <p className="mt-2 text-sm text-forest/60">
+                  {event.registrationCount} persone/{event.maxRegistrations}
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="mt-5 rounded-full border-emerald-200"
+                  onClick={() => onOpenChange(false)}
+                >
+                  Chiudi
+                </Button>
+              </div>
             ) : useQuickBook && bookingProfile ? (
               <form onSubmit={handleQuickSubmit} className="space-y-4">
                 <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-4">

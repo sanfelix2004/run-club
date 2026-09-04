@@ -277,7 +277,7 @@ export function EventsManager() {
                     </span>
                     <span className="flex items-center gap-1.5">
                       <Users className="h-4 w-4 text-emerald-500" />
-                      {event.registrationCount} iscritti
+                      {event.registrationCount} persone/{event.maxRegistrations}
                     </span>
                     <span className="flex items-center gap-1.5">
                       <CheckCircle2 className="h-4 w-4 text-emerald-500" />
