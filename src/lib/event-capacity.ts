@@ -31,7 +31,7 @@ export function isEventFull(registrationCount: number): boolean {
   return registrationCount >= MAX_EVENT_REGISTRATIONS;
 }
 
-/** Contatore stile "33 persone/100" — senza messaggi marketing sul limite. */
+/** Contatore stile "33 persone/102" — senza messaggi marketing sul limite. */
 export function formatRegistrationCapacity(count: number): string {
   return `${count} persone/${MAX_EVENT_REGISTRATIONS}`;
 }
