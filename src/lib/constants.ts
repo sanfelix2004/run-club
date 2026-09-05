@@ -1,7 +1,7 @@
 export const EVENT_TIMEZONE = "Europe/Rome";
 
-/** Capienza massima iscrizioni attive per evento (mostrata solo come n/102). */
-export const MAX_EVENT_REGISTRATIONS = 102;
+/** Capienza massima iscrizioni attive per evento (mostrata solo come n/100). */
+export const MAX_EVENT_REGISTRATIONS = 100;
 
 export const SITE = {
   name: "Sunset Run Giovinazzo",
