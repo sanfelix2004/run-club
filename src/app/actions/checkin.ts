@@ -7,6 +7,7 @@ import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 import { ensureFeaturedEvent } from "@/lib/featured-event";
 import { FEATURED_EVENT } from "@/lib/constants";
 import { assertEventHasCapacity } from "@/lib/event-capacity";
+import { generateConfirmationToken } from "@/lib/participation";
 import { walkInRegistrationSchema } from "@/lib/validations/walk-in-registration";
 import type { WalkInRegistrationData } from "@/lib/validations/walk-in-registration";
 export type ScanResult =
@@ -195,6 +196,7 @@ export async function registerWalkIn(
       phone: normalizedPhone,
       paceCategory: "Medio 5:00/km",
       qrToken: generateQrToken(),
+      confirmationToken: generateConfirmationToken(),
       status: hasPaid
         ? REGISTRATION_STATUSES.PAID_AND_CHECKED_IN
         : REGISTRATION_STATUSES.PENDING_PAYMENT,

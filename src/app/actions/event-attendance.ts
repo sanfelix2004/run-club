@@ -2,9 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
-import { REGISTRATION_STATUSES } from "@/lib/registration-types";
+import {
+  PARTICIPATION_STATUSES,
+  REGISTRATION_STATUSES,
+  type ParticipationStatus,
+} from "@/lib/registration-types";
 import { isAdminAuthenticated } from "@/app/actions/admin-auth";
 import { assertEventHasCapacity } from "@/lib/event-capacity";
+import { ensureParticipationColumns } from "@/lib/participation";
 import {
   adminRegistrationUpdateSchema,
   type AdminRegistrationUpdateData,
@@ -24,6 +29,9 @@ export type EventAttendee = {
   status: string;
   checkedInAt: string | null;
   createdAt: string;
+  participationStatus: ParticipationStatus;
+  participationRespondedAt: string | null;
+  confirmationSentAt: string | null;
 };
 
 export type EventAttendanceSummary = {
@@ -32,6 +40,9 @@ export type EventAttendanceSummary = {
   checkedIn: number;
   pending: number;
   cancelled: number;
+  participationYes: number;
+  participationNo: number;
+  participationPending: number;
   attendees: EventAttendee[];
 };
 
@@ -49,6 +60,9 @@ function serializeRegistration(r: {
   status: string;
   checkedInAt: Date | null;
   createdAt: Date;
+  participationStatus?: string | null;
+  participationRespondedAt?: Date | null;
+  confirmationSentAt?: Date | null;
 }): EventAttendee {
   return {
     id: r.id,
@@ -64,6 +78,10 @@ function serializeRegistration(r: {
     status: r.status,
     checkedInAt: r.checkedInAt?.toISOString() ?? null,
     createdAt: r.createdAt.toISOString(),
+    participationStatus: (r.participationStatus ||
+      PARTICIPATION_STATUSES.PENDING) as ParticipationStatus,
+    participationRespondedAt: r.participationRespondedAt?.toISOString() ?? null,
+    confirmationSentAt: r.confirmationSentAt?.toISOString() ?? null,
   };
 }
 
@@ -78,6 +96,8 @@ export async function getEventAttendance(
 ): Promise<EventAttendanceSummary | null> {
   const authed = await isAdminAuthenticated();
   if (!authed) return null;
+
+  await ensureParticipationColumns();
 
   const event = await prisma.event.findUnique({ where: { id: eventId } });
   if (!event) return null;
@@ -106,6 +126,17 @@ export async function getEventAttendance(
       .length,
     cancelled: registrations.filter(
       (r) => r.status === REGISTRATION_STATUSES.CANCELLED,
+    ).length,
+    participationYes: active.filter(
+      (r) => r.participationStatus === PARTICIPATION_STATUSES.YES,
+    ).length,
+    participationNo: active.filter(
+      (r) => r.participationStatus === PARTICIPATION_STATUSES.NO,
+    ).length,
+    participationPending: active.filter(
+      (r) =>
+        !r.participationStatus ||
+        r.participationStatus === PARTICIPATION_STATUSES.PENDING,
     ).length,
     attendees: registrations.map(serializeRegistration),
   };

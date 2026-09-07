@@ -11,6 +11,8 @@
     "db:push": "prisma db push",
     "db:push:turso": "tsx scripts/push-turso-schema.ts",
     "db:seed": "prisma db seed",
+    "whatsapp:confirm": "tsx scripts/send-whatsapp-confirmations.ts",
+    "whatsapp:confirm:all": "tsx scripts/send-whatsapp-confirmations.ts --all",
     "postinstall": "prisma generate"
   },
   "dependencies": {

@@ -9,6 +9,7 @@ import {
   Clock,
   Download,
   Loader2,
+  MessageCircle,
   QrCode,
   UserX,
   Users,
@@ -25,7 +26,15 @@ import {
   type EventAttendanceSummary,
   type EventAttendee,
 } from "@/app/actions/event-attendance";
-import { PACE_CATEGORIES, REGISTRATION_STATUSES, type PaceCategory, type RegistrationStatus } from "@/lib/registration-types";
+import { prepareWhatsAppConfirmationTest } from "@/app/actions/participation";
+import {
+  PACE_CATEGORIES,
+  PARTICIPATION_STATUS_LABELS,
+  PARTICIPATION_STATUSES,
+  REGISTRATION_STATUSES,
+  type PaceCategory,
+  type RegistrationStatus,
+} from "@/lib/registration-types";
 import { buildQrPayload } from "@/lib/qr";
 import { MAX_EVENT_REGISTRATIONS } from "@/lib/constants";
 
@@ -61,6 +70,7 @@ function exportCsv(attendees: EventAttendee[], eventTitle: string) {
     "Fascia di passo",
     "Patologie / note mediche",
     "Stato",
+    "Conferma partecipazione",
     "Data iscrizione",
     "Check-in",
     "Codice QR",
@@ -76,6 +86,7 @@ function exportCsv(attendees: EventAttendee[], eventTitle: string) {
     a.paceCategory,
     a.medicalNotes ?? "",
     STATUS_LABELS[a.status] ?? a.status,
+    PARTICIPATION_STATUS_LABELS[a.participationStatus] ?? a.participationStatus,
     formatDateTime(a.createdAt),
     a.checkedInAt ? formatDateTime(a.checkedInAt) : "",
     a.qrToken,
@@ -293,6 +304,15 @@ function AdminRegistrationDetail({
             {attendee.checkedInAt && (
               <span>· Check-in {formatDateTime(attendee.checkedInAt)}</span>
             )}
+            <span>
+              · Conferma:{" "}
+              <strong className="text-forest">
+                {PARTICIPATION_STATUS_LABELS[attendee.participationStatus]}
+              </strong>
+              {attendee.participationRespondedAt
+                ? ` (${formatDateTime(attendee.participationRespondedAt)})`
+                : ""}
+            </span>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -387,6 +407,7 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
   const [summary, setSummary] = useState<EventAttendanceSummary | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("active");
+  const [whatsappLoading, setWhatsappLoading] = useState(false);
 
   const loadSummary = useCallback(async () => {
     setLoading(true);
@@ -405,6 +426,21 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
 
     loadSummary();
   }, [eventId, open, loadSummary]);
+
+  const handleWhatsAppTest = async () => {
+    setWhatsappLoading(true);
+    const result = await prepareWhatsAppConfirmationTest("3288826170");
+    setWhatsappLoading(false);
+
+    if (!result.success) {
+      toast.error(result.error);
+      return;
+    }
+
+    await loadSummary();
+    toast.success(`Messaggio pronto per ${result.registrationName}. Apro WhatsApp...`);
+    window.open(result.whatsappUrl, "_blank", "noopener,noreferrer");
+  };
 
   if (!open) return null;
 
@@ -471,18 +507,52 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
           </div>
         </div>
 
-        {summary.attendees.length > 0 && (
+        <div className="flex flex-wrap gap-2">
           <Button
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => exportCsv(summary.attendees, summary.eventTitle)}
+            disabled={whatsappLoading}
+            onClick={handleWhatsAppTest}
             className="rounded-full border-emerald-200"
           >
-            <Download className="mr-1.5 h-3.5 w-3.5" />
-            Esporta CSV
+            <MessageCircle className="mr-1.5 h-3.5 w-3.5" />
+            {whatsappLoading ? "Preparazione..." : "WhatsApp prova (328...)"}
           </Button>
-        )}
+          {summary.attendees.length > 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => exportCsv(summary.attendees, summary.eventTitle)}
+              className="rounded-full border-emerald-200"
+            >
+              <Download className="mr-1.5 h-3.5 w-3.5" />
+              Esporta CSV
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        <div className="rounded-xl border border-emerald-100 bg-white px-3 py-2 text-center">
+          <p className="text-lg font-bold text-emerald-600">{summary.participationYes}</p>
+          <p className="text-[10px] font-medium uppercase tracking-wide text-forest/50">
+            Confermati sì
+          </p>
+        </div>
+        <div className="rounded-xl border border-emerald-100 bg-white px-3 py-2 text-center">
+          <p className="text-lg font-bold text-red-500">{summary.participationNo}</p>
+          <p className="text-[10px] font-medium uppercase tracking-wide text-forest/50">
+            Non partecipano
+          </p>
+        </div>
+        <div className="rounded-xl border border-emerald-100 bg-white px-3 py-2 text-center">
+          <p className="text-lg font-bold text-amber-600">{summary.participationPending}</p>
+          <p className="text-[10px] font-medium uppercase tracking-wide text-forest/50">
+            Conferma in attesa
+          </p>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -546,6 +616,24 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
                       </p>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
+                      {!isCancelled &&
+                        attendee.participationStatus === PARTICIPATION_STATUSES.YES && (
+                          <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-medium text-sky-700">
+                            Partecipa
+                          </span>
+                        )}
+                      {!isCancelled &&
+                        attendee.participationStatus === PARTICIPATION_STATUSES.NO && (
+                          <span className="rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-medium text-orange-700">
+                            Non partecipa
+                          </span>
+                        )}
+                      {!isCancelled &&
+                        attendee.participationStatus === PARTICIPATION_STATUSES.PENDING && (
+                          <span className="hidden rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-600 sm:inline">
+                            Conferma ?
+                          </span>
+                        )}
                       {isCancelled ? (
                         <span className="hidden rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-medium text-red-700 sm:inline">
                           Annullato

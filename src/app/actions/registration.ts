@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { assertEventHasCapacity } from "@/lib/event-capacity";
 import { generateQrToken } from "@/lib/qr";
+import { generateConfirmationToken } from "@/lib/participation";
 import { REGISTRATION_STATUSES } from "@/lib/registration-types";
 import {
   registrationSchema,
@@ -111,6 +112,7 @@ export async function registerForMeetup(
     }
 
     const qrToken = generateQrToken();
+    const confirmationToken = generateConfirmationToken();
 
     const userProfile = await prisma.user.findUnique({
       where: { id: userId },
@@ -128,6 +130,7 @@ export async function registerForMeetup(
         medicalNotes: userProfile?.medicalNotes,
         paceCategory,
         qrToken,
+        confirmationToken,
         status: REGISTRATION_STATUSES.PENDING_PAYMENT,
       },
       include: { event: true },
