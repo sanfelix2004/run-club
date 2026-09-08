@@ -37,6 +37,9 @@ import {
 } from "@/lib/registration-types";
 import { buildQrPayload } from "@/lib/qr";
 import { MAX_EVENT_REGISTRATIONS } from "@/lib/constants";
+import { buildCommunityInviteWhatsAppUrl } from "@/lib/whatsapp-community";
+
+const COMMUNITY_LINK_STORAGE_KEY = "sunset_run_whatsapp_community_url";
 
 type EventAttendeesPanelProps = {
   eventId: string;
@@ -408,6 +411,10 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("active");
   const [whatsappLoading, setWhatsappLoading] = useState(false);
+  const [communityUrl, setCommunityUrl] = useState("");
+  const [inviteQueue, setInviteQueue] = useState<EventAttendee[]>([]);
+  const [inviteIndex, setInviteIndex] = useState(0);
+  const [inviteActive, setInviteActive] = useState(false);
 
   const loadSummary = useCallback(async () => {
     setLoading(true);
@@ -421,9 +428,17 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
       setSummary(null);
       setExpandedId(null);
       setFilter("active");
+      setInviteActive(false);
+      setInviteQueue([]);
+      setInviteIndex(0);
       return;
     }
 
+    const saved =
+      typeof window !== "undefined"
+        ? window.localStorage.getItem(COMMUNITY_LINK_STORAGE_KEY) ?? ""
+        : "";
+    setCommunityUrl(saved);
     loadSummary();
   }, [eventId, open, loadSummary]);
 
@@ -440,6 +455,54 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
     await loadSummary();
     toast.success(`Messaggio pronto per ${result.registrationName}. Apro WhatsApp...`);
     window.open(result.whatsappUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const openInviteForIndex = (queue: EventAttendee[], index: number, url: string) => {
+    const person = queue[index];
+    if (!person) return;
+    const waUrl = buildCommunityInviteWhatsAppUrl({
+      phone: person.phone,
+      firstName: person.firstName,
+      communityUrl: url,
+    });
+    window.open(waUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const startCommunityInvites = () => {
+    const url = communityUrl.trim();
+    if (!url || (!url.includes("chat.whatsapp.com") && !url.includes("whatsapp.com"))) {
+      toast.error("Incolla prima il link invito della community WhatsApp.");
+      return;
+    }
+
+    window.localStorage.setItem(COMMUNITY_LINK_STORAGE_KEY, url);
+
+    const active = (summary?.attendees ?? []).filter(
+      (a) => a.status !== REGISTRATION_STATUSES.CANCELLED,
+    );
+    if (active.length === 0) {
+      toast.error("Nessun iscritto attivo da invitare.");
+      return;
+    }
+
+    setInviteQueue(active);
+    setInviteIndex(0);
+    setInviteActive(true);
+    openInviteForIndex(active, 0, url);
+    toast.success(`Invito 1/${active.length}: apri WhatsApp e premi Invia, poi "Prossimo".`);
+  };
+
+  const goNextInvite = () => {
+    const url = communityUrl.trim();
+    const next = inviteIndex + 1;
+    if (next >= inviteQueue.length) {
+      setInviteActive(false);
+      toast.success("Fatto: hai aperto tutte le chat di invito.");
+      return;
+    }
+    setInviteIndex(next);
+    openInviteForIndex(inviteQueue, next, url);
+    toast.message(`Invito ${next + 1}/${inviteQueue.length}`);
   };
 
   if (!open) return null;
@@ -519,6 +582,15 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
             <MessageCircle className="mr-1.5 h-3.5 w-3.5" />
             {whatsappLoading ? "Preparazione..." : "WhatsApp prova (328...)"}
           </Button>
+          <Button
+            type="button"
+            size="sm"
+            onClick={startCommunityInvites}
+            className="rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
+          >
+            <Users className="mr-1.5 h-3.5 w-3.5" />
+            Invita tutti in community
+          </Button>
           {summary.attendees.length > 0 && (
             <Button
               type="button"
@@ -533,6 +605,67 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
           )}
         </div>
       </div>
+
+      <div className="space-y-2 rounded-xl border border-emerald-100 bg-white p-3">
+        <Label htmlFor="community-invite-url" className="text-xs text-forest/60">
+          Link invito community WhatsApp
+        </Label>
+        <Input
+          id="community-invite-url"
+          value={communityUrl}
+          onChange={(e) => setCommunityUrl(e.target.value)}
+          placeholder="https://chat.whatsapp.com/...."
+          className="rounded-xl border-emerald-100 text-sm"
+        />
+        <p className="text-[11px] text-forest/45">
+          Incolla il link della community, poi clicca &quot;Invita tutti&quot;. Si apre una chat alla
+          volta: premi Invia su WhatsApp e poi Prossimo.
+        </p>
+      </div>
+
+      {inviteActive && inviteQueue[inviteIndex] && (
+        <div className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3">
+          <p className="text-sm font-semibold text-sky-900">
+            Invito {inviteIndex + 1}/{inviteQueue.length}
+          </p>
+          <p className="mt-1 text-sm text-sky-800">
+            {inviteQueue[inviteIndex].firstName} {inviteQueue[inviteIndex].lastName} ·{" "}
+            {inviteQueue[inviteIndex].phone}
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button
+              type="button"
+              size="sm"
+              onClick={goNextInvite}
+              className="rounded-full bg-sky-600 text-white hover:bg-sky-700"
+            >
+              {inviteIndex + 1 >= inviteQueue.length ? "Fine" : "Prossimo"}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() =>
+                openInviteForIndex(inviteQueue, inviteIndex, communityUrl.trim())
+              }
+              className="rounded-full border-sky-200"
+            >
+              Riapri chat
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                setInviteActive(false);
+                toast.message("Inviti interrotti.");
+              }}
+            >
+              Stop
+            </Button>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-3 gap-3">
         <div className="rounded-xl border border-emerald-100 bg-white px-3 py-2 text-center">
