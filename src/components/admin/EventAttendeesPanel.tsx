@@ -37,7 +37,8 @@ import {
 } from "@/lib/registration-types";
 import { buildQrPayload } from "@/lib/qr";
 import { MAX_EVENT_REGISTRATIONS } from "@/lib/constants";
-import { buildCommunityInviteWhatsAppUrl } from "@/lib/whatsapp-community";
+import { buildCommunityInviteWhatsAppUrl } from "@/lib/whatsapp-links";
+import { SITE } from "@/lib/constants";
 
 const COMMUNITY_LINK_STORAGE_KEY = "sunset_run_whatsapp_community_url";
 
@@ -464,6 +465,7 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
       phone: person.phone,
       firstName: person.firstName,
       communityUrl: url,
+      siteName: SITE.name,
     });
     window.open(waUrl, "_blank", "noopener,noreferrer");
   };

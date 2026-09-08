@@ -1,5 +1,9 @@
 import { randomBytes } from "crypto";
 import { prisma } from "@/lib/db";
+import {
+  buildWhatsAppClickToChatUrl,
+  normalizePhoneForWhatsApp,
+} from "@/lib/whatsapp-links";
 
 export function generateConfirmationToken(): string {
   return randomBytes(24).toString("hex");
@@ -80,14 +84,6 @@ export function buildConfirmationUrl(token: string): string {
   return `${getAppBaseUrl()}/conferma/${token}`;
 }
 
-export function normalizePhoneForWhatsApp(phone: string): string {
-  const digits = phone.replace(/\D/g, "");
-  if (digits.startsWith("39") && digits.length >= 11) return digits;
-  if (digits.startsWith("0")) return `39${digits.slice(1)}`;
-  if (digits.length === 10) return `39${digits}`;
-  return digits;
-}
-
 export function buildWhatsAppConfirmMessage(params: {
   firstName: string;
   confirmationUrl: string;
@@ -107,7 +103,4 @@ export function buildWhatsAppConfirmMessage(params: {
   ].join("\n");
 }
 
-export function buildWhatsAppClickToChatUrl(phone: string, message: string): string {
-  const normalized = normalizePhoneForWhatsApp(phone);
-  return `https://wa.me/${normalized}?text=${encodeURIComponent(message)}`;
-}
+export { buildWhatsAppClickToChatUrl, normalizePhoneForWhatsApp };

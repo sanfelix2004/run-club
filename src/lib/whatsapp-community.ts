@@ -1,8 +1,9 @@
-import {
-  buildWhatsAppClickToChatUrl,
-  normalizePhoneForWhatsApp,
-} from "@/lib/participation";
 import { SITE } from "@/lib/constants";
+import {
+  buildCommunityInviteMessage,
+  buildCommunityInviteWhatsAppUrl,
+  normalizePhoneForWhatsApp,
+} from "@/lib/whatsapp-links";
 
 /** Link invito community WhatsApp (impostabile anche da env). */
 export function getWhatsAppCommunityInviteUrl(): string {
@@ -13,30 +14,29 @@ export function getWhatsAppCommunityInviteUrl(): string {
   );
 }
 
-export function buildCommunityInviteMessage(params: {
+export function buildSiteCommunityInviteMessage(params: {
   firstName: string;
   communityUrl: string;
 }): string {
-  return [
-    `Ciao ${params.firstName}! 🌅`,
-    ``,
-    `Entra nella community WhatsApp di *${SITE.name}* per aggiornamenti sull'11 settembre:`,
-    params.communityUrl,
-    ``,
-    `Ci vediamo al tramonto!`,
-  ].join("\n");
+  return buildCommunityInviteMessage({
+    ...params,
+    siteName: SITE.name,
+  });
 }
 
-export function buildCommunityInviteWhatsAppUrl(params: {
+export function buildSiteCommunityInviteWhatsAppUrl(params: {
   phone: string;
   firstName: string;
   communityUrl: string;
 }): string {
-  const message = buildCommunityInviteMessage({
-    firstName: params.firstName,
-    communityUrl: params.communityUrl,
+  return buildCommunityInviteWhatsAppUrl({
+    ...params,
+    siteName: SITE.name,
   });
-  return buildWhatsAppClickToChatUrl(params.phone, message);
 }
 
-export { normalizePhoneForWhatsApp };
+export {
+  buildCommunityInviteMessage,
+  buildCommunityInviteWhatsAppUrl,
+  normalizePhoneForWhatsApp,
+};
