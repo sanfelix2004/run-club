@@ -16,6 +16,7 @@ export async function ensureParticipationColumns(): Promise<void> {
     `ALTER TABLE registrations ADD COLUMN confirmation_token TEXT`,
     `ALTER TABLE registrations ADD COLUMN participation_responded_at DATETIME`,
     `ALTER TABLE registrations ADD COLUMN confirmation_sent_at DATETIME`,
+    `ALTER TABLE registrations ADD COLUMN paid_at DATETIME`,
   ];
 
   for (const statement of statements) {

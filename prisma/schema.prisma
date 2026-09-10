@@ -94,6 +94,7 @@ model Registration {
   paceCategory              String    @map("pace_category")
   qrToken                   String    @unique @map("qr_token")
   status                    String    @default("PENDING_PAYMENT")
+  paidAt                    DateTime? @map("paid_at")
   checkedInAt               DateTime? @map("checked_in_at")
   participationStatus       String    @default("PENDING") @map("participation_status")
   confirmationToken         String?   @unique @map("confirmation_token")

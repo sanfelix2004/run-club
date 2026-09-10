@@ -3,13 +3,18 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { isValidQrToken, parseQrPayload, generateQrToken } from "@/lib/qr";
-import { REGISTRATION_STATUSES } from "@/lib/registration-types";
+import {
+  isPaidStatus,
+  isRacePresentStatus,
+  REGISTRATION_STATUSES,
+} from "@/lib/registration-types";
 import { ensureFeaturedEvent } from "@/lib/featured-event";
 import { FEATURED_EVENT } from "@/lib/constants";
 import { assertEventHasCapacity } from "@/lib/event-capacity";
 import { generateConfirmationToken } from "@/lib/participation";
 import { walkInRegistrationSchema } from "@/lib/validations/walk-in-registration";
 import type { WalkInRegistrationData } from "@/lib/validations/walk-in-registration";
+
 export type ScanResult =
   | {
       success: true;
@@ -19,6 +24,7 @@ export type ScanResult =
         lastName: string;
         paceCategory: string;
         status: string;
+        paidAt: string | null;
         checkedInAt: string | null;
         email: string;
         phone: string;
@@ -32,7 +38,27 @@ export type ScanResult =
     }
   | { success: false; error: string };
 
+async function ensurePaidAtColumn() {
+  try {
+    await prisma.$executeRawUnsafe(
+      `ALTER TABLE registrations ADD COLUMN paid_at DATETIME`,
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (!/duplicate column|already exists/i.test(message)) {
+      /* ignore */
+    }
+  }
+}
+
+function revalidateCheckInPaths() {
+  revalidatePath("/admin/checkin");
+  revalidatePath("/admin/events");
+  revalidatePath("/area-atleta");
+}
+
 export async function lookupRegistrationByQr(qrToken: string): Promise<ScanResult> {
+  await ensurePaidAtColumn();
   const token = parseQrPayload(qrToken);
 
   if (!isValidQrToken(token)) {
@@ -60,6 +86,7 @@ export async function lookupRegistrationByQr(qrToken: string): Promise<ScanResul
       lastName: registration.lastName,
       paceCategory: registration.paceCategory,
       status: registration.status,
+      paidAt: registration.paidAt?.toISOString() ?? null,
       checkedInAt: registration.checkedInAt?.toISOString() ?? null,
       email: registration.email,
       phone: registration.phone,
@@ -77,7 +104,10 @@ export type CheckInResult =
   | { success: true; message: string }
   | { success: false; error: string };
 
+/** Scansione QR di oggi: registra solo il pagamento. */
 export async function confirmCheckIn(registrationId: string): Promise<CheckInResult> {
+  await ensurePaidAtColumn();
+
   const registration = await prisma.registration.findUnique({
     where: { id: registrationId },
   });
@@ -90,31 +120,44 @@ export async function confirmCheckIn(registrationId: string): Promise<CheckInRes
     return { success: false, error: "Questo biglietto è stato annullato." };
   }
 
-  if (registration.status === REGISTRATION_STATUSES.PAID_AND_CHECKED_IN) {
+  if (isPaidStatus(registration.status)) {
     return {
       success: false,
-      error: `Biglietto già utilizzato il ${registration.checkedInAt?.toLocaleString("it-IT") ?? "—"}.`,
+      error: `Pagamento già registrato${
+        registration.paidAt
+          ? ` il ${registration.paidAt.toLocaleString("it-IT")}`
+          : registration.checkedInAt
+            ? ` il ${registration.checkedInAt.toLocaleString("it-IT")}`
+            : ""
+      }.`,
     };
   }
 
   await prisma.registration.update({
     where: { id: registrationId },
     data: {
-      status: REGISTRATION_STATUSES.PAID_AND_CHECKED_IN,
-      checkedInAt: new Date(),
+      status: REGISTRATION_STATUSES.PAID,
+      paidAt: new Date(),
     },
   });
 
   const event = await prisma.event.findUnique({ where: { id: registration.eventId } });
   const price = event?.priceAmount ?? 5;
 
+  revalidateCheckInPaths();
+
   return {
     success: true,
-    message: `${registration.firstName} ${registration.lastName} — presenza confermata e €${price.toFixed(2).replace(".", ",")} incassati.`,
+    message: `${registration.firstName} ${registration.lastName} — pagamento €${price
+      .toFixed(2)
+      .replace(".", ",")} registrato. Presenza corsa da confermare domani.`,
   };
 }
 
+/** Annulla solo il pagamento (QR di nuovo utilizzabile). */
 export async function undoCheckIn(registrationId: string): Promise<CheckInResult> {
+  await ensurePaidAtColumn();
+
   const registration = await prisma.registration.findUnique({
     where: { id: registrationId },
   });
@@ -123,25 +166,142 @@ export async function undoCheckIn(registrationId: string): Promise<CheckInResult
     return { success: false, error: "Registrazione non trovata." };
   }
 
-  if (registration.status !== REGISTRATION_STATUSES.PAID_AND_CHECKED_IN) {
-    return { success: false, error: "Questa persona non risulta ancora presente." };
+  if (!isPaidStatus(registration.status)) {
+    return { success: false, error: "Questa persona non risulta ancora pagata." };
   }
 
   await prisma.registration.update({
     where: { id: registrationId },
     data: {
       status: REGISTRATION_STATUSES.PENDING_PAYMENT,
+      paidAt: null,
       checkedInAt: null,
     },
   });
 
-  revalidatePath("/admin/checkin");
-  revalidatePath("/admin/events");
-  revalidatePath("/area-atleta");
+  revalidateCheckInPaths();
 
   return {
     success: true,
-    message: `${registration.firstName} ${registration.lastName} — check-in annullato. Il QR è di nuovo utilizzabile.`,
+    message: `${registration.firstName} ${registration.lastName} — pagamento annullato. Il QR è di nuovo utilizzabile.`,
+  };
+}
+
+/** Segna una persona pagata come presente alla corsa. */
+export async function markRacePresent(registrationId: string): Promise<CheckInResult> {
+  await ensurePaidAtColumn();
+
+  const registration = await prisma.registration.findUnique({
+    where: { id: registrationId },
+  });
+
+  if (!registration) {
+    return { success: false, error: "Registrazione non trovata." };
+  }
+
+  if (registration.status === REGISTRATION_STATUSES.CANCELLED) {
+    return { success: false, error: "Iscrizione annullata." };
+  }
+
+  if (isRacePresentStatus(registration.status)) {
+    return { success: false, error: "Questa persona risulta già presente alla corsa." };
+  }
+
+  if (registration.status !== REGISTRATION_STATUSES.PAID) {
+    return {
+      success: false,
+      error: "Prima registra il pagamento con il QR, poi segna la presenza alla corsa.",
+    };
+  }
+
+  await prisma.registration.update({
+    where: { id: registrationId },
+    data: {
+      status: REGISTRATION_STATUSES.PAID_AND_CHECKED_IN,
+      checkedInAt: new Date(),
+      paidAt: registration.paidAt ?? new Date(),
+    },
+  });
+
+  revalidateCheckInPaths();
+
+  return {
+    success: true,
+    message: `${registration.firstName} ${registration.lastName} — presente alla corsa.`,
+  };
+}
+
+/** Bottone domani: tutti i pagati diventano presenti alla corsa. */
+export async function markAllPaidAsRacePresent(): Promise<CheckInResult> {
+  await ensurePaidAtColumn();
+
+  const event = await getActiveEvent();
+  if (!event) {
+    return { success: false, error: "Nessun evento attivo trovato." };
+  }
+
+  const result = await prisma.registration.updateMany({
+    where: {
+      eventId: event.id,
+      status: REGISTRATION_STATUSES.PAID,
+    },
+    data: {
+      status: REGISTRATION_STATUSES.PAID_AND_CHECKED_IN,
+      checkedInAt: new Date(),
+    },
+  });
+
+  // Assicura paidAt sui record che non ce l'avevano (legacy)
+  await prisma.$executeRawUnsafe(
+    `UPDATE registrations SET paid_at = checked_in_at WHERE event_id = ? AND status = ? AND paid_at IS NULL AND checked_in_at IS NOT NULL`,
+    event.id,
+    REGISTRATION_STATUSES.PAID_AND_CHECKED_IN,
+  );
+
+  revalidateCheckInPaths();
+
+  if (result.count === 0) {
+    return {
+      success: false,
+      error: "Nessun pagato da segnare come presente. Scansiona prima i QR (pagamento).",
+    };
+  }
+
+  return {
+    success: true,
+    message: `${result.count} persone segnate come presenti alla corsa.`,
+  };
+}
+
+export async function undoRacePresent(registrationId: string): Promise<CheckInResult> {
+  await ensurePaidAtColumn();
+
+  const registration = await prisma.registration.findUnique({
+    where: { id: registrationId },
+  });
+
+  if (!registration) {
+    return { success: false, error: "Registrazione non trovata." };
+  }
+
+  if (!isRacePresentStatus(registration.status)) {
+    return { success: false, error: "Questa persona non risulta presente alla corsa." };
+  }
+
+  await prisma.registration.update({
+    where: { id: registrationId },
+    data: {
+      status: REGISTRATION_STATUSES.PAID,
+      checkedInAt: null,
+      paidAt: registration.paidAt ?? registration.checkedInAt ?? new Date(),
+    },
+  });
+
+  revalidateCheckInPaths();
+
+  return {
+    success: true,
+    message: `${registration.firstName} ${registration.lastName} — presenza corsa annullata (resta pagato).`,
   };
 }
 
@@ -152,6 +312,8 @@ export type WalkInRegistrationResult =
 export async function registerWalkIn(
   data: WalkInRegistrationData,
 ): Promise<WalkInRegistrationResult> {
+  await ensurePaidAtColumn();
+
   const parsed = walkInRegistrationSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Dati non validi." };
@@ -197,19 +359,16 @@ export async function registerWalkIn(
       paceCategory: "Medio 5:00/km",
       qrToken: generateQrToken(),
       confirmationToken: generateConfirmationToken(),
-      status: hasPaid
-        ? REGISTRATION_STATUSES.PAID_AND_CHECKED_IN
-        : REGISTRATION_STATUSES.PENDING_PAYMENT,
-      checkedInAt: hasPaid ? new Date() : null,
+      status: hasPaid ? REGISTRATION_STATUSES.PAID : REGISTRATION_STATUSES.PENDING_PAYMENT,
+      paidAt: hasPaid ? new Date() : null,
+      checkedInAt: null,
     },
   });
 
-  revalidatePath("/admin/checkin");
-  revalidatePath("/admin/events");
-  revalidatePath("/area-atleta");
+  revalidateCheckInPaths();
 
   const paymentNote = hasPaid
-    ? `€${event.priceAmount.toFixed(2).replace(".", ",")} incassati`
+    ? `€${event.priceAmount.toFixed(2).replace(".", ",")} incassati (presenza corsa da segnare dopo)`
     : "pagamento in sospeso";
 
   return {
@@ -222,9 +381,18 @@ export type CheckInStats = {
   eventId: string | null;
   eventTitle: string;
   totalRegistered: number;
-  checkedIn: number;
-  pending: number;
+  paidCount: number;
+  racePresentCount: number;
+  pendingPayment: number;
   totalCollected: number;
+};
+
+export type PaidAttendee = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  paceCategory: string;
+  paidAt: string;
 };
 
 export type PresentAttendee = {
@@ -256,21 +424,27 @@ async function getActiveEvent() {
 }
 
 export async function getCheckInStats(): Promise<CheckInStats> {
+  await ensurePaidAtColumn();
+
   const event = await getActiveEvent();
   if (!event) {
     return {
       eventId: null,
       eventTitle: "",
       totalRegistered: 0,
-      checkedIn: 0,
-      pending: 0,
+      paidCount: 0,
+      racePresentCount: 0,
+      pendingPayment: 0,
       totalCollected: 0,
     };
   }
 
-  const [totalRegistered, checkedIn] = await Promise.all([
+  const [totalRegistered, paidOnly, racePresent] = await Promise.all([
     prisma.registration.count({
       where: { eventId: event.id, status: { not: REGISTRATION_STATUSES.CANCELLED } },
+    }),
+    prisma.registration.count({
+      where: { eventId: event.id, status: REGISTRATION_STATUSES.PAID },
     }),
     prisma.registration.count({
       where: {
@@ -280,17 +454,51 @@ export async function getCheckInStats(): Promise<CheckInStats> {
     }),
   ]);
 
+  const paidCount = paidOnly + racePresent;
+
   return {
     eventId: event.id,
     eventTitle: event.title,
     totalRegistered,
-    checkedIn,
-    pending: totalRegistered - checkedIn,
-    totalCollected: checkedIn * event.priceAmount,
+    paidCount,
+    racePresentCount: racePresent,
+    pendingPayment: totalRegistered - paidCount,
+    totalCollected: paidCount * event.priceAmount,
   };
 }
 
+export async function getPaidAttendees(): Promise<PaidAttendee[]> {
+  await ensurePaidAtColumn();
+  const event = await getActiveEvent();
+  if (!event) return [];
+
+  const registrations = await prisma.registration.findMany({
+    where: {
+      eventId: event.id,
+      status: REGISTRATION_STATUSES.PAID,
+    },
+    orderBy: { paidAt: "desc" },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      paceCategory: true,
+      paidAt: true,
+      createdAt: true,
+    },
+  });
+
+  return registrations.map((r) => ({
+    id: r.id,
+    firstName: r.firstName,
+    lastName: r.lastName,
+    paceCategory: r.paceCategory,
+    paidAt: (r.paidAt ?? r.createdAt).toISOString(),
+  }));
+}
+
 export async function getPresentAttendees(): Promise<PresentAttendee[]> {
+  await ensurePaidAtColumn();
   const event = await getActiveEvent();
   if (!event) return [];
 

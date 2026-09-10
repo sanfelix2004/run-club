@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import {
+  isRacePresentStatus,
   PARTICIPATION_STATUSES,
   REGISTRATION_STATUSES,
   type ParticipationStatus,
@@ -119,9 +120,7 @@ export async function getEventAttendance(
   return {
     eventTitle: event.title,
     totalRegistered: active.length,
-    checkedIn: active.filter(
-      (r) => r.status === REGISTRATION_STATUSES.PAID_AND_CHECKED_IN,
-    ).length,
+    checkedIn: active.filter((r) => isRacePresentStatus(r.status)).length,
     pending: active.filter((r) => r.status === REGISTRATION_STATUSES.PENDING_PAYMENT)
       .length,
     cancelled: registrations.filter(
@@ -178,12 +177,20 @@ async function updateRegistrationRecord(
   }
 
   let checkedInAt = existing.checkedInAt;
+  let paidAt = existing.paidAt ?? null;
+
   if (status === REGISTRATION_STATUSES.CANCELLED) {
     checkedInAt = null;
+    paidAt = null;
   } else if (status === REGISTRATION_STATUSES.PENDING_PAYMENT) {
     checkedInAt = null;
-  } else if (status === REGISTRATION_STATUSES.PAID_AND_CHECKED_IN && !checkedInAt) {
-    checkedInAt = new Date();
+    paidAt = null;
+  } else if (status === REGISTRATION_STATUSES.PAID) {
+    checkedInAt = null;
+    paidAt = paidAt ?? new Date();
+  } else if (status === REGISTRATION_STATUSES.PAID_AND_CHECKED_IN) {
+    paidAt = paidAt ?? new Date();
+    if (!checkedInAt) checkedInAt = new Date();
   }
 
   const updated = await prisma.registration.update({
@@ -194,6 +201,7 @@ async function updateRegistrationRecord(
       medicalNotes: medicalNotes?.trim() || null,
       status,
       checkedInAt,
+      paidAt,
     },
   });
 

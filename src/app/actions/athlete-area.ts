@@ -61,7 +61,9 @@ export async function getAthleteDashboard(): Promise<AthleteDashboard | null> {
       ).length,
       upcomingEvents: registrations.filter(
         (r) =>
-          r.event.dateTime >= now && r.status === REGISTRATION_STATUSES.PENDING_PAYMENT,
+          r.event.dateTime >= now &&
+          (r.status === REGISTRATION_STATUSES.PENDING_PAYMENT ||
+            r.status === REGISTRATION_STATUSES.PAID),
       ).length,
     },
     registrations: registrations.map((r) => ({

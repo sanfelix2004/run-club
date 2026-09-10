@@ -6,6 +6,7 @@ import {
   AlertTriangle,
   Banknote,
   CheckCircle2,
+  Flag,
   RefreshCw,
   ScanLine,
   Undo2,
@@ -20,17 +21,22 @@ import { ModalPortal } from "@/components/ModalPortal";
 import {
   confirmCheckIn,
   getCheckInStats,
+  getPaidAttendees,
   getPresentAttendees,
   lookupRegistrationByQr,
+  markAllPaidAsRacePresent,
+  markRacePresent,
   registerWalkIn,
   undoCheckIn,
+  undoRacePresent,
   type CheckInStats,
+  type PaidAttendee,
   type PresentAttendee,
   type ScanResult,
 } from "@/app/actions/checkin";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { SITE, FEATURED_EVENT, MAX_EVENT_REGISTRATIONS } from "@/lib/constants";
-import { REGISTRATION_STATUSES } from "@/lib/registration-types";
+import { isPaidStatus, REGISTRATION_STATUSES } from "@/lib/registration-types";
 
 const SCANNER_ID = "qr-reader";
 
@@ -48,12 +54,16 @@ export function AdminCheckIn() {
     eventId: null,
     eventTitle: "",
     totalRegistered: 0,
-    checkedIn: 0,
-    pending: 0,
+    paidCount: 0,
+    racePresentCount: 0,
+    pendingPayment: 0,
     totalCollected: 0,
   });
+  const [paidList, setPaidList] = useState<PaidAttendee[]>([]);
   const [presentList, setPresentList] = useState<PresentAttendee[]>([]);
   const [undoingId, setUndoingId] = useState<string | null>(null);
+  const [markingId, setMarkingId] = useState<string | null>(null);
+  const [markingAll, setMarkingAll] = useState(false);
   const [walkInForm, setWalkInForm] = useState({
     firstName: "",
     lastName: "",
@@ -66,12 +76,14 @@ export function AdminCheckIn() {
   const processingRef = useRef(false);
 
   const refreshDashboard = useCallback(async () => {
-    const [nextStats, attendees] = await Promise.all([
+    const [nextStats, paid, present] = await Promise.all([
       getCheckInStats(),
+      getPaidAttendees(),
       getPresentAttendees(),
     ]);
     setStats(nextStats);
-    setPresentList(attendees);
+    setPaidList(paid);
+    setPresentList(present);
   }, []);
 
   useEffect(() => {
@@ -86,10 +98,7 @@ export function AdminCheckIn() {
 
   const processCheckIn = useCallback(
     async (result: Extract<ScanResult, { success: true }>) => {
-      const alreadyIn =
-        result.registration.status === REGISTRATION_STATUSES.PAID_AND_CHECKED_IN;
-
-      if (alreadyIn) {
+      if (isPaidStatus(result.registration.status)) {
         setModal({ type: "already_used", result });
         return;
       }
@@ -106,8 +115,8 @@ export function AdminCheckIn() {
             ...result,
             registration: {
               ...result.registration,
-              status: REGISTRATION_STATUSES.PAID_AND_CHECKED_IN,
-              checkedInAt: new Date().toISOString(),
+              status: REGISTRATION_STATUSES.PAID,
+              paidAt: new Date().toISOString(),
             },
           },
           message: checkIn.message,
@@ -189,7 +198,7 @@ export function AdminCheckIn() {
     await handleScan(token.trim());
   };
 
-  const handleUndoCheckIn = useCallback(
+  const handleUndoPayment = useCallback(
     async (registrationId: string) => {
       setUndoingId(registrationId);
       const result = await undoCheckIn(registrationId);
@@ -205,6 +214,49 @@ export function AdminCheckIn() {
     },
     [closeModal, refreshDashboard],
   );
+
+  const handleMarkRacePresent = async (registrationId: string) => {
+    setMarkingId(registrationId);
+    const result = await markRacePresent(registrationId);
+    setMarkingId(null);
+    if (result.success) {
+      toast.success(result.message);
+      await refreshDashboard();
+    } else {
+      toast.error(result.error);
+    }
+  };
+
+  const handleMarkAllRacePresent = async () => {
+    if (
+      !window.confirm(
+        `Segnare tutti i ${paidList.length} pagati come presenti alla corsa?`,
+      )
+    ) {
+      return;
+    }
+    setMarkingAll(true);
+    const result = await markAllPaidAsRacePresent();
+    setMarkingAll(false);
+    if (result.success) {
+      toast.success(result.message);
+      await refreshDashboard();
+    } else {
+      toast.error(result.error);
+    }
+  };
+
+  const handleUndoRacePresent = async (registrationId: string) => {
+    setUndoingId(registrationId);
+    const result = await undoRacePresent(registrationId);
+    setUndoingId(null);
+    if (result.success) {
+      toast.success(result.message);
+      await refreshDashboard();
+    } else {
+      toast.error(result.error);
+    }
+  };
 
   const handleWalkInSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -244,7 +296,7 @@ export function AdminCheckIn() {
       </header>
 
       <main className="mx-auto max-w-lg space-y-4 p-4 pb-8">
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-xl border border-emerald-100 bg-white p-3 text-center shadow-sm">
             <Users className="mx-auto h-4 w-4 text-emerald-500" />
             <p className="mt-1 text-xl font-bold text-forest">
@@ -255,14 +307,21 @@ export function AdminCheckIn() {
             </p>
           </div>
           <div className="rounded-xl border border-emerald-100 bg-white p-3 text-center shadow-sm">
-            <CheckCircle2 className="mx-auto h-4 w-4 text-emerald-500" />
-            <p className="mt-1 text-xl font-bold text-emerald-600">{stats.checkedIn}</p>
+            <Banknote className="mx-auto h-4 w-4 text-emerald-500" />
+            <p className="mt-1 text-xl font-bold text-emerald-600">{stats.paidCount}</p>
             <p className="text-[10px] font-medium uppercase tracking-wide text-forest/50">
-              Presenti
+              Pagati
             </p>
           </div>
           <div className="rounded-xl border border-emerald-100 bg-white p-3 text-center shadow-sm">
-            <Banknote className="mx-auto h-4 w-4 text-emerald-500" />
+            <Flag className="mx-auto h-4 w-4 text-emerald-500" />
+            <p className="mt-1 text-xl font-bold text-emerald-600">{stats.racePresentCount}</p>
+            <p className="text-[10px] font-medium uppercase tracking-wide text-forest/50">
+              In corsa
+            </p>
+          </div>
+          <div className="rounded-xl border border-emerald-100 bg-white p-3 text-center shadow-sm">
+            <CheckCircle2 className="mx-auto h-4 w-4 text-emerald-500" />
             <p className="mt-1 text-xl font-bold text-emerald-600">
               €{stats.totalCollected.toFixed(0)}
             </p>
@@ -276,7 +335,7 @@ export function AdminCheckIn() {
           <div className="flex items-center justify-between border-b border-emerald-50 px-4 py-3">
             <div className="flex items-center gap-2">
               <ScanLine className="h-4 w-4 text-emerald-500" />
-              <span className="text-sm font-semibold text-forest">Scanner QR</span>
+              <span className="text-sm font-semibold text-forest">Scanner QR — pagamento</span>
             </div>
             <Button variant="ghost" size="icon-sm" onClick={startScanner} aria-label="Riavvia scanner">
               <RefreshCw className="h-4 w-4" />
@@ -353,20 +412,98 @@ export function AdminCheckIn() {
               disabled={walkInSubmitting}
               className="w-full rounded-xl bg-forest text-white hover:bg-forest/90"
             >
-              {walkInSubmitting ? "Registrazione..." : walkInForm.hasPaid ? "Registra e segna presente" : "Registra (pagamento in sospeso)"}
+              {walkInSubmitting
+                ? "Registrazione..."
+                : walkInForm.hasPaid
+                  ? "Registra come pagato"
+                  : "Registra (pagamento in sospeso)"}
             </Button>
           </form>
+        </div>
+
+        <div className="rounded-2xl border-2 border-emerald-300 bg-emerald-50/60 p-4 shadow-sm">
+          <div className="flex items-start gap-3">
+            <Flag className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
+            <div className="min-w-0 flex-1">
+              <h2 className="text-sm font-bold text-forest">Presenza alla corsa</h2>
+              <p className="mt-1 text-xs text-forest/60">
+                Usa questo bottone il giorno della corsa: segna tutti i pagati come presenti.
+              </p>
+              <Button
+                type="button"
+                disabled={markingAll || paidList.length === 0}
+                onClick={handleMarkAllRacePresent}
+                className="mt-3 w-full rounded-xl bg-emerald-600 text-white hover:bg-emerald-700"
+              >
+                {markingAll
+                  ? "Salvataggio..."
+                  : `Segna ${paidList.length} pagati come presenti alla corsa`}
+              </Button>
+            </div>
+          </div>
         </div>
 
         <div className="rounded-2xl border border-emerald-100 bg-white shadow-sm">
           <div className="border-b border-emerald-50 px-4 py-3">
             <h2 className="text-sm font-semibold text-forest">
-              Chi è presente ({presentList.length})
+              Pagati — da segnare in corsa ({paidList.length})
+            </h2>
+          </div>
+          {paidList.length === 0 ? (
+            <p className="px-4 py-6 text-center text-sm text-forest/50">
+              Nessun pagamento ancora. Scansiona i QR oggi.
+            </p>
+          ) : (
+            <ul className="max-h-64 divide-y divide-emerald-50 overflow-y-auto">
+              {paidList.map((person) => (
+                <li key={person.id} className="flex items-center gap-2 px-3 py-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-forest">
+                      {person.firstName} {person.lastName}
+                    </p>
+                    <p className="text-xs text-forest/50">
+                      Pagato alle{" "}
+                      {new Date(person.paidAt).toLocaleTimeString("it-IT", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => handleMarkRacePresent(person.id)}
+                    disabled={markingId === person.id}
+                    className="shrink-0 rounded-full bg-emerald-500 px-3 text-xs text-white hover:bg-emerald-600"
+                  >
+                    {markingId === person.id ? "..." : "In corsa"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={() => handleUndoPayment(person.id)}
+                    disabled={undoingId === person.id}
+                    aria-label={`Annulla pagamento di ${person.firstName}`}
+                    className="shrink-0 text-forest/40 hover:bg-red-50 hover:text-red-600"
+                  >
+                    <Undo2 className="h-4 w-4" />
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="rounded-2xl border border-emerald-100 bg-white shadow-sm">
+          <div className="border-b border-emerald-50 px-4 py-3">
+            <h2 className="text-sm font-semibold text-forest">
+              Presenti alla corsa ({presentList.length})
             </h2>
           </div>
           {presentList.length === 0 ? (
             <p className="px-4 py-6 text-center text-sm text-forest/50">
-              Nessun check-in ancora. Scansiona un QR valido.
+              Domani usa il bottone verde per segnare chi è in corsa.
             </p>
           ) : (
             <ul className="max-h-64 divide-y divide-emerald-50 overflow-y-auto">
@@ -391,9 +528,9 @@ export function AdminCheckIn() {
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    onClick={() => handleUndoCheckIn(person.id)}
+                    onClick={() => handleUndoRacePresent(person.id)}
                     disabled={undoingId === person.id}
-                    aria-label={`Annulla check-in di ${person.firstName} ${person.lastName}`}
+                    aria-label={`Annulla presenza di ${person.firstName}`}
                     className="shrink-0 text-forest/40 hover:bg-red-50 hover:text-red-600"
                   >
                     <Undo2 className="h-4 w-4" />
@@ -443,7 +580,7 @@ export function AdminCheckIn() {
                   <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
                     <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
                   </div>
-                  <h3 className="text-lg font-bold text-forest">Registrazione in corso...</h3>
+                  <h3 className="text-lg font-bold text-forest">Registrazione pagamento...</h3>
                   <p className="mt-2 text-sm text-forest/60">
                     {modalResult.registration.firstName} {modalResult.registration.lastName}
                   </p>
@@ -453,15 +590,15 @@ export function AdminCheckIn() {
               {modal.type === "success" && modalResult && (
                 <div className="text-center">
                   <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500 text-white">
-                    <CheckCircle2 className="h-8 w-8" />
+                    <Banknote className="h-8 w-8" />
                   </div>
-                  <h3 className="text-lg font-bold text-forest">Presente!</h3>
+                  <h3 className="text-lg font-bold text-forest">Pagato!</h3>
                   <p className="mt-2 text-xl font-semibold text-emerald-600">
                     {modalResult.registration.firstName} {modalResult.registration.lastName}
                   </p>
                   <p className="mt-1 text-sm text-forest/60">{modal.message}</p>
                   <p className="mt-4 rounded-xl bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">
-                    Totale presenti: {stats.checkedIn}
+                    Totale pagati: {stats.paidCount}
                   </p>
                 </div>
               )}
@@ -471,32 +608,30 @@ export function AdminCheckIn() {
                   <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
                     <AlertTriangle className="h-7 w-7 text-amber-600" />
                   </div>
-                  <h3 className="text-lg font-bold text-forest">Già presente</h3>
+                  <h3 className="text-lg font-bold text-forest">
+                    {modalResult.registration.status === REGISTRATION_STATUSES.PAID_AND_CHECKED_IN
+                      ? "Già presente in corsa"
+                      : "Già pagato"}
+                  </h3>
                   <p className="mt-2 text-xl font-semibold text-amber-700">
                     {modalResult.registration.firstName} {modalResult.registration.lastName}
                   </p>
                   <p className="mt-2 text-sm text-forest/60">
-                    Check-in già effettuato
-                    {modalResult.registration.checkedInAt
-                      ? ` alle ${new Date(modalResult.registration.checkedInAt).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}`
-                      : ""}
-                    .
+                    {modalResult.registration.status === REGISTRATION_STATUSES.PAID_AND_CHECKED_IN
+                      ? "Questa persona è già segnata come presente alla corsa."
+                      : "Pagamento già registrato. Domani usa il bottone presenza corsa."}
                   </p>
                   <div className="mt-6 space-y-2">
                     <Button
-                      onClick={() => handleUndoCheckIn(modalResult.registration.id)}
+                      onClick={() => handleUndoPayment(modalResult.registration.id)}
                       disabled={undoingId === modalResult.registration.id}
                       variant="outline"
                       className="w-full rounded-full border-amber-200 text-amber-800 hover:bg-amber-50"
                     >
                       <Undo2 className="mr-2 h-4 w-4" />
-                      Annulla check-in
+                      Annulla pagamento
                     </Button>
-                    <Button
-                      onClick={closeModal}
-                      variant="ghost"
-                      className="w-full rounded-full"
-                    >
+                    <Button onClick={closeModal} variant="ghost" className="w-full rounded-full">
                       Chiudi
                     </Button>
                   </div>

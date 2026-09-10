@@ -50,8 +50,9 @@ type EventAttendeesPanelProps = {
 type Filter = "active" | "cancelled" | "all";
 
 const STATUS_LABELS: Record<string, string> = {
-  [REGISTRATION_STATUSES.PENDING_PAYMENT]: "Iscritto — in attesa",
-  [REGISTRATION_STATUSES.PAID_AND_CHECKED_IN]: "Presente — check-in fatto",
+  [REGISTRATION_STATUSES.PENDING_PAYMENT]: "Iscritto — da pagare",
+  [REGISTRATION_STATUSES.PAID]: "Pagato",
+  [REGISTRATION_STATUSES.PAID_AND_CHECKED_IN]: "Presente alla corsa",
   [REGISTRATION_STATUSES.CANCELLED]: "Annullato / non viene",
 };
 
@@ -163,6 +164,7 @@ function AdminRegistrationDetail({
 
   const isCancelled = attendee.status === REGISTRATION_STATUSES.CANCELLED;
   const isPresent = attendee.status === REGISTRATION_STATUSES.PAID_AND_CHECKED_IN;
+  const isPaid = attendee.status === REGISTRATION_STATUSES.PAID;
 
   const handleSave = async () => {
     setSaving(true);
@@ -281,10 +283,11 @@ function AdminRegistrationDetail({
                 className="h-9 w-full rounded-xl border border-emerald-100 bg-white px-3 text-sm text-forest"
               >
                 <option value={REGISTRATION_STATUSES.PENDING_PAYMENT}>
-                  Iscritto — in attesa check-in
+                  Iscritto — da pagare
                 </option>
+                <option value={REGISTRATION_STATUSES.PAID}>Pagato</option>
                 <option value={REGISTRATION_STATUSES.PAID_AND_CHECKED_IN}>
-                  Presente — check-in fatto
+                  Presente alla corsa
                 </option>
                 <option value={REGISTRATION_STATUSES.CANCELLED}>
                   Annullato / non viene
@@ -392,12 +395,17 @@ function AdminRegistrationDetail({
           ) : isPresent ? (
             <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
               <CheckCircle2 className="h-3 w-3" />
-              Già presente
+              Presente alla corsa
+            </span>
+          ) : isPaid ? (
+            <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-medium text-sky-700">
+              <CheckCircle2 className="h-3 w-3" />
+              Pagato
             </span>
           ) : (
             <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700">
               <Clock className="h-3 w-3" />
-              Valido per check-in
+              Da pagare — QR valido
             </span>
           )}
         </div>
@@ -553,7 +561,7 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
             <CheckCircle2 className="mx-auto h-4 w-4 text-emerald-500" />
             <p className="mt-1 text-xl font-bold text-emerald-600">{summary.checkedIn}</p>
             <p className="text-[10px] font-medium uppercase tracking-wide text-forest/50">
-              Presenti
+              Presenti corsa
             </p>
           </div>
           <div className="rounded-xl border border-emerald-100 bg-white p-3 text-center">
@@ -775,11 +783,15 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
                         </span>
                       ) : isPresent ? (
                         <span className="hidden rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-700 sm:inline">
-                          Presente
+                          In corsa
+                        </span>
+                      ) : attendee.status === REGISTRATION_STATUSES.PAID ? (
+                        <span className="hidden rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-medium text-sky-700 sm:inline">
+                          Pagato
                         </span>
                       ) : (
                         <span className="hidden rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700 sm:inline">
-                          In attesa
+                          Da pagare
                         </span>
                       )}
                       <ChevronDown

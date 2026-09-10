@@ -23,8 +23,12 @@ const STATUS_LABELS: Record<string, { label: string; className: string }> = {
     label: "Prenotato",
     className: "bg-sky-100 text-sky-700",
   },
+  [REGISTRATION_STATUSES.PAID]: {
+    label: "Pagato",
+    className: "bg-amber-100 text-amber-800",
+  },
   [REGISTRATION_STATUSES.PAID_AND_CHECKED_IN]: {
-    label: "Partecipato",
+    label: "Presente alla corsa",
     className: "bg-emerald-100 text-emerald-700",
   },
   [REGISTRATION_STATUSES.CANCELLED]: {

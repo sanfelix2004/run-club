@@ -12,6 +12,7 @@ export const adminRegistrationUpdateSchema = z.object({
   medicalNotes: z.string().max(500).optional().or(z.literal("")),
   status: z.enum([
     REGISTRATION_STATUSES.PENDING_PAYMENT,
+    REGISTRATION_STATUSES.PAID,
     REGISTRATION_STATUSES.PAID_AND_CHECKED_IN,
     REGISTRATION_STATUSES.CANCELLED,
   ]),
