@@ -9,6 +9,7 @@ import {
   Flag,
   RefreshCw,
   ScanLine,
+  Search,
   Undo2,
   UserPlus,
   Users,
@@ -34,8 +35,7 @@ import {
   type PresentAttendee,
   type ScanResult,
 } from "@/app/actions/checkin";
-import { AdminNav } from "@/components/admin/AdminNav";
-import { SITE, FEATURED_EVENT, MAX_EVENT_REGISTRATIONS, EVENT_TIMEZONE } from "@/lib/constants";
+import { FEATURED_EVENT, MAX_EVENT_REGISTRATIONS, EVENT_TIMEZONE } from "@/lib/constants";
 import {
   isPaidStatus,
   isRacePresentStatus,
@@ -84,6 +84,7 @@ export function AdminCheckIn() {
   });
   const [walkInSubmitting, setWalkInSubmitting] = useState(false);
   const [raceDayMode, setRaceDayMode] = useState(false);
+  const [listSearch, setListSearch] = useState("");
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const lastScannedRef = useRef<string>("");
   const processingRef = useRef(false);
@@ -307,21 +308,37 @@ export function AdminCheckIn() {
       ? modal.result
       : null;
 
-  return (
-    <div className="min-h-screen bg-[#FFFBF7]">
-      <header className="sticky top-0 z-10 border-b border-emerald-100 bg-white/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-lg items-center justify-between gap-2 px-4 py-3">
-          <div className="min-w-0">
-            <h1 className="text-sm font-bold text-forest">Check-in organizzatore</h1>
-            <p className="truncate text-xs text-forest/50">
-              {stats.eventTitle || SITE.name}
-            </p>
-          </div>
-          <AdminNav />
-        </div>
-      </header>
+  const searchNeedle = listSearch.trim().toLowerCase();
+  const matchesSearch = (firstName: string, lastName: string) => {
+    if (!searchNeedle) return true;
+    return `${firstName} ${lastName}`.toLowerCase().includes(searchNeedle);
+  };
+  const filteredPaid = paidList.filter((p) => matchesSearch(p.firstName, p.lastName));
+  const filteredPresent = presentList.filter((p) =>
+    matchesSearch(p.firstName, p.lastName),
+  );
 
-      <main className="mx-auto max-w-lg space-y-4 p-4 pb-8">
+  return (
+    <div>
+      <main className="mx-auto max-w-lg space-y-4 p-4 pb-12">
+        <div className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
+          <p className="text-sm font-semibold text-forest">Come usarlo</p>
+          <ol className="mt-2 list-decimal space-y-1.5 pl-4 text-xs leading-relaxed text-forest/65">
+            <li>
+              <strong className="text-forest">Prima della corsa</strong> — modalità
+              &quot;Solo pagamento&quot;: scansiona i QR e registra chi ha pagato.
+            </li>
+            <li>
+              <strong className="text-forest">Giorno della corsa</strong> — modalità
+              &quot;Paga + presente&quot;: un solo scan serve per chi arriva sul posto.
+            </li>
+            <li>
+              Senza QR? Usa <strong className="text-forest">Registrazione in loco</strong>{" "}
+              sotto.
+            </li>
+          </ol>
+        </div>
+
         <div className="grid grid-cols-2 gap-2 rounded-2xl border border-emerald-100 bg-white p-2 shadow-sm">
           <button
             type="button"
@@ -332,7 +349,7 @@ export function AdminCheckIn() {
                 : "bg-transparent text-forest/60 hover:bg-emerald-50"
             }`}
           >
-            Oggi — solo pagamento
+            Solo pagamento
           </button>
           <button
             type="button"
@@ -343,13 +360,13 @@ export function AdminCheckIn() {
                 : "bg-transparent text-forest/60 hover:bg-emerald-50"
             }`}
           >
-            Giorno corsa — paga + presente
+            Paga + presente
           </button>
         </div>
         <p className="text-center text-xs text-forest/50">
           {raceDayMode
-            ? "Chi arriva senza aver pagato: QR = paga e segna presente. Chi ha già pagato: QR = solo presente."
-            : "Scanner QR registra solo il pagamento. La presenza alla corsa si segna dopo."}
+            ? "Giorno corsa: se non ha pagato → paga e presente; se ha già pagato → solo presente."
+            : "Oggi: lo scanner registra solo il pagamento. La presenza si segna dopo."}
         </p>
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -387,12 +404,18 @@ export function AdminCheckIn() {
           </div>
         </div>
 
+        {stats.eventTitle && (
+          <p className="text-center text-xs text-forest/45">
+            Evento attivo: <span className="font-medium text-forest/70">{stats.eventTitle}</span>
+          </p>
+        )}
+
         <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-sm">
           <div className="flex items-center justify-between border-b border-emerald-50 px-4 py-3">
             <div className="flex items-center gap-2">
               <ScanLine className="h-4 w-4 text-emerald-500" />
               <span className="text-sm font-semibold text-forest">
-                {raceDayMode ? "Scanner QR — pagamento e/o presenza" : "Scanner QR — pagamento"}
+                {raceDayMode ? "Scanner QR — paga e/o presente" : "Scanner QR — pagamento"}
               </span>
             </div>
             <Button variant="ghost" size="icon-sm" onClick={startScanner} aria-label="Riavvia scanner">
@@ -410,7 +433,7 @@ export function AdminCheckIn() {
         <form onSubmit={handleManualLookup} className="flex gap-2">
           <Input
             name="token"
-            placeholder="Codice QR manuale..."
+            placeholder="Codice QR manuale (se lo scanner non legge)..."
             className="rounded-xl border-emerald-100 text-sm"
           />
           <Button type="submit" variant="outline" className="shrink-0 rounded-xl border-emerald-200">
@@ -421,7 +444,10 @@ export function AdminCheckIn() {
         <div className="rounded-2xl border border-emerald-100 bg-white shadow-sm">
           <div className="flex items-center gap-2 border-b border-emerald-50 px-4 py-3">
             <UserPlus className="h-4 w-4 text-emerald-500" />
-            <h2 className="text-sm font-semibold text-forest">Registrazione in loco</h2>
+            <div>
+              <h2 className="text-sm font-semibold text-forest">Registrazione in loco</h2>
+              <p className="text-[11px] text-forest/45">Per chi arriva senza iscrizione online</p>
+            </div>
           </div>
           <form onSubmit={handleWalkInSubmit} className="space-y-3 p-4">
             <div className="grid grid-cols-2 gap-3">
@@ -485,9 +511,9 @@ export function AdminCheckIn() {
           <div className="flex items-start gap-3">
             <Flag className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
             <div className="min-w-0 flex-1">
-              <h2 className="text-sm font-bold text-forest">Presenza alla corsa</h2>
+              <h2 className="text-sm font-bold text-forest">Tutti i pagati → in corsa</h2>
               <p className="mt-1 text-xs text-forest/60">
-                Usa questo bottone il giorno della corsa: segna tutti i pagati come presenti.
+                Il giorno della partenza: un tap per segnare tutti i pagati come presenti.
               </p>
               <Button
                 type="button"
@@ -497,25 +523,40 @@ export function AdminCheckIn() {
               >
                 {markingAll
                   ? "Salvataggio..."
-                  : `Segna ${paidList.length} pagati come presenti alla corsa`}
+                  : `Segna ${paidList.length} pagati come presenti`}
               </Button>
             </div>
           </div>
         </div>
 
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-forest/35" />
+          <Input
+            value={listSearch}
+            onChange={(e) => setListSearch(e.target.value)}
+            placeholder="Cerca per nome nelle liste..."
+            className="rounded-xl border-emerald-100 pl-9 text-sm"
+          />
+        </div>
+
         <div className="rounded-2xl border border-emerald-100 bg-white shadow-sm">
           <div className="border-b border-emerald-50 px-4 py-3">
             <h2 className="text-sm font-semibold text-forest">
-              Pagati — da segnare in corsa ({paidList.length})
+              Pagati — da segnare in corsa ({filteredPaid.length}
+              {searchNeedle ? ` / ${paidList.length}` : ""})
             </h2>
           </div>
           {paidList.length === 0 ? (
             <p className="px-4 py-6 text-center text-sm text-forest/50">
-              Nessun pagamento ancora. Scansiona i QR oggi.
+              Nessun pagamento ancora. Scansiona i QR.
+            </p>
+          ) : filteredPaid.length === 0 ? (
+            <p className="px-4 py-6 text-center text-sm text-forest/50">
+              Nessun risultato per &quot;{listSearch}&quot;.
             </p>
           ) : (
             <ul className="max-h-64 divide-y divide-emerald-50 overflow-y-auto">
-              {paidList.map((person) => (
+              {filteredPaid.map((person) => (
                 <li key={person.id} className="flex items-center gap-2 px-3 py-3">
                   <div className="min-w-0 flex-1">
                     <p className="font-medium text-forest">
@@ -558,19 +599,24 @@ export function AdminCheckIn() {
         <div className="rounded-2xl border border-emerald-100 bg-white shadow-sm">
           <div className="border-b border-emerald-50 px-4 py-3">
             <h2 className="text-sm font-semibold text-forest">
-              Presenti alla corsa ({presentList.length})
+              Presenti alla corsa ({filteredPresent.length}
+              {searchNeedle ? ` / ${presentList.length}` : ""})
             </h2>
           </div>
           {presentList.length === 0 ? (
             <p className="px-4 py-6 text-center text-sm text-forest/50">
-              Domani usa il bottone verde per segnare chi è in corsa.
+              Ancora nessuno in corsa. Usa lo scanner o il bottone verde sopra.
+            </p>
+          ) : filteredPresent.length === 0 ? (
+            <p className="px-4 py-6 text-center text-sm text-forest/50">
+              Nessun risultato per &quot;{listSearch}&quot;.
             </p>
           ) : (
             <ul className="max-h-64 divide-y divide-emerald-50 overflow-y-auto">
-              {presentList.map((person, index) => (
+              {filteredPresent.map((person, index) => (
                 <li key={person.id} className="flex items-center gap-3 px-4 py-3">
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold text-white">
-                    {presentList.length - index}
+                    {filteredPresent.length - index}
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="font-medium text-forest">
@@ -685,7 +731,9 @@ export function AdminCheckIn() {
                   <p className="mt-2 text-sm text-forest/60">
                     {modalResult.registration.status === REGISTRATION_STATUSES.PAID_AND_CHECKED_IN
                       ? "Questa persona è già segnata come presente alla corsa."
-                      : "Pagamento già registrato. Domani usa il bottone presenza corsa."}
+                      : raceDayMode
+                        ? "Già pagato: passa a «Paga + presente» se non è ancora in corsa, oppure chiudi."
+                        : "Pagamento già registrato. Il giorno della corsa usa «Paga + presente» o il bottone presenza."}
                   </p>
                   <div className="mt-6 space-y-2">
                     <Button

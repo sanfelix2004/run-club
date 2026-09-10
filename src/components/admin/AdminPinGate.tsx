@@ -38,7 +38,7 @@ export function AdminPinGate({ title, subtitle, children }: AdminPinGateProps) {
     setSubmitting(false);
     if (result.success) {
       setAuthed(true);
-      toast.success("Accesso back office confermato");
+      toast.success("Accesso confermato");
     } else {
       toast.error("PIN non valido");
     }
@@ -62,16 +62,24 @@ export function AdminPinGate({ title, subtitle, children }: AdminPinGateProps) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#FFFBF7] p-4">
         <div className="w-full max-w-sm rounded-2xl border border-emerald-100 bg-white p-8 shadow-lg">
-          <h1 className="text-xl font-bold text-forest">{title}</h1>
+          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">
+            Back office
+          </p>
+          <h1 className="mt-1 text-xl font-bold text-forest">{title}</h1>
           <p className="mt-2 text-sm text-forest/60">{subtitle}</p>
+          <p className="mt-3 text-xs text-forest/45">
+            Inserisci il PIN organizzatore per gestire iscritti, pagamenti e presenza.
+          </p>
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <Input
               type="password"
-              placeholder="PIN organizzatore"
+              inputMode="numeric"
+              placeholder="PIN"
               value={pin}
               onChange={(e) => setPin(e.target.value)}
               className="rounded-xl border-emerald-100 text-center text-lg tracking-widest"
               autoFocus
+              autoComplete="current-password"
             />
             <Button
               type="submit"
@@ -90,13 +98,18 @@ export function AdminPinGate({ title, subtitle, children }: AdminPinGateProps) {
     <div className="min-h-screen bg-[#FFFBF7]">
       <header className="sticky top-0 z-10 border-b border-emerald-100 bg-white/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3">
-          <div>
-            <h1 className="text-sm font-bold text-forest">{title}</h1>
-            <p className="text-xs text-forest/50">{subtitle}</p>
+          <div className="min-w-0">
+            <h1 className="truncate text-sm font-bold text-forest">{title}</h1>
+            <p className="truncate text-xs text-forest/50">{subtitle}</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <AdminNav />
-            <Button variant="ghost" size="icon-sm" onClick={handleLogout} aria-label="Esci">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={handleLogout}
+              aria-label="Esci dal back office"
+            >
               <LogOut className="h-4 w-4" />
             </Button>
           </div>

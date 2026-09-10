@@ -11,6 +11,7 @@ import {
   Loader2,
   MessageCircle,
   QrCode,
+  Search,
   UserX,
   Users,
 } from "lucide-react";
@@ -419,6 +420,7 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
   const [summary, setSummary] = useState<EventAttendanceSummary | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("active");
+  const [search, setSearch] = useState("");
   const [whatsappLoading, setWhatsappLoading] = useState(false);
   const [communityUrl, setCommunityUrl] = useState("");
   const [inviteQueue, setInviteQueue] = useState<EventAttendee[]>([]);
@@ -437,6 +439,7 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
       setSummary(null);
       setExpandedId(null);
       setFilter("active");
+      setSearch("");
       setInviteActive(false);
       setInviteQueue([]);
       setInviteIndex(0);
@@ -536,39 +539,55 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
 
   const filteredAttendees = summary.attendees.filter((attendee) => {
     if (filter === "cancelled") {
-      return attendee.status === REGISTRATION_STATUSES.CANCELLED;
+      if (attendee.status !== REGISTRATION_STATUSES.CANCELLED) return false;
+    } else if (filter === "active") {
+      if (attendee.status === REGISTRATION_STATUSES.CANCELLED) return false;
     }
-    if (filter === "active") {
-      return attendee.status !== REGISTRATION_STATUSES.CANCELLED;
-    }
-    return true;
+
+    const needle = search.trim().toLowerCase();
+    if (!needle) return true;
+    const haystack = `${attendee.firstName} ${attendee.lastName} ${attendee.phone} ${attendee.email}`.toLowerCase();
+    return haystack.includes(needle);
   });
+
+  const paidCount = summary.attendees.filter(
+    (a) =>
+      a.status === REGISTRATION_STATUSES.PAID ||
+      a.status === REGISTRATION_STATUSES.PAID_AND_CHECKED_IN,
+  ).length;
 
   return (
     <div className="mt-4 space-y-4 rounded-xl border border-emerald-50 bg-emerald-50/30 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-5">
           <div className="rounded-xl border border-emerald-100 bg-white p-3 text-center">
             <Users className="mx-auto h-4 w-4 text-emerald-500" />
             <p className="mt-1 text-xl font-bold text-forest">
               {summary.totalRegistered}/{MAX_EVENT_REGISTRATIONS}
             </p>
             <p className="text-[10px] font-medium uppercase tracking-wide text-forest/50">
-              Iscritti attivi
+              Iscritti
+            </p>
+          </div>
+          <div className="rounded-xl border border-emerald-100 bg-white p-3 text-center">
+            <CheckCircle2 className="mx-auto h-4 w-4 text-sky-500" />
+            <p className="mt-1 text-xl font-bold text-sky-600">{paidCount}</p>
+            <p className="text-[10px] font-medium uppercase tracking-wide text-forest/50">
+              Pagati
             </p>
           </div>
           <div className="rounded-xl border border-emerald-100 bg-white p-3 text-center">
             <CheckCircle2 className="mx-auto h-4 w-4 text-emerald-500" />
             <p className="mt-1 text-xl font-bold text-emerald-600">{summary.checkedIn}</p>
             <p className="text-[10px] font-medium uppercase tracking-wide text-forest/50">
-              Presenti corsa
+              In corsa
             </p>
           </div>
           <div className="rounded-xl border border-emerald-100 bg-white p-3 text-center">
             <Clock className="mx-auto h-4 w-4 text-amber-500" />
             <p className="mt-1 text-xl font-bold text-amber-600">{summary.pending}</p>
             <p className="text-[10px] font-medium uppercase tracking-wide text-forest/50">
-              In attesa
+              Da pagare
             </p>
           </div>
           <div className="rounded-xl border border-emerald-100 bg-white p-3 text-center">
@@ -590,16 +609,7 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
             className="rounded-full border-emerald-200"
           >
             <MessageCircle className="mr-1.5 h-3.5 w-3.5" />
-            {whatsappLoading ? "Preparazione..." : "WhatsApp prova (328...)"}
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            onClick={startCommunityInvites}
-            className="rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
-          >
-            <Users className="mr-1.5 h-3.5 w-3.5" />
-            Invita tutti in community
+            {whatsappLoading ? "Preparazione..." : "Prova conferma WhatsApp"}
           </Button>
           {summary.attendees.length > 0 && (
             <Button
@@ -616,21 +626,35 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
         </div>
       </div>
 
-      <div className="space-y-2 rounded-xl border border-emerald-100 bg-white p-3">
-        <Label htmlFor="community-invite-url" className="text-xs text-forest/60">
-          Link invito community WhatsApp
-        </Label>
-        <Input
-          id="community-invite-url"
-          value={communityUrl}
-          onChange={(e) => setCommunityUrl(e.target.value)}
-          placeholder="https://chat.whatsapp.com/...."
-          className="rounded-xl border-emerald-100 text-sm"
-        />
-        <p className="text-[11px] text-forest/45">
-          Incolla il link della community, poi clicca &quot;Invita tutti&quot;. Si apre una chat alla
-          volta: premi Invia su WhatsApp e poi Prossimo.
-        </p>
+      <div className="space-y-3 rounded-xl border border-emerald-100 bg-white p-4">
+        <div>
+          <p className="text-sm font-semibold text-forest">Inviti community WhatsApp</p>
+          <p className="mt-1 text-xs text-forest/50">
+            Incolla il link della community, poi invita gli iscritti uno alla volta (WhatsApp non
+            permette l&apos;aggiunta di massa).
+          </p>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="community-invite-url" className="text-xs text-forest/60">
+            Link invito (chat.whatsapp.com/...)
+          </Label>
+          <Input
+            id="community-invite-url"
+            value={communityUrl}
+            onChange={(e) => setCommunityUrl(e.target.value)}
+            placeholder="https://chat.whatsapp.com/...."
+            className="rounded-xl border-emerald-100 text-sm"
+          />
+        </div>
+        <Button
+          type="button"
+          size="sm"
+          onClick={startCommunityInvites}
+          className="rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
+        >
+          <Users className="mr-1.5 h-3.5 w-3.5" />
+          Avvia inviti (uno per uno)
+        </Button>
       </div>
 
       {inviteActive && inviteQueue[inviteIndex] && (
@@ -641,6 +665,9 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
           <p className="mt-1 text-sm text-sky-800">
             {inviteQueue[inviteIndex].firstName} {inviteQueue[inviteIndex].lastName} ·{" "}
             {inviteQueue[inviteIndex].phone}
+          </p>
+          <p className="mt-1 text-xs text-sky-700/80">
+            Su WhatsApp premi Invia, poi torna qui e clicca Prossimo.
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             <Button
@@ -693,42 +720,55 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
         <div className="rounded-xl border border-emerald-100 bg-white px-3 py-2 text-center">
           <p className="text-lg font-bold text-amber-600">{summary.participationPending}</p>
           <p className="text-[10px] font-medium uppercase tracking-wide text-forest/50">
-            Conferma in attesa
+            In attesa risposta
           </p>
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {(
-          [
-            ["active", "Attivi"],
-            ["cancelled", "Annullati"],
-            ["all", "Tutti"],
-          ] as const
-        ).map(([value, label]) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => setFilter(value)}
-            className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-              filter === value
-                ? "bg-emerald-500 text-white"
-                : "bg-white text-forest/60 hover:bg-emerald-50"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap gap-2">
+          {(
+            [
+              ["active", "Attivi"],
+              ["cancelled", "Annullati"],
+              ["all", "Tutti"],
+            ] as const
+          ).map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setFilter(value)}
+              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                filter === value
+                  ? "bg-emerald-500 text-white"
+                  : "bg-white text-forest/60 hover:bg-emerald-50"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="relative w-full sm:max-w-xs">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-forest/35" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Cerca nome, telefono o email..."
+            className="h-9 rounded-full border-emerald-100 bg-white pl-9 text-sm"
+          />
+        </div>
       </div>
 
       {filteredAttendees.length === 0 ? (
         <p className="rounded-xl border border-dashed border-emerald-200 bg-white px-4 py-6 text-center text-sm text-forest/60">
-          Nessuna iscrizione in questa lista.
+          {search.trim()
+            ? `Nessun iscritto trovato per "${search.trim()}".`
+            : "Nessuna iscrizione in questa lista."}
         </p>
       ) : (
         <div className="overflow-hidden rounded-xl border border-emerald-100 bg-white">
           <p className="border-b border-emerald-50 bg-emerald-50/50 px-4 py-2 text-xs text-forest/60">
-            Clicca su un iscritto per modificare la prenotazione e vedere il QR code
+            Tocca un iscritto per modificare i dati o vedere il QR
           </p>
           <ul className="divide-y divide-emerald-50">
             {filteredAttendees.map((attendee) => {
@@ -755,7 +795,10 @@ export function EventAttendeesPanel({ eventId, open }: EventAttendeesPanelProps)
                         {attendee.firstName} {attendee.lastName}
                       </p>
                       <p className="truncate text-xs text-forest/50">
-                        {attendee.email} · {attendee.phone}
+                        {attendee.phone}
+                        {attendee.email.includes("@giovinazzo-sunset.run")
+                          ? ""
+                          : ` · ${attendee.email}`}
                       </p>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">

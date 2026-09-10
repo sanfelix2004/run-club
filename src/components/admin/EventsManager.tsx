@@ -1,7 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Calendar, CheckCircle2, MapPin, Pencil, Plus, Trash2, Users } from "lucide-react";
+import Link from "next/link";
+import {
+  Banknote,
+  Calendar,
+  CheckCircle2,
+  MapPin,
+  Pencil,
+  Plus,
+  QrCode,
+  Trash2,
+  Users,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,6 +55,11 @@ export function EventsManager() {
     const data = await getAllEventsAdmin();
     setEvents(data);
     setLoading(false);
+    setExpandedEventId((current) => {
+      if (current) return current;
+      const upcoming = data.find((event) => new Date(event.dateTime) >= new Date());
+      return upcoming?.id ?? data[0]?.id ?? null;
+    });
   };
 
   useEffect(() => {
@@ -123,13 +139,23 @@ export function EventsManager() {
 
   return (
     <main className="mx-auto max-w-4xl space-y-6 p-4 pb-12">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
         <div>
-          <p className="text-sm text-forest/60">
-            {events.length} eventi totali
+          <p className="text-sm font-semibold text-forest">Cosa fare qui</p>
+          <p className="mt-1 max-w-xl text-sm text-forest/60">
+            Apri un evento per vedere gli iscritti, modificare prenotazioni, inviare WhatsApp
+            e scaricare il CSV. Per pagamenti e presenza usa QR &amp; Cassa.
           </p>
+          <p className="mt-2 text-xs text-forest/45">{events.length} eventi totali</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/admin/checkin"
+            className="inline-flex h-9 items-center justify-center gap-2 rounded-full border border-emerald-200 bg-white px-4 text-sm font-medium text-forest transition-colors hover:bg-emerald-50"
+          >
+            <QrCode className="h-4 w-4" />
+            Vai a QR &amp; Cassa
+          </Link>
           <Button
             onClick={startCreate}
             className="rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
@@ -280,6 +306,10 @@ export function EventsManager() {
                       {event.registrationCount} persone/{event.maxRegistrations}
                     </span>
                     <span className="flex items-center gap-1.5">
+                      <Banknote className="h-4 w-4 text-emerald-500" />
+                      {event.paidCount} pagati
+                    </span>
+                    <span className="flex items-center gap-1.5">
                       <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                       {event.checkedInCount} presenti
                     </span>
@@ -295,7 +325,7 @@ export function EventsManager() {
                     className="rounded-full border-emerald-200"
                   >
                     <Users className="mr-1.5 h-3.5 w-3.5" />
-                    {expandedEventId === event.id ? "Nascondi" : "Iscritti"}
+                    {expandedEventId === event.id ? "Nascondi lista" : "Gestisci iscritti"}
                   </Button>
                   <Button
                     type="button"

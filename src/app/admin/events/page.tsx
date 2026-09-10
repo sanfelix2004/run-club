@@ -2,15 +2,15 @@ import { AdminPinGate } from "@/components/admin/AdminPinGate";
 import { EventsManager } from "@/components/admin/EventsManager";
 
 export const metadata = {
-  title: "Gestione Eventi — Sunset Run Giovinazzo",
-  description: "Gestione eventi e meetup di Sunset Run Giovinazzo.",
+  title: "Iscritti — Sunset Run Giovinazzo",
+  description: "Gestione iscritti, eventi e messaggi WhatsApp.",
 };
 
 export default function AdminEventsPage() {
   return (
     <AdminPinGate
-      title="Gestione Eventi"
-      subtitle="Sunset Run Giovinazzo"
+      title="Iscritti e eventi"
+      subtitle="Prenotazioni, conferme e WhatsApp"
     >
       <EventsManager />
     </AdminPinGate>

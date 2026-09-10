@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { formatEventDate } from "@/lib/pdf";
-import { REGISTRATION_STATUSES } from "@/lib/registration-types";
+import { REGISTRATION_STATUSES, isPaidStatus } from "@/lib/registration-types";
 import { isAdminAuthenticated } from "@/app/actions/admin-auth";
 import { eventSchema, type EventFormData } from "@/lib/validations/event";
 import { ensureFeaturedEvent } from "@/lib/featured-event";
@@ -27,6 +27,7 @@ export type PublicEvent = {
 
 export type AdminEvent = PublicEvent & {
   checkedInCount: number;
+  paidCount: number;
 };
 
 function serializeEvent(
@@ -108,6 +109,7 @@ export async function getAllEventsAdmin(): Promise<AdminEvent[]> {
     });
     return {
       ...base,
+      paidCount: event.registrations.filter((r) => isPaidStatus(r.status)).length,
       checkedInCount: event.registrations.filter(
         (r) => r.status === REGISTRATION_STATUSES.PAID_AND_CHECKED_IN,
       ).length,

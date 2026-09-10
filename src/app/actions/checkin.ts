@@ -14,6 +14,11 @@ import { assertEventHasCapacity } from "@/lib/event-capacity";
 import { generateConfirmationToken } from "@/lib/participation";
 import { walkInRegistrationSchema } from "@/lib/validations/walk-in-registration";
 import type { WalkInRegistrationData } from "@/lib/validations/walk-in-registration";
+import { isAdminAuthenticated } from "@/app/actions/admin-auth";
+
+async function requireAdmin(): Promise<boolean> {
+  return isAdminAuthenticated();
+}
 
 export type ScanResult =
   | {
@@ -58,6 +63,9 @@ function revalidateCheckInPaths() {
 }
 
 export async function lookupRegistrationByQr(qrToken: string): Promise<ScanResult> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: "Accesso non autorizzato. Inserisci il PIN." };
+  }
   await ensurePaidAtColumn();
   const token = parseQrPayload(qrToken);
 
@@ -112,6 +120,9 @@ export async function confirmCheckIn(
   registrationId: string,
   options?: { raceDay?: boolean },
 ): Promise<CheckInResult> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: "Accesso non autorizzato." };
+  }
   await ensurePaidAtColumn();
   const raceDay = options?.raceDay === true;
 
@@ -196,6 +207,9 @@ export async function confirmCheckIn(
 
 /** Annulla solo il pagamento (QR di nuovo utilizzabile). */
 export async function undoCheckIn(registrationId: string): Promise<CheckInResult> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: "Accesso non autorizzato." };
+  }
   await ensurePaidAtColumn();
 
   const registration = await prisma.registration.findUnique({
@@ -229,6 +243,9 @@ export async function undoCheckIn(registrationId: string): Promise<CheckInResult
 
 /** Segna una persona pagata come presente alla corsa. */
 export async function markRacePresent(registrationId: string): Promise<CheckInResult> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: "Accesso non autorizzato." };
+  }
   await ensurePaidAtColumn();
 
   const registration = await prisma.registration.findUnique({
@@ -273,6 +290,9 @@ export async function markRacePresent(registrationId: string): Promise<CheckInRe
 
 /** Bottone domani: tutti i pagati diventano presenti alla corsa. */
 export async function markAllPaidAsRacePresent(): Promise<CheckInResult> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: "Accesso non autorizzato." };
+  }
   await ensurePaidAtColumn();
 
   const event = await getActiveEvent();
@@ -314,6 +334,9 @@ export async function markAllPaidAsRacePresent(): Promise<CheckInResult> {
 }
 
 export async function undoRacePresent(registrationId: string): Promise<CheckInResult> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: "Accesso non autorizzato." };
+  }
   await ensurePaidAtColumn();
 
   const registration = await prisma.registration.findUnique({
@@ -352,6 +375,9 @@ export type WalkInRegistrationResult =
 export async function registerWalkIn(
   data: WalkInRegistrationData & { raceDay?: boolean },
 ): Promise<WalkInRegistrationResult> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: "Accesso non autorizzato." };
+  }
   await ensurePaidAtColumn();
 
   const parsed = walkInRegistrationSchema.safeParse(data);
@@ -481,6 +507,17 @@ async function getActiveEvent() {
 }
 
 export async function getCheckInStats(): Promise<CheckInStats> {
+  if (!(await requireAdmin())) {
+    return {
+      eventId: null,
+      eventTitle: "",
+      totalRegistered: 0,
+      paidCount: 0,
+      racePresentCount: 0,
+      pendingPayment: 0,
+      totalCollected: 0,
+    };
+  }
   await ensurePaidAtColumn();
 
   const event = await getActiveEvent();
@@ -525,6 +562,7 @@ export async function getCheckInStats(): Promise<CheckInStats> {
 }
 
 export async function getPaidAttendees(): Promise<PaidAttendee[]> {
+  if (!(await requireAdmin())) return [];
   await ensurePaidAtColumn();
   const event = await getActiveEvent();
   if (!event) return [];
@@ -555,6 +593,7 @@ export async function getPaidAttendees(): Promise<PaidAttendee[]> {
 }
 
 export async function getPresentAttendees(): Promise<PresentAttendee[]> {
+  if (!(await requireAdmin())) return [];
   await ensurePaidAtColumn();
   const event = await getActiveEvent();
   if (!event) return [];
