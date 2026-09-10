@@ -391,7 +391,7 @@ export async function registerWalkIn(
   const email = `walkin.${normalizedPhone.replace(/\D/g, "")}.${event.id.slice(0, 8)}@giovinazzo-sunset.run`;
   const now = new Date();
 
-  let status = REGISTRATION_STATUSES.PENDING_PAYMENT;
+  let status: string = REGISTRATION_STATUSES.PENDING_PAYMENT;
   let paidAt: Date | null = null;
   let checkedInAt: Date | null = null;
 
