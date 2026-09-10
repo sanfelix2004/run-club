@@ -81,14 +81,18 @@ export function AthleteRegistrationTicket({ registration }: AthleteRegistrationT
             </div>
           )}
           <p className="mt-2 text-center text-xs text-forest/50">
-            Mostra questo QR al check-in
+            Mostra questo QR per il pagamento
           </p>
         </div>
       </div>
 
       {isCheckedIn ? (
         <p className="mt-3 text-center text-xs font-medium text-emerald-700">
-          Check-in già effettuato — conserva il biglietto come ricevuta.
+          Presente alla corsa — conserva il biglietto come ricevuta.
+        </p>
+      ) : isPaid ? (
+        <p className="mt-3 text-center text-xs font-medium text-amber-700">
+          Pagamento registrato — presenza alla corsa da confermare il giorno evento.
         </p>
       ) : (
         <p className="mt-3 text-center text-xs text-forest/50">

@@ -35,10 +35,22 @@ import {
   type ScanResult,
 } from "@/app/actions/checkin";
 import { AdminNav } from "@/components/admin/AdminNav";
-import { SITE, FEATURED_EVENT, MAX_EVENT_REGISTRATIONS } from "@/lib/constants";
-import { isPaidStatus, REGISTRATION_STATUSES } from "@/lib/registration-types";
+import { SITE, FEATURED_EVENT, MAX_EVENT_REGISTRATIONS, EVENT_TIMEZONE } from "@/lib/constants";
+import {
+  isPaidStatus,
+  isRacePresentStatus,
+  REGISTRATION_STATUSES,
+} from "@/lib/registration-types";
 
 const SCANNER_ID = "qr-reader";
+
+function isEventDayToday(): boolean {
+  const eventDate = new Date(FEATURED_EVENT.dateTimeIso).toLocaleDateString("en-CA", {
+    timeZone: EVENT_TIMEZONE,
+  });
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: EVENT_TIMEZONE });
+  return eventDate === today;
+}
 
 type ModalState =
   | { type: "idle" }
@@ -71,9 +83,14 @@ export function AdminCheckIn() {
     hasPaid: true,
   });
   const [walkInSubmitting, setWalkInSubmitting] = useState(false);
+  const [raceDayMode, setRaceDayMode] = useState(false);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const lastScannedRef = useRef<string>("");
   const processingRef = useRef(false);
+
+  useEffect(() => {
+    setRaceDayMode(isEventDayToday());
+  }, []);
 
   const refreshDashboard = useCallback(async () => {
     const [nextStats, paid, present] = await Promise.all([
@@ -98,25 +115,34 @@ export function AdminCheckIn() {
 
   const processCheckIn = useCallback(
     async (result: Extract<ScanResult, { success: true }>) => {
-      if (isPaidStatus(result.registration.status)) {
+      if (raceDayMode) {
+        if (isRacePresentStatus(result.registration.status)) {
+          setModal({ type: "already_used", result });
+          return;
+        }
+      } else if (isPaidStatus(result.registration.status)) {
         setModal({ type: "already_used", result });
         return;
       }
 
       setModal({ type: "confirming", result });
 
-      const checkIn = await confirmCheckIn(result.registration.id);
+      const checkIn = await confirmCheckIn(result.registration.id, { raceDay: raceDayMode });
 
       if (checkIn.success) {
         await refreshDashboard();
+        const nowIso = new Date().toISOString();
         setModal({
           type: "success",
           result: {
             ...result,
             registration: {
               ...result.registration,
-              status: REGISTRATION_STATUSES.PAID,
-              paidAt: new Date().toISOString(),
+              status: raceDayMode
+                ? REGISTRATION_STATUSES.PAID_AND_CHECKED_IN
+                : REGISTRATION_STATUSES.PAID,
+              paidAt: result.registration.paidAt ?? nowIso,
+              checkedInAt: raceDayMode ? nowIso : result.registration.checkedInAt,
             },
           },
           message: checkIn.message,
@@ -126,7 +152,7 @@ export function AdminCheckIn() {
         setModal({ type: "error", message: checkIn.error });
       }
     },
-    [closeModal, refreshDashboard],
+    [closeModal, raceDayMode, refreshDashboard],
   );
 
   const stopScanner = useCallback(async () => {
@@ -262,7 +288,7 @@ export function AdminCheckIn() {
     e.preventDefault();
     setWalkInSubmitting(true);
 
-    const result = await registerWalkIn(walkInForm);
+    const result = await registerWalkIn({ ...walkInForm, raceDay: raceDayMode });
     setWalkInSubmitting(false);
 
     if (result.success) {
@@ -296,6 +322,36 @@ export function AdminCheckIn() {
       </header>
 
       <main className="mx-auto max-w-lg space-y-4 p-4 pb-8">
+        <div className="grid grid-cols-2 gap-2 rounded-2xl border border-emerald-100 bg-white p-2 shadow-sm">
+          <button
+            type="button"
+            onClick={() => setRaceDayMode(false)}
+            className={`rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors ${
+              !raceDayMode
+                ? "bg-forest text-white"
+                : "bg-transparent text-forest/60 hover:bg-emerald-50"
+            }`}
+          >
+            Oggi — solo pagamento
+          </button>
+          <button
+            type="button"
+            onClick={() => setRaceDayMode(true)}
+            className={`rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors ${
+              raceDayMode
+                ? "bg-emerald-600 text-white"
+                : "bg-transparent text-forest/60 hover:bg-emerald-50"
+            }`}
+          >
+            Giorno corsa — paga + presente
+          </button>
+        </div>
+        <p className="text-center text-xs text-forest/50">
+          {raceDayMode
+            ? "Chi arriva senza aver pagato: QR = paga e segna presente. Chi ha già pagato: QR = solo presente."
+            : "Scanner QR registra solo il pagamento. La presenza alla corsa si segna dopo."}
+        </p>
+
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-xl border border-emerald-100 bg-white p-3 text-center shadow-sm">
             <Users className="mx-auto h-4 w-4 text-emerald-500" />
@@ -335,7 +391,9 @@ export function AdminCheckIn() {
           <div className="flex items-center justify-between border-b border-emerald-50 px-4 py-3">
             <div className="flex items-center gap-2">
               <ScanLine className="h-4 w-4 text-emerald-500" />
-              <span className="text-sm font-semibold text-forest">Scanner QR — pagamento</span>
+              <span className="text-sm font-semibold text-forest">
+                {raceDayMode ? "Scanner QR — pagamento e/o presenza" : "Scanner QR — pagamento"}
+              </span>
             </div>
             <Button variant="ghost" size="icon-sm" onClick={startScanner} aria-label="Riavvia scanner">
               <RefreshCw className="h-4 w-4" />
@@ -415,7 +473,9 @@ export function AdminCheckIn() {
               {walkInSubmitting
                 ? "Registrazione..."
                 : walkInForm.hasPaid
-                  ? "Registra come pagato"
+                  ? raceDayMode
+                    ? "Registra, paga e segna presente"
+                    : "Registra come pagato"
                   : "Registra (pagamento in sospeso)"}
             </Button>
           </form>
@@ -580,7 +640,9 @@ export function AdminCheckIn() {
                   <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
                     <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
                   </div>
-                  <h3 className="text-lg font-bold text-forest">Registrazione pagamento...</h3>
+                  <h3 className="text-lg font-bold text-forest">
+                    {raceDayMode ? "Registrazione in corso..." : "Registrazione pagamento..."}
+                  </h3>
                   <p className="mt-2 text-sm text-forest/60">
                     {modalResult.registration.firstName} {modalResult.registration.lastName}
                   </p>
@@ -590,15 +652,19 @@ export function AdminCheckIn() {
               {modal.type === "success" && modalResult && (
                 <div className="text-center">
                   <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500 text-white">
-                    <Banknote className="h-8 w-8" />
+                    {raceDayMode ? <Flag className="h-8 w-8" /> : <Banknote className="h-8 w-8" />}
                   </div>
-                  <h3 className="text-lg font-bold text-forest">Pagato!</h3>
+                  <h3 className="text-lg font-bold text-forest">
+                    {raceDayMode ? "Presente!" : "Pagato!"}
+                  </h3>
                   <p className="mt-2 text-xl font-semibold text-emerald-600">
                     {modalResult.registration.firstName} {modalResult.registration.lastName}
                   </p>
                   <p className="mt-1 text-sm text-forest/60">{modal.message}</p>
                   <p className="mt-4 rounded-xl bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">
-                    Totale pagati: {stats.paidCount}
+                    {raceDayMode
+                      ? `Presenti in corsa: ${stats.racePresentCount}`
+                      : `Totale pagati: ${stats.paidCount}`}
                   </p>
                 </div>
               )}
