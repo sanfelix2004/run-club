@@ -40,7 +40,7 @@ export function AdminPinGate({ title, subtitle, children }: AdminPinGateProps) {
       setAuthed(true);
       toast.success("Accesso confermato");
     } else {
-      toast.error("PIN non valido");
+      toast.error("Password non valida");
     }
   };
 
@@ -68,18 +68,19 @@ export function AdminPinGate({ title, subtitle, children }: AdminPinGateProps) {
           <h1 className="mt-1 text-xl font-bold text-forest">{title}</h1>
           <p className="mt-2 text-sm text-forest/60">{subtitle}</p>
           <p className="mt-3 text-xs text-forest/45">
-            Inserisci il PIN organizzatore per gestire iscritti, pagamenti e presenza.
+            Inserisci la password organizzatore (lettere e numeri) per gestire iscritti,
+            pagamenti e presenza.
           </p>
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <Input
               type="password"
-              inputMode="numeric"
-              placeholder="PIN"
+              placeholder="Password"
               value={pin}
               onChange={(e) => setPin(e.target.value)}
-              className="rounded-xl border-emerald-100 text-center text-lg tracking-widest"
+              className="rounded-xl border-emerald-100 text-center text-base tracking-normal"
               autoFocus
               autoComplete="current-password"
+              spellCheck={false}
             />
             <Button
               type="submit"
