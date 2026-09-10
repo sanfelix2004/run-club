@@ -74,13 +74,17 @@ export function AdminPinGate({ title, subtitle, children }: AdminPinGateProps) {
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <Input
               type="password"
-              placeholder="Password"
+              inputMode="text"
+              enterKeyHint="done"
+              autoCapitalize="off"
+              autoCorrect="off"
+              autoComplete="current-password"
+              spellCheck={false}
+              placeholder="Password (es. runclub2026)"
               value={pin}
               onChange={(e) => setPin(e.target.value)}
               className="rounded-xl border-emerald-100 text-center text-base tracking-normal"
               autoFocus
-              autoComplete="current-password"
-              spellCheck={false}
             />
             <Button
               type="submit"

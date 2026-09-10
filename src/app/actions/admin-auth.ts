@@ -5,13 +5,17 @@ import { cookies } from "next/headers";
 const ADMIN_COOKIE = "runclub_admin_auth";
 
 function getAdminPassword(): string {
-  return process.env.ADMIN_PIN ?? "rubclub2026";
+  return process.env.ADMIN_PIN ?? "runclub2026";
 }
 
 function isValidAdminPassword(password: string): boolean {
   const expected = getAdminPassword();
-  // Accetta anche la password precedente per non bloccare chi ha già ADMIN_PIN=runclub2026
-  return password === expected || password === "rubclub2026" || password === "runclub2026";
+  // Accetta le password note (lettere + numeri)
+  return (
+    password === expected ||
+    password === "runclub2026" ||
+    password === "rubclub2026"
+  );
 }
 
 export async function verifyAdminPin(pin: string): Promise<{ success: boolean }> {
