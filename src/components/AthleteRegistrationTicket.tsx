@@ -18,6 +18,7 @@ export function AthleteRegistrationTicket({ registration }: AthleteRegistrationT
   const [qrDataUrl, setQrDataUrl] = useState("");
 
   const isCheckedIn = registration.status === REGISTRATION_STATUSES.PAID_AND_CHECKED_IN;
+  const isPaid = registration.status === REGISTRATION_STATUSES.PAID;
   const downloadUrl = `/api/ticket/${registration.qrToken}`;
 
   useEffect(() => {
