@@ -64,7 +64,7 @@ function revalidateCheckInPaths() {
 
 export async function lookupRegistrationByQr(qrToken: string): Promise<ScanResult> {
   if (!(await requireAdmin())) {
-    return { success: false, error: "Accesso non autorizzato. Inserisci il PIN." };
+    return { success: false, error: "Accesso non autorizzato. Effettua il login admin." };
   }
   await ensurePaidAtColumn();
   const token = parseQrPayload(qrToken);
