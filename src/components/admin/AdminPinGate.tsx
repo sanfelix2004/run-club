@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { CSSProperties } from "react";
 import { LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { AdminNav } from "@/components/admin/AdminNav";
 import {
   isAdminAuthenticated,
@@ -68,22 +68,25 @@ export function AdminPinGate({ title, subtitle, children }: AdminPinGateProps) {
           <h1 className="mt-1 text-xl font-bold text-forest">{title}</h1>
           <p className="mt-2 text-sm text-forest/60">{subtitle}</p>
           <p className="mt-3 text-xs text-forest/45">
-            Inserisci la password organizzatore (lettere e numeri) per gestire iscritti,
-            pagamenti e presenza.
+            Usa la password con lettere e numeri (tastiera completa, non solo cifre).
           </p>
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            <Input
-              type="password"
+            {/* Native input: evita tastiera numerica iOS (inputMode/pattern del vecchio PIN) */}
+            <input
+              type="text"
+              name="admin-password"
               inputMode="text"
               enterKeyHint="done"
               autoCapitalize="off"
               autoCorrect="off"
-              autoComplete="current-password"
+              autoComplete="off"
               spellCheck={false}
-              placeholder="Password (es. runclub2026)"
+              lang="en"
+              placeholder="Password (lettere e numeri)"
               value={pin}
               onChange={(e) => setPin(e.target.value)}
-              className="rounded-xl border-emerald-100 text-center text-base tracking-normal"
+              className="h-11 w-full rounded-xl border border-emerald-100 bg-white px-3 text-center text-base text-forest outline-none focus-visible:border-emerald-400 focus-visible:ring-2 focus-visible:ring-emerald-200"
+              style={{ WebkitTextSecurity: "disc" } as CSSProperties}
               autoFocus
             />
             <Button
